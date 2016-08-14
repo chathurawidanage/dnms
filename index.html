@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<!--
+@author Chathura Widanage
+@supervisors Dr. Roshan Hewapathirana, Dr. Pamod Amarakoon
+
+Developed as an extended project of the Tracker Longitudinal Charts for GSoC
+-->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!--Temp cache off for testing-->
+    <meta http-equiv="cache-control" content="max-age=0"/>
+    <meta http-equiv="cache-control" content="no-cache"/>
+    <meta http-equiv="expires" content="0"/>
+    <meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT"/>
+    <meta http-equiv="pragma" content="no-cache"/>
+
+    <title>Tracker Longitudinal Charts</title>
+
+    <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+    <!-- Angular Material style sheet -->
+    <link rel="stylesheet" href="css/angular-material.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!--<link href="css/bootstrap.css" rel="stylesheet">-->
+
+    <!-- Angular Material requires Angular.js Libraries -->
+    <script src="js/angular/angular.min.js"></script>
+    <script src="js/angular/angular-animate.min.js"></script>
+    <script src="js/angular/angular-aria.min.js"></script>
+    <script src="js/angular/angular-messages.min.js"></script>
+    <script src="js/angular/angular-route.min.js"></script>
+
+    <!-- Angular Material Library -->
+    <script src="js/angular/angular-material.min.js"></script>
+
+
+    <!--Charts JS-->
+    <script type="text/javascript" src="js/Chart.js"></script>
+    <script type="text/javascript" src="js/angular-chart-v1.js"></script>
+
+    <!--DropZone-->
+    <script type="text/javascript" src="js/dropzone.js"></script>
+
+    <!--lf-file-->
+    <script type="text/javascript" src="vendor/file/lf-ng-md-file-input.min.js"></script>
+    <link rel="stylesheet" href="vendor/file/lf-ng-md-file-input.css">
+
+    <!--Color Picker-->
+    <link rel="stylesheet" href="css/mdColorPicker.min.css">
+    <script type="text/javascript" src="js/tinycolor-min.js"></script>
+    <script type="text/javascript" src="js/mdColorPicker.min.js"></script>
+
+    <!--Angular Time Line-->
+    <link rel="stylesheet" href="vendor/timeline/angular-timeline.css"/>
+    <!--<link rel="stylesheet" href="vendor/timeline/angular-timeline-bootstrap.css"/>-->
+    <link rel="stylesheet" href="vendor/timeline/angular-timeline-animations.css"/>
+    <script src="vendor/timeline/angular-timeline.js"></script>
+
+    <!--ForerunnerDB-->
+    <script type="text/javascript" src="js/fdb-all.min.js"></script>
+    <script type="text/javascript" src="js/fdb-angular.min.js"></script>
+    <script type="text/javascript">
+        var debugDb;
+    </script>
+</head>
+<body ng-app="long-charts" ng-cloak>
+<div layout="column" layout-fill>
+    <md-toolbar class="nav-dark">
+        <div class="md-toolbar-tools">
+            <a href="" id="home-link">
+                <span><img src="img/logo_banner.png"></span>
+            </a>
+        </div>
+    </md-toolbar>
+    <md-content>
+        <div ng-view></div>
+    </md-content>
+</div>
+<script type="text/javascript" src="js/app/models.js"></script>
+<script type="text/javascript" src="js/app/controllers/ChartController.js"></script>
+<script type="text/javascript" src="js/app/controllers/DashboardController.js"></script>
+<script type="text/javascript" src="js/app/controllers/ProfileController.js"></script>
+<script type="text/javascript" src="js/app/controllers/ViewerController.js"></script>
+<script type="text/javascript" src="js/app/controllers/OptionsController.js"></script>
+<script type="text/javascript" src="js/app/controllers/RefDataController.js"></script>
+<script type="text/javascript" src="js/app/app.js"></script>
+<!--Controllers-->
+<script>
+    var homeUrl = location.href.substr(0, location.href.indexOf('api'));
+    document.getElementById('home-link').setAttribute('href', homeUrl);
+</script>
+</body>
+</html>

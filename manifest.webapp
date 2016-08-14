@@ -1,0 +1,25 @@
+{
+  "version": "0.0.2",
+  "name": "District Nutrition Monitoring",
+  "description": "Responsive Web application for easy monitoring of district nutrition problems",
+  "icons": {
+    "16": "/img/icons/16.png",
+    "48": "/img/icons/48.png",
+    "128": "/img/icons/128.png"
+  },
+  "developer": {
+    "url": "http://www.cwidanage.com",
+    "name": "Chathura Widanage",
+    "company": null,
+    "email": null
+  },
+  "activities": {
+    "dhis": {
+      "href": "*"
+    }
+  },
+  "launchUrl": null,
+  "launch_path": "index.html#/",
+  "installs_allowed_from": null,
+  "default_locale": "en"
+}

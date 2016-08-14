@@ -1,0 +1,44 @@
+<md-dialog aria-label="options"  ng-cloak ng-init="init()">
+    <form>
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2>Options</h2>
+                <span flex></span>
+                <md-button class="md-icon-button" ng-click="close()">
+                    <md-icon aria-label="Close dialog">
+                        <i class="material-icons">clear</i>
+                    </md-icon>
+                </md-button>
+            </div>
+        </md-toolbar>
+        <md-dialog-content>
+            <div class="md-dialog-content">
+                <h3>Tracked Entity Attributes</h3>
+                <md-input-container class="md-block">
+                    <label>DOB Attribute mapping</label>
+                    <md-select ng-model="options.teiAttributes.dob" required>
+                        <md-option ng-repeat="att in dobAttributes" value="{{att.id}}">
+                            {{att.displayName}}
+                        </md-option>
+                    </md-select>
+                </md-input-container>
+                <md-input-container class="md-block">
+                    <label>Gender Attribute mapping</label>
+                    <md-select ng-model="options.teiAttributes.gender" required>
+                        <md-option ng-repeat="att in genAttributes" value="{{att.id}}">
+                            {{att.displayName}}
+                        </md-option>
+                    </md-select>
+                </md-input-container>
+            </div>
+        </md-dialog-content>
+        <md-dialog-actions layout="row">
+            <md-button md-autofocus ng-click="save()">
+                Save
+            </md-button>
+            <md-button ng-click="close()">
+                Close
+            </md-button>
+        </md-dialog-actions>
+    </form>
+</md-dialog>

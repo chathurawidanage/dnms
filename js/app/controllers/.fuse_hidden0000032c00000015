@@ -1,0 +1,22 @@
+/**
+ * @author Chathura Widanage
+ */
+function DashboardController($location, $scope, toastService, programService, userService, chartService, appService, $mdDialog) {
+    var ctrl = this;
+    ctrl.programs = [];
+    ctrl.mohUserRole = "Ej7USJV1ccn";
+    ctrl.phmUserRole = "jpsN0Kh6KTr";//todo make as a setting
+
+    ctrl.selectedProgram = {};
+
+    programService.getPrograms().then(function (programs) {
+        ctrl.programs = programs;
+        ctrl.selectedProgram = ctrl.programs[0];//todo change
+    }).then(function () {
+        userService.getCurrentUser().then(function (user) {
+            console.log(user);
+        });
+    })
+
+
+}

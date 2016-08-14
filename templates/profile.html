@@ -1,0 +1,85 @@
+<div ng-controller="ProfileController as ctrl" class="dashboard">
+    <md-content layout-padding layout="row" layout-align="left">
+        <div flex="50">
+            <md-card class="profile-card">
+                <md-card-header>
+                    <md-card-avatar>
+                        <md-icon class="md-avatar-icon" md-png-icon="img/profile_default.png"></md-icon>
+                    </md-card-avatar>
+                    <md-card-header-text>
+                        <span class="md-title">{{ctrl.childProfile.firstName.value}} {{ctrl.childProfile.lastName.value}}</span>
+                        <span class="md-subhead">{{ctrl.childProfile.chdrNumber.value}}</span>
+                    </md-card-header-text>
+                </md-card-header>
+                <!--<md-card-title>
+                    <md-card-title-text>
+                        <span class="md-headline">In-card actions</span>
+                        <span class="md-subhead">Description</span>
+                    </md-card-title-text>
+                </md-card-title>-->
+                <md-card-content>
+                    <table width="100%" class="profile-attributes-table">
+                        <tbody>
+                        <tr ng-repeat="attribute in ctrl.attributes">
+                            <td width="50%">
+                                {{attribute.displayName}}
+                            </td>
+                            <td width="50%">
+                                {{attribute.value}}
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </md-card-content>
+                <md-button class="md-fab md-mini md-primary profile-expand-btn" aria-label="Use Android">
+                    <md-icon>
+                        <i class="material-icons">expand_more</i>
+                    </md-icon>
+                </md-button>
+            </md-card>
+            <div ng-controller="ViewerController as ctrl" class="dashboard">
+                <md-content layout-padding>
+                    <!--<h3>Longitudinal Charts</h3>-->
+
+                    <md-tabs md-selected="selectedIndex" md-border-bottom md-autoselect md-dynamic-height>
+                        <md-tab ng-repeat="chart in ctrl.charts"
+                                ng-disabled="chart.disabled"
+                                label="{{chart.title}}">
+                            <div style="padding: 25px; text-align: center;">
+                                <canvas class="chart chart-line" chart-data="chart.data" chart-labels="chart.labels"
+                                        chart-series="chart.series" chart-colors="chart.dataColors"
+                                        chart-options="chart.options"
+                                        chart-dataset-override="chart.dso"
+                                        id="chart-preview"></canvas>
+                            </div>
+                        </md-tab>
+                    </md-tabs>
+
+                </md-content>
+            </div>
+        </div>
+        <div flex="50">
+            <timeline side="right">
+                <timeline-event ng-repeat="event in ctrl.events" side="{{$index%2==0?'left':'right'}}">
+                    <timeline-badge class="{{event.badgeClass}}">
+                        <i class="material-icons">{{event.badgeIcon}}</i>
+                    </timeline-badge>
+                    <timeline-panel class="{{event.badgeClass}}">
+                        <timeline-heading>
+                            <h4>{{event.title}}</h4>
+                        </timeline-heading>
+                        <p>{{event.content}}</p>
+                        <md-button md-no-ink class="md-primary">Review</md-button>
+                    </timeline-panel>
+                </timeline-event>
+            </timeline>
+        </div>
+    </md-content>
+
+    <md-button class="md-fab md-fab md-fab-bottom-right md-faded" aria-label="Add Chart" ng-click="ctrl.navBack()"
+               style="position: fixed; right: 20px">
+        <md-icon>
+            <i class="material-icons">navigate_before</i>
+        </md-icon>
+    </md-button>
+</div>

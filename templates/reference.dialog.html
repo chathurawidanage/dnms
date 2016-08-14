@@ -1,0 +1,54 @@
+<md-dialog aria-label="Reference Data" ng-cloak style="min-width: 600px">
+    <form>
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2>Reference Data</h2>
+                <span flex></span>
+                <md-button class="md-icon-button" ng-click="close()">
+                    <md-icon>
+                        <i class="material-icons">close</i>
+                    </md-icon>
+                </md-button>
+            </div>
+        </md-toolbar>
+        <md-dialog-content>
+            <div class="md-dialog-content">
+                <md-content>
+
+                    <!--<lf-ng-md-file-input lf-files='files' drag preview></lf-ng-md-file-input>-->
+                    <div dropzone="dropzoneConfig" class="drop-zone">
+                        <div class="dz-message">
+                            Drop reference data(CSV) here.
+                        </div>
+                    </div>
+                </md-content>
+                <md-content layout="row">
+                    <md-input-container flex="50">
+                        <label>Data interval</label>
+                        <md-select ng-model="refData.xAxisPeriod">
+                            <md-option ng-repeat="period in xAxisPeriods" value="{{$index}}">
+                                {{period}}
+                            </md-option>
+                        </md-select>
+                    </md-input-container>
+                    <md-input-container flex="50">
+                        <label>Gender</label>
+                        <md-select ng-model="refData.gender">
+                            <md-option value="0">Any</md-option>
+                            <md-option value="1">Male</md-option>
+                            <md-option value="2">Female</md-option>
+                        </md-select>
+                    </md-input-container>
+                </md-content>
+            </div>
+        </md-dialog-content>
+        <md-dialog-actions layout="row">
+            <md-button ng-click="close()">
+                Cancel
+            </md-button>
+            <md-button ng-click="submit()">
+                Save
+            </md-button>
+        </md-dialog-actions>
+    </form>
+</md-dialog>

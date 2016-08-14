@@ -1,0 +1,164 @@
+<div ng-controller="ChartController as cctrl">
+    <div layout-padding>
+        <h2>Define New Longitudinal Chart</h2>
+    </div>
+    <div layout="row">
+        <md-content layout-padding flex="50" style="overflow-x: hidden" layout="column">
+            <!--<span class="md-headline">Preview</span>-->
+            <div>
+                <img src="img/nopreview.jpg" ng-if="!cctrl.previewAvailable()">
+                <canvas class="chart chart-line" chart-data="cctrl.lc.data" chart-labels="cctrl.lc.labels"
+                        chart-series="cctrl.lc.series" chart-colors="cctrl.lc.dataColors"
+                        chart-options="cctrl.lc.options"
+                        id="chart-preview"></canvas>
+            </div>
+            <div>
+                <md-list class="fixedRows">
+                    <md-list-item class="md-2-line centile-item" ng-repeat="centile in cctrl.getPreviewData().centiles">
+                        <div md-color-picker ng-model="centile.color" ng-change="cctrl.applyData()"
+                             class="md-avatar"></div>
+                        <div class="md-list-item-text compact">
+                            <h3> {{centile.name}}</h3>
+                            <md-switch ng-model="centile.selected" class="md-primary"
+                                       ng-change="cctrl.applyData()" aria-label="enable">
+                            </md-switch>
+                        </div>
+                    </md-list-item>
+                </md-list>
+            </div>
+        </md-content>
+        <md-content layout-padding flex="50">
+            <span class="md-headline">Basic Configurations</span>
+            <form name="chartForm">
+                <md-input-container class="md-block">
+                    <label>Title</label>
+                    <input required name="title" ng-model="cctrl.lc.title">
+                </md-input-container>
+                <md-input-container class="md-block">
+                    <label>Program</label>
+                    <md-select ng-model="cctrl.lc.program" ng-change="cctrl.refreshDependants()">
+                        <md-option ng-repeat="program in cctrl.programs" value="{{program.id}}">
+                            {{program.displayName}}
+                        </md-option>
+                    </md-select>
+                </md-input-container>
+                <md-content>
+                    <p>Dependant Axis/Axes Type</p>
+                    <md-radio-group ng-model="cctrl.lc.dependantDataType">
+                        <md-radio-button value="0" class="md-primary" selected>Single Data Element</md-radio-button>
+                        <md-radio-button value="1" class="md-primary">Complex Data Element</md-radio-button>
+                        <md-radio-button value="2" class="md-primary">Program Indicator</md-radio-button>
+                    </md-radio-group>
+                </md-content>
+                <md-content layout="row">
+                    <md-input-container flex="50">
+                        <label ng-if="cctrl.lc.dependantDataType==0">Dependant Data Element </label>
+                        <label ng-if="cctrl.lc.dependantDataType==1">Dependant Data Element I (Y)</label>
+                        <label ng-if="cctrl.lc.dependantDataType==2">Dependant Program Indicator</label>
+                        <md-select ng-model="cctrl.lc.yAxisVariable1">
+                            <md-option ng-if="cctrl.lc.dependantDataType<2" ng-repeat="de in cctrl.dataElements"
+                                       value="{{de.id}}">
+                                {{de.name}}
+                            </md-option>
+                            <md-option ng-if="cctrl.lc.dependantDataType==2" ng-repeat="de in cctrl.programIndicators"
+                                       value="{{de.id}}">
+                                {{de.name}}
+                            </md-option>
+                        </md-select>
+                    </md-input-container>
+                    <md-input-container flex="50" ng-if="cctrl.lc.dependantDataType==1">
+                        <label>Dependant Data Element II (X)</label>
+                        <md-select ng-model="cctrl.lc.yAxisVariable2">
+                            <md-option ng-repeat="de in cctrl.dataElements" value="{{de.id}}">
+                                {{de.name}}
+                            </md-option>
+                        </md-select>
+                    </md-input-container>
+                </md-content>
+               <!-- <md-content layout="row">
+                    <md-input-container flex="50">
+                        <label>Reference Data Interval</label>
+                        <md-select ng-model="cctrl.lc.xAxisPeriod">
+                            <md-option ng-repeat="period in cctrl.xAxisPeriods" value="{{$index}}">
+                                {{period}}
+                            </md-option>
+                        </md-select>
+                    </md-input-container>
+                </md-content>-->
+                <md-content class="md-whiteframe-1dp">
+                    <section class="md-whiteframe-z1">
+                        <md-toolbar class="md-theme-light">
+                            <div class="md-toolbar-tools">
+                                <h2>
+                                    <span>Reference Data</span>
+                                </h2>
+                                <span flex></span>
+                                <md-button class="md-icon-button" aria-label="Add" ng-click="cctrl.showNewRefDataDialog()">
+                                    <md-icon>
+                                        <i class="material-icons">add</i>
+                                    </md-icon>
+                                </md-button>
+                            </div>
+                        </md-toolbar>
+                        <md-content>
+                            <md-list id="reference-data-list">
+                                <md-list-item class="md-3-line" ng-repeat="refData in cctrl.lc.refData">
+                                    <md-button class="md-fab md-mini" ng-class="cctrl.refDataPreviewIndex==$index?'md-green':'md-primary'" aria-label="Preview" ng-click="cctrl.setPreviewDataIndex($index)">
+                                        <md-tooltip md-direction="bottom">
+                                            Preview Data
+                                        </md-tooltip>
+                                        <md-icon ng-if="cctrl.refDataPreviewIndex==$index">
+                                            <i class="material-icons">visibility</i>
+                                        </md-icon>
+                                        <md-icon ng-if="cctrl.refDataPreviewIndex!=$index">
+                                            <i class="material-icons">visibility_off</i>
+                                        </md-icon>
+                                    </md-button>
+                                    <md-button class="md-fab md-mini" aria-label="Delete" ng-click="cctrl.deleteRefData($event,$index)">
+                                        <md-tooltip md-direction="bottom">
+                                            Delete Data
+                                        </md-tooltip>
+                                        <md-icon>
+                                            <i class="material-icons">delete</i>
+                                        </md-icon>
+                                    </md-button>
+                                    <div class="md-list-item-text">
+                                        <p><b>{{cctrl.getIntervalByIndex(refData.xAxisPeriod)}}</b>
+                                            reference data of <b>{{cctrl.getGenderByIndex(refData.gender)}}</b></p>
+                                        <p><i>{{refData.centiles.length}} centiles over {{refData.centiles[0].data.length-1}} {{cctrl.getIntervalByIndex(refData.xAxisPeriod,true)}}</i></p>
+                                    </div>
+
+                                    <md-divider ng-if="!$last"></md-divider>
+                                </md-list-item>
+                                <md-list-item class="md-3-line" ng-show="cctrl.lc.refData.length==0">
+                                    <p id="no-ref-msg">No reference data defined. Click
+                                        <i class="material-icons">add</i> to add a new set of refrence data.</p>
+                                </md-list-item>
+                            </md-list>
+                        </md-content>
+                    </section>
+                </md-content>
+               <!-- <md-content>
+                    <div dropzone="dropzoneConfig" class="drop-zone">
+                        <div class="dz-message">
+                            Drop reference data(CSV) here.
+                        </div>
+                    </div>
+                </md-content>-->
+            </form>
+        </md-content>
+    </div>
+
+    <md-button class="md-fab md-fab md-fab-bottom-right md-faded" aria-label="Add Chart" ng-click="cctrl.navBack()"
+               style="position: fixed; right: 100px">
+        <md-icon>
+            <i class="material-icons">navigate_before</i>
+        </md-icon>
+    </md-button>
+    <md-button class="md-fab md-fab md-fab-bottom-right md-primary" aria-label="Add Chart" ng-click="cctrl.saveChart()"
+               style="position: fixed">
+        <md-icon>
+            <i class="material-icons">save</i>
+        </md-icon>
+    </md-button>
+</div>
