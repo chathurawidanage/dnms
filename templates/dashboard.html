@@ -8,7 +8,8 @@
         <div flex="20" class="loading-element">
             <div layout="column">
                 <div>
-                    <i class="material-icons" ng-if="ctrl.caches.profile!=2" ng-class="{'progressing' : ctrl.caches.profile==1,'todo':ctrl.caches.profile==0}">panorama_fish_eye</i>
+                    <i class="material-icons" ng-if="ctrl.caches.profile!=2"
+                       ng-class="{'progressing' : ctrl.caches.profile==1,'todo':ctrl.caches.profile==0}">panorama_fish_eye</i>
                     <i class="material-icons done" ng-if="ctrl.caches.profile==2">offline_pin</i>
                 </div>
                 <div>
@@ -19,7 +20,8 @@
         <div flex="20" class="loading-element">
             <div layout="column">
                 <div>
-                    <i class="material-icons" ng-if="ctrl.caches.events!=2" ng-class="{'progressing' : ctrl.caches.events==1,'todo':ctrl.caches.events==0}">panorama_fish_eye</i>
+                    <i class="material-icons" ng-if="ctrl.caches.events!=2"
+                       ng-class="{'progressing' : ctrl.caches.events==1,'todo':ctrl.caches.events==0}">panorama_fish_eye</i>
                     <i class="material-icons done" ng-if="ctrl.caches.events==2">offline_pin</i>
                 </div>
                 <div>
@@ -30,7 +32,8 @@
         <div flex="20" class="loading-element">
             <div layout="column">
                 <div>
-                    <i class="material-icons" ng-if="ctrl.caches.tei!=2" ng-class="{'progressing' : ctrl.caches.tei==1,'todo':ctrl.caches.tei==0}">panorama_fish_eye</i>
+                    <i class="material-icons" ng-if="ctrl.caches.tei!=2"
+                       ng-class="{'progressing' : ctrl.caches.tei==1,'todo':ctrl.caches.tei==0}">panorama_fish_eye</i>
                     <i class="material-icons done" ng-if="ctrl.caches.tei==2">offline_pin</i>
                 </div>
                 <div>
@@ -41,7 +44,8 @@
         <div flex="20" class="loading-element">
             <div layout="column">
                 <div>
-                    <i class="material-icons" ng-if="ctrl.caches.malNut!=2" ng-class="{'progressing' : ctrl.caches.malNut==1,'todo':ctrl.caches.malNut==0}">panorama_fish_eye</i>
+                    <i class="material-icons" ng-if="ctrl.caches.malNut!=2"
+                       ng-class="{'progressing' : ctrl.caches.malNut==1,'todo':ctrl.caches.malNut==0}">panorama_fish_eye</i>
                     <i class="material-icons done" ng-if="ctrl.caches.malNut==2">offline_pin</i>
                 </div>
                 <div>
@@ -62,14 +66,28 @@
                 <img src="img/banner.jpg" class="md-card-image" alt="Washed Out" style="height: 150px !important;">
                 <md-card-content>
                     <md-list>
+                        <md-list-item class="md-2-line">
+                            <img src="img/location_ico.png" class="md-avatar" alt="admin-area" />
+                            <div class="md-list-item-text">
+                                <h3>Administrative Area</h3>
+                                <p>{{ctrl.currentOuSelection.displayName}}</p>
+                            </div>
+                            <md-button class="md-secondary md-icon-button" ng-click="ctrl.toggleRightNav()" aria-label="toggle">
+                                <md-icon>
+                                    <i class="material-icons">edit_location</i>
+                                </md-icon>
+                            </md-button>
+                        </md-list-item>
+                        <md-divider ></md-divider>
                         <md-list-item ng-repeat="malNut in ctrl.malNutReasons" class="noright">
                             <img alt="{{ malNut.title }}" ng-src="img/health_ico.png" class="md-avatar"/>
                             <p>{{ malNut.title }}</p>
-                            <md-progress-circular ng-show="!malNut.records" md-mode="indeterminate" class="md-secondary"
+                            <md-progress-circular ng-show="!malNut.selectedRecords" md-mode="indeterminate"
+                                                  class="md-secondary"
                                                   md-diameter="20"></md-progress-circular>
-                            <md-button ng-click="ctrl.showMalNutTeis(malNut)" ng-show="malNut.records"
+                            <md-button ng-click="ctrl.showMalNutTeis(malNut)" ng-show="malNut.selectedRecords"
                                        class="md-secondary">
-                                View <b>{{malNut.records.length}}</b>
+                                View <b>{{malNut.selectedRecords.length}}</b>
                                 children
                             </md-button>
                         </md-list-item>
@@ -78,6 +96,21 @@
             </md-card>
         </div>
         <div flex="50" layout="column">
+            <!--<div flex="100">
+                <md-card>
+                    <md-card-header class="colored-card-header">
+                        <md-card-header-text>
+                            <span class="md-title main-card-title">Profile & Settings</span>
+                        </md-card-header-text>
+                    </md-card-header>
+                    <md-card-content>
+                        <p>TODO Display user profile data</p>
+                        <p>Area of interest</p>
+                        <h3>{{$scope["orgTree"].currentNode.displayName}}</h3>
+                        <md-button ng-click="ctrl.toggleRightNav()">Change</md-button>
+                    </md-card-content>
+                </md-card>
+            </div>-->
             <md-card flex="100" ng-show="ctrl.selectedMalNul">
                 <md-card-header class="colored-card-header">
                     <md-card-header-text>
@@ -154,18 +187,39 @@
         </div>
     </div>
 
+    <md-sidenav class="md-sidenav-right md-whiteframe-4dp" md-component-id="right">
+        <md-toolbar class="background-theme">
+            <h2 class="md-toolbar-tools">Administrative Areas</h2><!--
+            <span flex></span>
+            <md-button class="md-icon-button" ng-click="ctrl.toggleRightNav()">
+                <md-icon>
+                    <i class="material-icons">settings</i>
+                </md-icon>
+            </md-button>-->
+        </md-toolbar>
+        <md-content layout-padding>
+            <div
+                    data-angular-treeview="true"
+                    data-tree-id="orgTree"
+                    data-tree-model="ctrl.orgTree"
+                    data-node-id="id"
+                    data-node-label="displayName"
+                    data-node-children="children">
+            </div>
+        </md-content>
+    </md-sidenav>
 
 
-<!--    <md-button class="md-fab md-fab md-fab-bottom-right md-faded" aria-label="Add Chart" ng-click="ctrl.showOptions()"
-               style="position: fixed; right: 100px">
-        <md-icon>
-            <i class="material-icons">settings</i>
-        </md-icon>
-    </md-button>
-    <md-button class="md-fab md-fab md-fab-bottom-right md-primary" aria-label="Add Chart" ng-click="ctrl.new()"
-               style="position: fixed">
-        <md-icon>
-            <i class="material-icons">add</i>
-        </md-icon>
-    </md-button>-->
+    <!--    <md-button class="md-fab md-fab md-fab-bottom-right md-faded" aria-label="Add Chart" ng-click="ctrl.showOptions()"
+                   style="position: fixed; right: 100px">
+            <md-icon>
+                <i class="material-icons">settings</i>
+            </md-icon>
+        </md-button>
+        <md-button class="md-fab md-fab md-fab-bottom-right md-primary" aria-label="Add Chart" ng-click="ctrl.new()"
+                   style="position: fixed">
+            <md-icon>
+                <i class="material-icons">add</i>
+            </md-icon>
+        </md-button>-->
 </div>

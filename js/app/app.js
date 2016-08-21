@@ -1,5 +1,7 @@
+//var serverRoot = 'http://148.251.224.242/nss1/api/';
+var serverRoot = '../../';
 var app = angular.module('long-charts', ['ngMaterial', 'ngRoute', 'longitudinalChartControllers', 'dropzone', 'chart.js'
-    , 'mdColorPicker', 'lfNgMdFileInput', 'angular-timeline', 'forerunnerdb']);
+    , 'mdColorPicker', 'lfNgMdFileInput', 'angular-timeline', 'forerunnerdb','angularTreeview']);
 app.config(['$routeProvider', function ($routeProvider) {
     $routeProvider.when('/', {
         templateUrl: 'templates/dashboard.html'
@@ -12,10 +14,15 @@ app.config(['$routeProvider', function ($routeProvider) {
     }).otherwise({
         redirectTo: '/'
     });
-}]).run(function ($rootScope, $fdb) {
+}]).run(function ($rootScope, $fdb, $http) {
     $rootScope.$db = $fdb.db('dnms');
     debugDb = $rootScope.$db;
 });
+//temp config
+app.config(['$httpProvider', function ($httpProvider) {
+    console.log($httpProvider);
+    //$httpProvider.defaults.headers.common['Authorization'] = "Basic Y2hhdGh1cmE6Q2hhdGh1ckExMjM=";
+}])
 var controllers = angular.module('longitudinalChartControllers', []);
 
 controllers.controller('DashboardController', DashboardController);
@@ -46,7 +53,7 @@ app.factory('eventService', function ($http, $q) {
     return {
         getEventAnalytics: function (programId, orgUnit, dataElementId, expectedValue) {//todo dates are hard coded
             var defer = $q.defer();
-            $http.get('../../analytics/events/query/' + programId + '?dimension=' + dataElementId + ':EQ:' + expectedValue + '&startDate=1992-08-16&endDate=2016-12-12&dimension=ou:' + orgUnit).then(function (response) {
+            $http.get(serverRoot + 'analytics/events/query/' + programId + '?dimension=' + dataElementId + ':EQ:' + expectedValue + '&startDate=1992-08-16&endDate=2016-12-12&dimension=ou:' + orgUnit).then(function (response) {
                 defer.resolve(response.data);
             }, function (response) {
                 console.log(response);
@@ -57,7 +64,7 @@ app.factory('eventService', function ($http, $q) {
 
         getEventTeiMap: function (programId) {
             var defer = $q.defer();
-            $http.get('../../events.json?ouMode=ACCESSIBLE&skipPaging=true&program=' + programId + '&fields=event,trackedEntityInstance').then(function (response) {
+            $http.get(serverRoot + 'events.json?ouMode=ACCESSIBLE&skipPaging=true&program=' + programId + '&fields=event,trackedEntityInstance').then(function (response) {
                 defer.resolve(response.data.events);
             }, function (response) {
                 console.log(response);
@@ -69,7 +76,7 @@ app.factory('eventService', function ($http, $q) {
         //todo remove this
         getEventData: function (programId) {
             var defer = $q.defer();
-            $http.get('../../events.json?ouMode=ACCESSIBLE&skipPaging=true&program=' + programId + '&fields=programStage,id,eventDate,lastUpdated,trackedEntityInstance,dataValues[dataElement,value]').then(function (response) {
+            $http.get(serverRoot + 'events.json?ouMode=ACCESSIBLE&skipPaging=true&program=' + programId + '&fields=programStage,id,eventDate,lastUpdated,trackedEntityInstance,dataValues[dataElement,value]').then(function (response) {
                 defer.resolve(response.data.events);
             }, function (response) {
                 console.log(response);
@@ -80,11 +87,25 @@ app.factory('eventService', function ($http, $q) {
     }
 });
 
+app.factory('orgUnitsService',function ($http,$q) {
+   return{
+       getOrgTree:function () {
+           var defer = $q.defer();
+           $http.get(serverRoot + 'organisationUnits.json?fields=level,id,displayName,children[level,id,displayName,children[level,id,displayName,children[level,id,displayName,children[level,id,displayName]]]]&paging=false&filter=level:eq:1').then(function (response) {
+               defer.resolve(response.data.organisationUnits);
+           }, function (response) {
+               defer.reject(response);
+           });
+           return defer.promise;
+       }
+   }
+});
+
 app.factory('appService', function ($http, $q) {
     return {
         getOptions: function () {//determines if this is the first run of the app -> need to show settings
             var defer = $q.defer();
-            $http.get('../../dataStore/lc-app/options').then(function (response) {
+            $http.get(serverRoot + 'dataStore/lc-app/options').then(function (response) {
                 defer.resolve(response.data);
             }, function (response) {
                 defer.reject(response);
@@ -93,7 +114,7 @@ app.factory('appService', function ($http, $q) {
         },
         setOptions: function (options) {//determines if this is the first run of the app -> need to show settings
             var defer = $q.defer();
-            $http.post('../../dataStore/lc-app/options', angular.toJson(options)).then(function (response) {
+            $http.post(serverRoot + 'dataStore/lc-app/options', angular.toJson(options)).then(function (response) {
                 defer.resolve(response.data);
             }, function (response) {
                 defer.reject(response);
@@ -102,7 +123,7 @@ app.factory('appService', function ($http, $q) {
         },
         updateOptions: function (options) {
             var defer = $q.defer();
-            $http.put('../../dataStore/lc-app/options', angular.toJson(options)).then(function (response) {
+            $http.put(serverRoot + 'dataStore/lc-app/options', angular.toJson(options)).then(function (response) {
                 defer.resolve(response.data);
             }, function (response) {
                 defer.reject(response);
@@ -120,7 +141,7 @@ app.factory('teiService', function ($http, $q, appService) {
          */
         getAllTeiAttributes: function () {
             var defer = $q.defer();
-            $http.get('../../trackedEntityAttributes').then(function (response) {
+            $http.get(serverRoot + 'trackedEntityAttributes').then(function (response) {
                 defer.resolve(response.data.trackedEntityAttributes);
             }, function (response) {
                 defer.reject(response);
@@ -135,7 +156,7 @@ app.factory('teiService', function ($http, $q, appService) {
          */
         getAllAttributesForTei: function (teiId) {
             var defer = $q.defer();
-            $http.get('../../trackedEntityInstances/' + teiId + '.json?fields=attributes&paging=false').then(function (response) {
+            $http.get(serverRoot + 'trackedEntityInstances/' + teiId + '.json?fields=attributes&paging=false').then(function (response) {
                 defer.resolve(response.data.attributes);
             }, function (response) {
                 defer.reject(response);
@@ -145,7 +166,7 @@ app.factory('teiService', function ($http, $q, appService) {
 
         queryForAllTeis: function (attributes) {
             var defer = $q.defer();
-            var url = '../../trackedEntityInstances/query.json?ouMode=ACCESSIBLE';
+            var url = serverRoot + 'trackedEntityInstances/query.json?ouMode=ACCESSIBLE';
             if (attributes) {
                 attributes.forEach(function (attr) {
                     url += "&attribute=" + attr;
@@ -160,7 +181,7 @@ app.factory('teiService', function ($http, $q, appService) {
         },
         queryForTeis: function (orgUnits, program, keyword, page) {
             var defer = $q.defer();
-            var query = '../../trackedEntityInstances/query.json?ou=';
+            var query = serverRoot + 'trackedEntityInstances/query.json?ou=';
             if (orgUnits.length == 1) {
                 query += orgUnits[0] + "&ouMode=DESCENDANTS";
             } else {
@@ -189,7 +210,7 @@ app.factory('teiService', function ($http, $q, appService) {
          */
         getDobPossibleTeiAttributes: function () {
             var defer = $q.defer();
-            $http.get('../../trackedEntityAttributes.json?skipPaging=true&filter=valueType:eq:DATE').then(function (response) {
+            $http.get(serverRoot + 'trackedEntityAttributes.json?skipPaging=true&filter=valueType:eq:DATE').then(function (response) {
                 defer.resolve(response.data.trackedEntityAttributes);
             }, function (response) {
                 defer.reject(response);
@@ -198,7 +219,7 @@ app.factory('teiService', function ($http, $q, appService) {
         },
         getGenderPossibleTeiAttributes: function () {
             var defer = $q.defer();
-            $http.get('../../trackedEntityAttributes.json?skipPaging=true&filter=valueType:in:[TEXT,BOOLEAN]').then(function (response) {
+            $http.get(serverRoot + 'trackedEntityAttributes.json?skipPaging=true&filter=valueType:in:[TEXT,BOOLEAN]').then(function (response) {
                 defer.resolve(response.data.trackedEntityAttributes);
             }, function (response) {
                 defer.reject(response);
@@ -209,7 +230,7 @@ app.factory('teiService', function ($http, $q, appService) {
             var defer = $q.defer();
             appService.getOptions().then(function (options) {
                 var dobAttributeId = options.teiAttributes.dob;
-                $http.get('../../trackedEntityInstances/' + teiId + '.json?fields=attributes').then(function (response) {
+                $http.get(serverRoot + 'trackedEntityInstances/' + teiId + '.json?fields=attributes').then(function (response) {
                     var dob = null;
                     response.data.attributes.forEach(function (attributeObj) {
                         if (attributeObj.attribute == dobAttributeId) {
@@ -230,7 +251,7 @@ app.factory('teiService', function ($http, $q, appService) {
         },
         getEventData: function (trackedEntityInstance, program) {
             var defer = $q.defer();
-            $http.get('../../events.json?ouMode=ACCESSIBLE&skipPaging=true&trackedEntityInstance='
+            $http.get(serverRoot + 'events.json?ouMode=ACCESSIBLE&skipPaging=true&trackedEntityInstance='
                 + trackedEntityInstance + "&program=" + program).then(function (response) {
                 var events = response.data.events;
                 defer.resolve(events);
@@ -255,7 +276,7 @@ app.factory('teiService', function ($http, $q, appService) {
                 var yAxisVariable1 = chart.yAxisVariable1;
                 var yAxisVariable2 = chart.yAxisVariable2;
                 console.log("Pre req", dateOfBirth, intervalDays);
-                $http.get('../../events.json?ouMode=ACCESSIBLE&skipPaging=true&trackedEntityInstance='
+                $http.get(serverRoot + 'events.json?ouMode=ACCESSIBLE&skipPaging=true&trackedEntityInstance='
                     + trackedEntityInstance + "&program=" + chart.program).then(function (response) {
                     var events = response.data.events;
                     var dataToPlot = [];
@@ -324,7 +345,7 @@ app.factory('chartService', function ($http, $q) {
     var chartService = {
         saveChart: function (chart) {
             var defer = $q.defer();
-            $http.post('../../dataStore/lc/' + chart.id, angular.toJson(chart)).then(function (response) {
+            $http.post(serverRoot + 'dataStore/lc/' + chart.id, angular.toJson(chart)).then(function (response) {
                 defer.resolve(response.data);
             }, function (response) {
                 defer.reject(response);
@@ -333,7 +354,7 @@ app.factory('chartService', function ($http, $q) {
         },
         deleteChart: function (chart) {
             var defer = $q.defer();
-            $http.delete('../../dataStore/lc/' + chart.id).then(function (response) {
+            $http.delete(serverRoot + 'dataStore/lc/' + chart.id).then(function (response) {
                 defer.resolve(response.data);
             }, function (response) {
                 defer.reject(response);
@@ -342,7 +363,7 @@ app.factory('chartService', function ($http, $q) {
         },
         generateId: function () {
             var defer = $q.defer();
-            $http.get('../../system/id?limit=1').then(function (response) {
+            $http.get(serverRoot + 'system/id?limit=1').then(function (response) {
                 defer.resolve(response.data);
             }, function (response) {
                 defer.reject(response);
@@ -351,7 +372,7 @@ app.factory('chartService', function ($http, $q) {
         },
         getAllIds: function () {
             var defer = $q.defer();
-            $http.get('../../dataStore/lc/').then(function (response) {
+            $http.get(serverRoot + 'dataStore/lc/').then(function (response) {
                 defer.resolve(response.data);
             }, function (response) {
                 defer.reject(response);
@@ -360,7 +381,7 @@ app.factory('chartService', function ($http, $q) {
         },
         getChart: function (chartId) {
             var defer = $q.defer();
-            $http.get('../../dataStore/lc/' + chartId).then(function (response) {
+            $http.get(serverRoot + 'dataStore/lc/' + chartId).then(function (response) {
                 defer.resolve(response.data);
             }, function (response) {
                 defer.reject(response);
@@ -432,7 +453,7 @@ app.factory('userService', function ($http, $q) {
     return {
         getCurrentUser: function () {
             var defer = $q.defer();
-            $http.get('../../me.json?fields=:all,organisationUnits[id,displayName,level]').then(function (response) {
+            $http.get(serverRoot + 'me.json?fields=:all,organisationUnits[id,displayName,level]').then(function (response) {
                 defer.resolve(response.data);
             }, function (response) {
                 defer.reject(response);
@@ -477,7 +498,7 @@ app.factory('programIndicatorsService', function ($http, $q) {
     return {
         getProgramIndicatorNameById: function (programIndicatorId) {
             var defer = $q.defer();
-            $http.get("../../programIndicators/" + programIndicatorId + ".json?fields=name").then(function (response) {
+            $http.get(serverRoot+"programIndicators/" + programIndicatorId + ".json?fields=name").then(function (response) {
                 defer.resolve(response.data.name);
             }, function (response) {
                 defer.reject(response);
@@ -494,7 +515,7 @@ app.factory('dataElementService', function ($http, $q) {
     return {
         getDataElementNameById: function (dataElementId) {
             var defer = $q.defer();
-            $http.get("../../dataElements/" + dataElementId + ".json?fields=name").then(function (response) {
+            $http.get(serverRoot+"dataElements/" + dataElementId + ".json?fields=name").then(function (response) {
                 defer.resolve(response.data.name);
             }, function (response) {
                 defer.reject(response);
@@ -511,7 +532,7 @@ app.factory('programService', function ($http, $q) {
     return {
         getPrograms: function () {
             var defer = $q.defer();
-            $http.get("../../programs.json?paging=false").then(function (response) {
+            $http.get(serverRoot+"programs.json?paging=false").then(function (response) {
                 defer.resolve(response.data.programs);
             }, function (response) {
                 defer.reject(response);
@@ -520,7 +541,7 @@ app.factory('programService', function ($http, $q) {
         },
         getProgramById: function (programId) {
             var defer = $q.defer();
-            $http.get("../../programs/" + programId + ".json?fields=:all,programStages[id,displayName,programStageDataElements[id,dataElement[id,displayName,valueType]]]").then(function (response) {
+            $http.get(serverRoot+"programs/" + programId + ".json?fields=:all,programStages[id,displayName,programStageDataElements[id,dataElement[id,displayName,valueType]]]").then(function (response) {
                 defer.resolve(response.data);
             }, function (response) {
                 defer.reject(response);
@@ -529,7 +550,7 @@ app.factory('programService', function ($http, $q) {
         },
         getProgramNameById: function (programId) {
             var defer = $q.defer();
-            $http.get("../../programs/" + programId + ".json?fields=name").then(function (response) {
+            $http.get(serverRoot+"programs/" + programId + ".json?fields=name").then(function (response) {
                 defer.resolve(response.data.name);
             }, function (response) {
                 defer.reject(response);
@@ -538,7 +559,7 @@ app.factory('programService', function ($http, $q) {
         },
         getProgramIndicators: function (programId) {
             var defer = $q.defer();
-            var url = "../../programs/" + programId + ".json?fields=programIndicators[name,id]";
+            var url = serverRoot+"programs/" + programId + ".json?fields=programIndicators[name,id]";
             $http.get(url).then(function (response) {
                 defer.resolve(response.data.programIndicators);
             }, function (response) {
@@ -548,7 +569,7 @@ app.factory('programService', function ($http, $q) {
         },
         getProgramDataElements: function (programId) {
             var defer = $q.defer();
-            var url = "../../programs/" + programId + ".json?fields=programStages[programStageDataElements[dataElement[name,id]]]";
+            var url = serverRoot+"programs/" + programId + ".json?fields=programStages[programStageDataElements[dataElement[name,id]]]";
             $http.get(url).then(function (response) {
                 var programStages = response.data.programStages;
                 var dataElements = [];

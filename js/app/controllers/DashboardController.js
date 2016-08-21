@@ -2,7 +2,8 @@
  * @author Chathura Widanage
  */
 function DashboardController($location, $scope, toastService, programService, userService,
-                             chartService, appService, $mdDialog, $timeout, teiService, eventService, $fdb, $window) {
+                             chartService, appService, $mdDialog, $timeout, teiService, eventService,
+                             $fdb, $window, orgUnitsService, $mdSidenav) {
     var ctrl = this;
     ctrl.programs = [];
     ctrl.mohUserRole = "Ej7USJV1ccn";
@@ -18,6 +19,9 @@ function DashboardController($location, $scope, toastService, programService, us
 
     ctrl.teis = [];
 
+    ctrl.orgTree = {};
+    ctrl.currentOuSelection={};
+
     ctrl.teiDb = null;
     ctrl.eventsDb = null;
 
@@ -25,29 +29,35 @@ function DashboardController($location, $scope, toastService, programService, us
         {
             title: "Low birth weight",
             dataElementId: "Sf3lPKs8oLs",
-            records: null
+            records: null,
+            visibleRecords: null
         },
         {
             title: "Under five with underweight",
             dataElementId: "gaZGnRTcR7T",
-            records: null
+            records: null,
+            visibleRecords: null
         },
         {
             title: "Under five with wasting",
             dataElementId: "oTLBvqfHCxz",
-            records: null
+            records: null,
+            visibleRecords: null
         }, {
             title: "Under five with stunting",
             dataElementId: "hUxgdSCMiNy",
-            records: null
+            records: null,
+            visibleRecords: null
         }, {
             title: "Anemia",
             dataElementId: "kerTmzDMqUB",
-            records: null
+            records: null,
+            visibleRecords: null
         }, {
             title: "Overweight",
             dataElementId: "l0WWFNEMoQZ",
-            records: null
+            records: null,
+            visibleRecords: null
         }
     ];
 
@@ -68,6 +78,62 @@ function DashboardController($location, $scope, toastService, programService, us
     ctrl.selectedMalNutRows = null;//mal nutirtion teis view list
 
     ctrl.doneInitLoading = false;
+
+    //side nav
+    ctrl.toggleRightNav = function () {
+        // Component lookup should always be available since we are not using `ng-if`
+        $mdSidenav('right')
+            .toggle()
+            .then(function () {
+                $log.debug("toggle " + navID + " is done");
+            });
+    }
+
+    //end of side nav
+
+    //load orgUnits
+    orgUnitsService.getOrgTree().then(function (orgUnits) {
+        var tis = this;
+        this.recursiveCollapse = function (node) {
+            node.collapsed = true;
+            if (node.children) {
+                node.children.forEach(function (child) {
+                    tis.recursiveCollapse(child);
+                })
+            }
+        }
+
+        ctrl.orgTree = orgUnits;
+        this.recursiveCollapse(ctrl.orgTree[0]);
+
+        var orgTreeObj = $scope["orgTree"];
+        orgTreeObj.selectNodeHead = function (selectedNode) {
+            console.log(selectedNode);
+            //Collapse or Expand
+            selectedNode.collapsed = !selectedNode.collapsed;
+        };
+
+        orgTreeObj.selectNodeLabel = function (selectedNode) {
+
+            //remove highlight from previous node
+            if (orgTreeObj.currentNode && orgTreeObj.currentNode.selected) {
+                orgTreeObj.currentNode.selected = undefined;
+            }
+
+            //set highlight to selected node
+            selectedNode.selected = 'selected';
+
+            //set currentNode
+            orgTreeObj.currentNode = selectedNode;
+            ctrl.currentOuSelection=selectedNode;
+
+            ctrl.refreshMalNulStats(selectedNode);
+        };
+
+        //init selection
+        orgTreeObj.selectNodeLabel(ctrl.orgTree[0]);
+
+    });
 
     userService.getCurrentUser().then(function (user) {//stage 1
         ctrl.caches.profile = CAHCE_STATUS.loading;
@@ -113,10 +179,15 @@ function DashboardController($location, $scope, toastService, programService, us
             ctrl.malNutReasons.forEach(function (malNut) {
                 malNut.records = [];
                 eventService.getEventAnalytics(ctrl.selectedProgram.id, ctrl.queryOrgUnits[0], malNut.dataElementId, 1).then(function (data) {
-                    //event id is the only thing that matters
+                    //event id is the only thing that matter
+                    console.log(data);
                     data.rows.forEach(function (row) {
-                        malNut.records.push(row);
-                    })
+                        malNut.records.push({
+                            eventId: row[0],
+                            ou: row[7]
+                        });
+                    });
+                    malNut.visibleRecords = malNut.records;
                     malNutLoadCount++;
                     if (malNutLoadCount == ctrl.malNutReasons.length) {
                         ctrl.caches.malNut = CAHCE_STATUS.loaded;
@@ -173,6 +244,17 @@ function DashboardController($location, $scope, toastService, programService, us
         }
     }
 
+    ctrl.refreshMalNulStats = function (selectedNode) {
+        //filtering data
+        var worker = new Worker("js/app/workers/childou.js");
+        worker.postMessage([ctrl.malNutReasons, selectedNode]);
+        worker.onmessage = function (e) {
+            ctrl.malNutReasons = e.data;
+            $scope.$apply();
+            console.log(ctrl.malNutReasons);
+        }
+    }
+
     ctrl.showMalNutTeis = function (malNutReason) {
         ctrl.selectedMalNul = malNutReason;
         ctrl.malNutInfiniteItems.reset();
@@ -180,21 +262,17 @@ function DashboardController($location, $scope, toastService, programService, us
 
     ctrl.malNutInfiniteItems = {
         teis: [],
-        currentPage: 1,
-        totalPages: 1,
         numLoaded_: 0,
         toLoad_: 0,
         // Required.
         reset: function () {
             this.teis = [];
-            this.currentPage = 1;
-            this.totalPages = ctrl.selectedMalNul.records.length;
             this.numLoaded_ = 0;
-            this.toLoad_ = 0;
+            this.toLoad_ = ctrl.selectedMalNul.selectedRecords.length;
         },
 
         getItemAtIndex: function (index) {
-            if (index > this.numLoaded_ || !ctrl.doneInitLoading) {
+            if (index >= this.numLoaded_ || !ctrl.doneInitLoading) {
                 this.fetchMoreItems_(index);
                 return null;
             }
@@ -211,25 +289,26 @@ function DashboardController($location, $scope, toastService, programService, us
             // promise. In real code, this function would likely contain an
             // $http request.
             var tis = this;
-            if (this.toLoad_ < index) {
-                this.toLoad_ += 20;
+            if (this.toLoad_ - 1 >= index) {
                 var loadCount = 0;
-                while (loadCount < 25 && index < ctrl.selectedMalNul.records.length) {
-                    var eventId = ctrl.selectedMalNul.records[index];
+                while (loadCount < 25 && index < ctrl.selectedMalNul.selectedRecords.length) {
+                    console.log(index);
+                    var eventId = ctrl.selectedMalNul.selectedRecords[index].eventId;
                     var event = ctrl.eventsDb.find({event: eventId});
                     if (event.length > 0) {
                         var teiId = event[0].trackedEntityInstance;
-                        console.log("searching for", teiId);
                         var teiArr = ctrl.teiDb.find({_id: teiId});
-                        console.log("searched", teiArr);
                         if (teiArr.length > 0) {
                             tis.teis.push(teiArr[0]);
                         }
+                    } else {
+                        console.log("Unexpecetd events length");
                     }
                     index++;
                     loadCount++;
                 }
                 tis.numLoaded_ = tis.teis.length;
+
             }
         }
     };
