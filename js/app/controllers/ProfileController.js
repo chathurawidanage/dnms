@@ -2,7 +2,7 @@
  * @author Chathura Widanage
  */
 function ProfileController($location, appService, teiService, $routeParams, toastService,
-                           programService, dataElementService, programIndicatorsService, $q, $scope) {
+                           programService, dataElementService, programIndicatorsService, $q, $scope, $mdSidenav) {
     var ctrl = this;
     this.tei = $routeParams.tei;
     this.programId = $routeParams.program;
@@ -13,10 +13,30 @@ function ProfileController($location, appService, teiService, $routeParams, toas
 
     this.dataElemets = [];
 
+    this.selectedEvent = {};
+
     this.childProfile = {
         firstName: {key: "izuwkaOUgFg", value: null},
         lastName: {key: "C8DBAo2wEYN", value: null},
         chdrNumber: {key: "WqdldQpOIxm", value: null}
+    }
+
+    ctrl.openNav = function () {
+        $mdSidenav('left').open();
+    }
+    ctrl.closeNav = function () {
+        $mdSidenav('left').close();
+    }
+
+    ctrl.showEvent = function (event) {
+        ctrl.openNav();
+        ctrl.selectedEvent = event;
+        console.log(event);
+    }
+
+    ctrl.getDataElement = function (dataElementId) {
+        console.log("Sending DE",ctrl.dataElemets[dataElementId]);
+        return ctrl.dataElemets[dataElementId];
     }
 
     teiService.getAllTeiAttributes().then(function (teiAttributes) {
@@ -53,11 +73,10 @@ function ProfileController($location, appService, teiService, $routeParams, toas
                 })
             });
 
-            console.log("data elements",ctrl.dataElemets);
+            console.log("data elements", ctrl.dataElemets);
         }).then(function () {
             console.log("loading events for tei");
             teiService.getEventData(ctrl.tei, ctrl.programId).then(function (events) {
-                var count = 0;
                 events.forEach(function (event) {
                     event.badgeIcon = "insert_chart";
                     event.badgeClass = "success";
@@ -84,7 +103,7 @@ function ProfileController($location, appService, teiService, $routeParams, toas
     };
 
     ctrl.navBack = function () {
-        $location.path("/");
+        window.close();
     }
 
     /*

@@ -69,12 +69,42 @@
                             <h4>{{event.title}}</h4>
                         </timeline-heading>
                         <p>{{event.content}}</p>
-                        <md-button md-no-ink class="md-primary">Review</md-button>
+                        <md-button md-no-ink class="md-primary" ng-click="ctrl.showEvent(event)">Review</md-button>
                     </timeline-panel>
                 </timeline-event>
             </timeline>
         </div>
     </md-content>
+
+    <md-sidenav class="md-sidenav-left event-sidenav" md-component-id="left"
+                md-disable-backdrop md-whiteframe="4">
+        <md-toolbar class="md-theme-indigo background-theme">
+            <h1 class="md-toolbar-tools">{{ctrl.selectedEvent.title}}</h1>
+        </md-toolbar>
+        <md-content layout-margin>
+            <md-list class="md-dense">
+                <md-list-item class="md-2-line" ng-repeat="dv in ctrl.selectedEvent.dataValues">
+                    <!--<img ng-src="{{todos[0].face}}?20" class="md-avatar" alt="{{todos[0].who}}" />-->
+                    <div class="md-list-item-text">
+                        <h3>{{ctrl.getDataElement(dv.dataElement).displayName}}</h3>
+                        <p>{{dv.value}}</p>
+                    </div>
+                </md-list-item>
+            </md-list>
+
+
+            <md-button class="md-fab md-mini md-primary" aria-label="Use Android">
+                <md-icon style="color: greenyellow;">
+                    <i class="material-icons">done</i>
+                </md-icon>
+            </md-button>
+            <md-button ng-click="ctrl.closeNav()" class="md-fab md-mini md-warn">
+                <md-icon>
+                    <i class="material-icons">close</i>
+                </md-icon>
+            </md-button>
+        </md-content>
+    </md-sidenav>
 
     <md-button class="md-fab md-fab md-fab-bottom-right md-faded" aria-label="Add Chart" ng-click="ctrl.navBack()"
                style="position: fixed; right: 20px">

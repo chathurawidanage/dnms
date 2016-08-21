@@ -152,4 +152,9 @@ table {
   .loading-element .done {
     color: #1B5E20; }
 
+.event-sidenav {
+  position: fixed;
+  height: calc(100% - 64px);
+  top: 64px; }
+
 /*# sourceMappingURL=style.css.map */

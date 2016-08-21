@@ -20,7 +20,7 @@ function DashboardController($location, $scope, toastService, programService, us
     ctrl.teis = [];
 
     ctrl.orgTree = {};
-    ctrl.currentOuSelection={};
+    ctrl.currentOuSelection = {};
 
     ctrl.teiDb = null;
     ctrl.eventsDb = null;
@@ -83,16 +83,37 @@ function DashboardController($location, $scope, toastService, programService, us
     ctrl.toggleRightNav = function () {
         // Component lookup should always be available since we are not using `ng-if`
         $mdSidenav('right')
-            .toggle()
-            .then(function () {
-                $log.debug("toggle " + navID + " is done");
-            });
+            .toggle();
     }
 
     //end of side nav
 
     //load orgUnits
-    orgUnitsService.getOrgTree().then(function (orgUnits) {
+    ctrl.fetchOrgUnits = function (callback) {
+        var ouDb = $fdb.db('dnms').collection("ous");
+        ouDb.load(function (err, tableStats, metaStats) {
+            if (!err && tableStats.foundData && tableStats.rowCount > 0) {
+                console.log("loaded cached org tree successfully");
+                debugDb = ouDb;
+                callback(ouDb.find());
+            } else {
+                orgUnitsService.getOrgTree().then(function (orgUnits) {
+                    callback(orgUnits);
+                    ouDb.insert(orgUnits);
+                    ouDb.save(function (err) {
+                        if (!err) {
+                            console.info("org tree saved to the cache");
+                        } else {
+                            console.error("error saving org tree to the cache");
+                        }
+                    })
+                });
+            }
+        });
+
+    }
+
+    ctrl.fetchOrgUnits(function (orgUnits) {
         var tis = this;
         this.recursiveCollapse = function (node) {
             node.collapsed = true;
@@ -100,6 +121,10 @@ function DashboardController($location, $scope, toastService, programService, us
                 node.children.forEach(function (child) {
                     tis.recursiveCollapse(child);
                 })
+
+                //remove children temporary to avoid ng-repeat lag
+                node.childrenTemp = node.children;
+                node.children = undefined;
             }
         }
 
@@ -108,9 +133,12 @@ function DashboardController($location, $scope, toastService, programService, us
 
         var orgTreeObj = $scope["orgTree"];
         orgTreeObj.selectNodeHead = function (selectedNode) {
-            console.log(selectedNode);
             //Collapse or Expand
             selectedNode.collapsed = !selectedNode.collapsed;
+
+            if (!selectedNode.collapsed && selectedNode.childrenTemp) {
+                selectedNode.children = selectedNode.childrenTemp;
+            }
         };
 
         orgTreeObj.selectNodeLabel = function (selectedNode) {
@@ -125,14 +153,13 @@ function DashboardController($location, $scope, toastService, programService, us
 
             //set currentNode
             orgTreeObj.currentNode = selectedNode;
-            ctrl.currentOuSelection=selectedNode;
+            ctrl.currentOuSelection = selectedNode;
 
             ctrl.refreshMalNulStats(selectedNode);
         };
 
         //init selection
         orgTreeObj.selectNodeLabel(ctrl.orgTree[0]);
-
     });
 
     userService.getCurrentUser().then(function (user) {//stage 1
@@ -158,7 +185,6 @@ function DashboardController($location, $scope, toastService, programService, us
                 ctrl.queryOrgUnits.push(orgUnit.id);
             }
         });
-        console.log(ctrl.queryOrgUnits);
         //loading full list
         ctrl.infiniteItems.reset();
 
@@ -180,14 +206,13 @@ function DashboardController($location, $scope, toastService, programService, us
                 malNut.records = [];
                 eventService.getEventAnalytics(ctrl.selectedProgram.id, ctrl.queryOrgUnits[0], malNut.dataElementId, 1).then(function (data) {
                     //event id is the only thing that matter
-                    console.log(data);
                     data.rows.forEach(function (row) {
                         malNut.records.push({
                             eventId: row[0],
                             ou: row[7]
                         });
                     });
-                    malNut.visibleRecords = malNut.records;
+                    malNut.selectedRecords = malNut.records;
                     malNutLoadCount++;
                     if (malNutLoadCount == ctrl.malNutReasons.length) {
                         ctrl.caches.malNut = CAHCE_STATUS.loaded;
@@ -213,7 +238,6 @@ function DashboardController($location, $scope, toastService, programService, us
 
     ctrl.cacheTeis = function () {
         ctrl.caches.tei = CAHCE_STATUS.loading;
-        debugDb = ctrl.teiDb;
         //todo firstname and last name attributes are hard coded
         teiService.queryForAllTeis(["izuwkaOUgFg", "C8DBAo2wEYN", "BZEpuufLyDE", "WqdldQpOIxm"]).then(function (data) {
             var rows = data.rows;
@@ -245,7 +269,11 @@ function DashboardController($location, $scope, toastService, programService, us
     }
 
     ctrl.refreshMalNulStats = function (selectedNode) {
+        if (ctrl.caches.malNut != CAHCE_STATUS.loaded) {//do only if cache is ready, else ignore
+            return;
+        }
         //filtering data
+        console.log("Selected node", selectedNode);
         var worker = new Worker("js/app/workers/childou.js");
         worker.postMessage([ctrl.malNutReasons, selectedNode]);
         worker.onmessage = function (e) {

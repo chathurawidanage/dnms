@@ -7,7 +7,6 @@ onmessage = function (e) {
     var selectedOrgUnit = e.data[1];
     console.log(selectedOrgUnit);
     getAllLevelFiveOrgUnits(selectedOrgUnit);
-    console.log("Level 5 org Unites", levelFiveOrgs);
     malNulRecords.forEach(function (malNul) {
         malNul.selectedRecords=[];
         malNul.records.forEach(function (record) {
@@ -21,8 +20,8 @@ onmessage = function (e) {
 
 getAllLevelFiveOrgUnits = function (orgUnit) {
     if (orgUnit.level < 5) {
-        if (orgUnit.children) {
-            orgUnit.children.forEach(function (child) {
+        if (orgUnit.childrenTemp) {
+            orgUnit.childrenTemp.forEach(function (child) {
                 getAllLevelFiveOrgUnits(child);
             })
         }
