@@ -249,7 +249,7 @@
         function getColor (color) {
             return {
                 backgroundColor: rgba(color, 1),//0.2
-                pointBackgroundColor: rgba(getDarkerShade(color), 0),//hide points
+                pointBackgroundColor: rgba(getDarkerShade(color), 1),//hide points
                 pointHoverBackgroundColor: rgba(color, 0.8),
                 borderColor: rgba(color, 1),
                 pointBorderColor: rgba([0,0,0],0),

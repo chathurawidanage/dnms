@@ -85,10 +85,41 @@
             <md-list class="md-dense">
                 <md-list-item class="md-2-line" ng-repeat="dv in ctrl.selectedEvent.dataValues">
                     <!--<img ng-src="{{todos[0].face}}?20" class="md-avatar" alt="{{todos[0].who}}" />-->
-                    <div class="md-list-item-text">
-                        <h3>{{ctrl.getDataElement(dv.dataElement).displayName}}</h3>
-                        <p>{{dv.value}}</p>
-                    </div>
+                    <md-input-container
+                            ng-if="ctrl.getDataElement(dv.dataElement).valueType=='BOOLEAN' || ctrl.getDataElement(dv.dataElement).valueType=='TRUE_ONLY'">
+                        <p>{{ctrl.getDataElement(dv.dataElement).displayName}}</p>
+                        <!--Due to a bug of angular ng-if should be applied to md-switch too-->
+                        <md-switch class="md-secondary md-" ng-model="dv.value" aria-label="Switch 2"
+                                   ng-change="ctrl.updateDataValue(dv)"
+                                   ng-true-value="'true'" ng-false-value="'false'" class="md-warn"
+                                   ng-if="ctrl.getDataElement(dv.dataElement).valueType=='BOOLEAN' || ctrl.getDataElement(dv.dataElement).valueType=='TRUE_ONLY'">
+                            <!--{{ctrl.getDataElement(dv.dataElement).displayName}}-->
+                        </md-switch>
+                    </md-input-container>
+                    <md-input-container
+                            ng-if="ctrl.getDataElement(dv.dataElement).valueType=='NUMBER' || ctrl.getDataElement(dv.dataElement).valueType=='INTEGER_POSITIVE'">
+                        <label>{{ctrl.getDataElement(dv.dataElement).displayName}}</label>
+                        <input ng-model="dv.value" ng-blur="ctrl.updateDataValue(dv)">
+                    </md-input-container>
+                    <md-input-container
+                            ng-if="ctrl.getDataElement(dv.dataElement).valueType=='TEXT' && ctrl.getDataElement(dv.dataElement).optionSet">
+                        <label>{{ctrl.getDataElement(dv.dataElement).displayName}}</label>
+                        <md-select ng-model="dv.value" ng-change="ctrl.updateDataValue(dv)">
+                            <md-option ng-repeat="option in ctrl.getDataElement(dv.dataElement).optionSet.options"
+                                       ng-value="option.name">
+                                {{option.displayName}}
+                            </md-option>
+                        </md-select>
+                    </md-input-container>
+                    <md-input-container
+                            ng-if="ctrl.getDataElement(dv.dataElement).valueType=='TEXT' && !ctrl.getDataElement(dv.dataElement).optionSet">
+                        <label>{{ctrl.getDataElement(dv.dataElement).displayName}}</label>
+                        <input ng-model="dv.value" ng-blur="ctrl.updateDataValue(dv)">
+                    </md-input-container>
+                    <!--  <div ng-if="ctrl.getDataElement(dv.dataElement).valueType!='BOOLEAN' && ctrl.getDataElement(dv.dataElement).valueType!='TRUE_ONLY'">
+                          <p>{{ctrl.getDataElement(dv.dataElement).displayName}}</p>
+                          <p>{{dv.value}}</p>
+                      </div>-->
                 </md-list-item>
             </md-list>
 

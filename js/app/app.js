@@ -1,7 +1,7 @@
 //var serverRoot = 'http://148.251.224.242/nss1/api/';
 var serverRoot = '../../';
 var app = angular.module('long-charts', ['ngMaterial', 'ngRoute', 'longitudinalChartControllers', 'dropzone', 'chart.js'
-    , 'mdColorPicker', 'lfNgMdFileInput', 'angular-timeline', 'forerunnerdb','angularTreeview']);
+    , 'mdColorPicker', 'lfNgMdFileInput', 'angular-timeline', 'forerunnerdb', 'angularTreeview']);
 app.config(['$routeProvider', function ($routeProvider) {
     $routeProvider.when('/', {
         templateUrl: 'templates/dashboard.html'
@@ -26,6 +26,7 @@ app.config(['$httpProvider', function ($httpProvider) {
 var controllers = angular.module('longitudinalChartControllers', []);
 
 controllers.controller('DashboardController', DashboardController);
+controllers.controller('RiskController', RiskController);
 controllers.controller('ChartController', ChartController);
 controllers.controller('ProfileController', ProfileController);
 controllers.controller('ViewerController', ViewerController);
@@ -73,6 +74,40 @@ app.factory('eventService', function ($http, $q) {
             return defer.promise;
         },
 
+        updateEventData: function (event, dataValue) {
+            var eventCopy = {
+                event: event.event,
+                orgUnit: event.orgUnit,
+                program: event.program,
+                programStage: event.programStage,
+                status: event.status,
+                trackedEntityInstance: event.trackedEntityInstance,
+                dataValues: [{
+                    dataElement: dataValue.dataElement,
+                    value: dataValue.value,
+                    providedElseWhere: dataValue.providedElseWhere
+                }]
+            };
+            var defer = $q.defer();
+            $http.put(serverRoot + 'events/'+event.event+'/'+dataValue.dataElement, angular.toJson(eventCopy)).then(function (response) {
+                defer.resolve(response.data);
+            }, function (response) {
+                defer.reject(response);
+            });
+            return defer.promise;
+        },
+        
+        getAnalyticsForDe:function (programId,programStageId,ouId,dataElementId) {
+            var defer = $q.defer();
+            $http.get(serverRoot + 'analytics/events/aggregate/'+programId+'.json?stage='+programStageId+'&dimension='+dataElementId+':IN%3A1&dimension=pe:LAST_3_MONTHS&filter=ou:'+ouId+'&outputType=EVENT&displayProperty=NAME').then(function (response) {
+                defer.resolve(response.data);
+            }, function (response) {
+                console.log(response);
+                defer.reject(response);
+            });
+            return defer.promise;
+        },
+
         //todo remove this
         getEventData: function (programId) {
             var defer = $q.defer();
@@ -87,18 +122,18 @@ app.factory('eventService', function ($http, $q) {
     }
 });
 
-app.factory('orgUnitsService',function ($http,$q) {
-   return{
-       getOrgTree:function () {
-           var defer = $q.defer();
-           $http.get(serverRoot + 'organisationUnits.json?fields=level,id,displayName,children[level,id,displayName,children[level,id,displayName,children[level,id,displayName,children[level,id,displayName]]]]&paging=false&filter=level:eq:1').then(function (response) {
-               defer.resolve(response.data.organisationUnits);
-           }, function (response) {
-               defer.reject(response);
-           });
-           return defer.promise;
-       }
-   }
+app.factory('orgUnitsService', function ($http, $q) {
+    return {
+        getOrgTree: function () {
+            var defer = $q.defer();
+            $http.get(serverRoot + 'organisationUnits.json?fields=level,id,displayName,children[level,id,displayName,children[level,id,displayName,children[level,id,displayName,children[level,id,displayName]]]]&paging=false&filter=level:eq:1').then(function (response) {
+                defer.resolve(response.data.organisationUnits);
+            }, function (response) {
+                defer.reject(response);
+            });
+            return defer.promise;
+        }
+    }
 });
 
 app.factory('appService', function ($http, $q) {
@@ -498,7 +533,7 @@ app.factory('programIndicatorsService', function ($http, $q) {
     return {
         getProgramIndicatorNameById: function (programIndicatorId) {
             var defer = $q.defer();
-            $http.get(serverRoot+"programIndicators/" + programIndicatorId + ".json?fields=name").then(function (response) {
+            $http.get(serverRoot + "programIndicators/" + programIndicatorId + ".json?fields=name").then(function (response) {
                 defer.resolve(response.data.name);
             }, function (response) {
                 defer.reject(response);
@@ -515,7 +550,7 @@ app.factory('dataElementService', function ($http, $q) {
     return {
         getDataElementNameById: function (dataElementId) {
             var defer = $q.defer();
-            $http.get(serverRoot+"dataElements/" + dataElementId + ".json?fields=name").then(function (response) {
+            $http.get(serverRoot + "dataElements/" + dataElementId + ".json?fields=name").then(function (response) {
                 defer.resolve(response.data.name);
             }, function (response) {
                 defer.reject(response);
@@ -532,7 +567,7 @@ app.factory('programService', function ($http, $q) {
     return {
         getPrograms: function () {
             var defer = $q.defer();
-            $http.get(serverRoot+"programs.json?paging=false").then(function (response) {
+            $http.get(serverRoot + "programs.json?paging=false").then(function (response) {
                 defer.resolve(response.data.programs);
             }, function (response) {
                 defer.reject(response);
@@ -541,7 +576,7 @@ app.factory('programService', function ($http, $q) {
         },
         getProgramById: function (programId) {
             var defer = $q.defer();
-            $http.get(serverRoot+"programs/" + programId + ".json?fields=:all,programStages[id,displayName,programStageDataElements[id,dataElement[id,displayName,valueType]]]").then(function (response) {
+            $http.get(serverRoot + "programs/" + programId + ".json?fields=:all,programStages[id,displayName,programStageDataElements[id,dataElement[id,displayName,valueType,optionSet[options[:all]]]]]").then(function (response) {
                 defer.resolve(response.data);
             }, function (response) {
                 defer.reject(response);
@@ -550,7 +585,7 @@ app.factory('programService', function ($http, $q) {
         },
         getProgramNameById: function (programId) {
             var defer = $q.defer();
-            $http.get(serverRoot+"programs/" + programId + ".json?fields=name").then(function (response) {
+            $http.get(serverRoot + "programs/" + programId + ".json?fields=name").then(function (response) {
                 defer.resolve(response.data.name);
             }, function (response) {
                 defer.reject(response);
@@ -559,7 +594,7 @@ app.factory('programService', function ($http, $q) {
         },
         getProgramIndicators: function (programId) {
             var defer = $q.defer();
-            var url = serverRoot+"programs/" + programId + ".json?fields=programIndicators[name,id]";
+            var url = serverRoot + "programs/" + programId + ".json?fields=programIndicators[name,id]";
             $http.get(url).then(function (response) {
                 defer.resolve(response.data.programIndicators);
             }, function (response) {
@@ -569,7 +604,7 @@ app.factory('programService', function ($http, $q) {
         },
         getProgramDataElements: function (programId) {
             var defer = $q.defer();
-            var url = serverRoot+"programs/" + programId + ".json?fields=programStages[programStageDataElements[dataElement[name,id]]]";
+            var url = serverRoot + "programs/" + programId + ".json?fields=programStages[programStageDataElements[dataElement[name,id]]]";
             $http.get(url).then(function (response) {
                 var programStages = response.data.programStages;
                 var dataElements = [];

@@ -284,10 +284,10 @@ function ViewerController($location, appService, teiService, $routeParams, toast
                     fill: false,
                     label: 'Recorded Data',
                     borderWidth: 2,
-                    pointBackgroundColor: "black",//hide points
+                    pointBackgroundColor: "rgba(0,0,0,0)",//hide points
                     pointHoverBackgroundColor: "black",
+                    borderColor:"rgba(0,0,0,0)",
                     //borderDash: [5, 15],
-                    borderColor: "black",
                     skipNullValues: true,
                     showLines: false
                 }];

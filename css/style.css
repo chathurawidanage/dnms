@@ -155,6 +155,10 @@ table {
 .event-sidenav {
   position: fixed;
   height: calc(100% - 64px);
-  top: 64px; }
+  top: 64px;
+  width: 100%; }
+  .event-sidenav md-content h3 {
+    white-space: normal !important;
+    overflow: visible !important; }
 
 /*# sourceMappingURL=style.css.map */
