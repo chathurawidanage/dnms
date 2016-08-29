@@ -2,8 +2,18 @@
  * Created by chath on 8/22/2016.
  */
 onmessage = function (e) {
-    var orgTree = e.data[0];
-    recursiveCollapse(orgTree);
+    //console.log("Data", e.data);
+    var orgTree = e.data;
+    if (orgTree.length > 1) {
+        var parent = orgTree[0].parent;
+        parent.children = orgTree;
+        orgTree = [parent];
+    }
+
+    orgTree.forEach(function (node) {
+        recursiveCollapse(node);
+    });
+
     postMessage(orgTree);
 }
 

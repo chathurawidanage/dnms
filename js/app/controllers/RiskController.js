@@ -147,6 +147,8 @@ function RiskController($location, appService, teiService, $routeParams, toastSe
     rctrl.riskIdentificationProgStage = "vTWcDsFE1rf";
 
     rctrl.mainChart = {
+        loading: false,
+        visible: true,
         data: [],
         labels: [],
         colors: [],
@@ -161,12 +163,16 @@ function RiskController($location, appService, teiService, $routeParams, toastSe
             }
         },
         reset: function () {
+            this.visible = true;
             this.data = [];
             this.labels = [];
+            this.loading = false;
         }
     }
 
     rctrl.subChart = {
+        loading: false,
+        visible: false,
         data: [],
         labels: [],
         colors: [],
@@ -180,9 +186,13 @@ function RiskController($location, appService, teiService, $routeParams, toastSe
                 text: 'Chart Title'
             }
         },
-        reset: function () {
+        reset: function (keepVisiblity) {//keep visibility to avoid page jumping issue
             this.data = [];
             this.labels = [];
+            if (!keepVisiblity) {
+                this.visible = false;
+            }
+            this.loading = false;
         }
     }
 
@@ -213,6 +223,10 @@ function RiskController($location, appService, teiService, $routeParams, toastSe
             return;
         }
         rctrl.mainChart.reset();
+        rctrl.subChart.reset();
+        rctrl.mainChart.loading = true;
+        var grandTotal = 0;
+        var count = 0;
         rctrl.risks.forEach(function (mainRisk) {
             eventService.getAnalyticsForDe($scope.ctrl.selectedProgram.id,
                 rctrl.riskIdentificationProgStage,
@@ -220,14 +234,28 @@ function RiskController($location, appService, teiService, $routeParams, toastSe
                 mainRisk.data = data;//saving for future
 
                 //creating data for main chart
-                rctrl.mainChart.labels.push(data.metaData.names[mainRisk.id]);
+
                 var total = 0;
                 data.rows.forEach(function (row) {
                     total += parseInt(row[2]);
                 })
+                mainRisk.total = total;
                 rctrl.mainChart.data.push(total);
-                rctrl.mainChart.colors.push("#" + ((1 << 24) * Math.random() | 0).toString(16));
-                console.log("Chart", rctrl.mainChart);
+                grandTotal += total;
+                count++;
+                if (count == rctrl.risks.length) {
+                    if (grandTotal == 0) {
+                        rctrl.mainChart.visible = false;
+                    }
+                    rctrl.risks.forEach(function (mR) {
+                        try {
+                            rctrl.mainChart.labels.push(mR.data.metaData.names[mR.id] + " [" + (mR.total * 100 / grandTotal).toFixed(2) + "%]");
+                        } catch (e) {
+//todo remove this, this is just in case for demo
+                        }
+                    });
+                    rctrl.mainChart.loading = false;
+                }
             });
         });
 
@@ -238,13 +266,16 @@ function RiskController($location, appService, teiService, $routeParams, toastSe
     rctrl.chartClick = function (points, evt) {
         var index = points[0]._index;
         console.log(index);
-        rctrl.generateSubChart(index);
-
+        rctrl.generateSubChart(index, true);
     }
 
-    rctrl.generateSubChart=function (mainRiskIndex) {
-        rctrl.subChart.reset();
-        var majorRisk=rctrl.risks[mainRiskIndex];
+    rctrl.generateSubChart = function (mainRiskIndex, keepVisibility) {
+        rctrl.subChart.reset(keepVisibility);
+        var majorRisk = rctrl.risks[mainRiskIndex];
+        var grandTotal = 0;
+        var count = 0;
+        rctrl.subChart.loading = true;
+        rctrl.subChart.visible = true;
         majorRisk.children.forEach(function (subRisk) {
             eventService.getAnalyticsForDe($scope.ctrl.selectedProgram.id,
                 rctrl.riskIdentificationProgStage,
@@ -252,14 +283,21 @@ function RiskController($location, appService, teiService, $routeParams, toastSe
                 subRisk.data = data;//saving for future
 
                 //creating data for main chart
-                rctrl.subChart.labels.push(data.metaData.names[subRisk.id]);
+
                 var total = 0;
                 data.rows.forEach(function (row) {
                     total += parseInt(row[2]);
-                })
+                });
+                subRisk.total = total;
+                grandTotal += total;
+                count++;
                 rctrl.subChart.data.push(total);
-                rctrl.subChart.colors.push("#" + ((1 << 24) * Math.random() | 0).toString(16));
-                console.log("Chart", rctrl.mainChart);
+                if (count == majorRisk.children.length) {
+                    majorRisk.children.forEach(function (sR) {
+                        rctrl.subChart.labels.push(sR.data.metaData.names[sR.id] + " [" + (sR.total * 100 / grandTotal).toFixed(2) + "%]");
+                    });
+                    rctrl.subChart.loading = false;
+                }
             });
         });
         rctrl.subChart.options.title.text = majorRisk.data.metaData.names[majorRisk.id];

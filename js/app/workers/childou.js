@@ -7,6 +7,7 @@ onmessage = function (e) {
     var selectedOrgUnit = e.data[1];
     console.log(selectedOrgUnit);
     getAllLevelFiveOrgUnits(selectedOrgUnit);
+    console.log("level 5",levelFiveOrgs);
     malNulRecords.forEach(function (malNul) {
         malNul.selectedRecords=[];
         malNul.records.forEach(function (record) {

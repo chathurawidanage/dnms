@@ -114,7 +114,46 @@ function DashboardController($location, $scope, toastService, programService, us
 
     }
 
-    ctrl.fetchOrgUnits(function (orgUnits) {
+    ctrl.buildOrgTree=function (orgUnits) {
+        var orgTreeObj = $scope["orgTree"];
+
+        var treeWorker = new Worker("js/app/workers/orgTreeProcess.js");
+        treeWorker.postMessage(orgUnits);
+        treeWorker.onmessage = function (e) {
+            ctrl.orgTree = e.data;
+            console.log(ctrl.orgTree);
+            //init selection
+            orgTreeObj.selectNodeLabel(ctrl.orgTree[0]);
+        };
+
+        orgTreeObj.selectNodeHead = function (selectedNode) {
+            //Collapse or Expand
+            selectedNode.collapsed = !selectedNode.collapsed;
+
+            if (!selectedNode.collapsed && selectedNode.childrenTemp) {
+                selectedNode.children = selectedNode.childrenTemp;
+            }
+        };
+
+        orgTreeObj.selectNodeLabel = function (selectedNode) {
+
+            //remove highlight from previous node
+            if (orgTreeObj.currentNode && orgTreeObj.currentNode.selected) {
+                orgTreeObj.currentNode.selected = undefined;
+            }
+
+            //set highlight to selected node
+            selectedNode.selected = 'selected';
+
+            //set currentNode
+            orgTreeObj.currentNode = selectedNode;
+            ctrl.currentOuSelection = selectedNode;
+
+            ctrl.refreshMalNulStats(selectedNode);
+        };
+    }
+
+/*    ctrl.fetchOrgUnits(function (orgUnits) {
         var orgTreeObj = $scope["orgTree"];
 
         var treeWorker = new Worker("js/app/workers/orgTreeProcess.js");
@@ -151,7 +190,7 @@ function DashboardController($location, $scope, toastService, programService, us
             ctrl.refreshMalNulStats(selectedNode);
         };
 
-    });
+    });*/
 
     userService.getCurrentUser().then(function (user) {//stage 1
         ctrl.caches.profile = CAHCE_STATUS.loading;
@@ -162,6 +201,9 @@ function DashboardController($location, $scope, toastService, programService, us
 
         var orgUnits = ctrl.user.organisationUnits;
         console.log(orgUnits);
+        ctrl.buildOrgTree(orgUnits);
+        
+
         //finding highest orgUnit
         var lowestLevel = Number.MAX_VALUE;
         orgUnits.forEach(function (orgUnit) {

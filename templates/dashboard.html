@@ -64,7 +64,7 @@
                             <span class="md-title main-card-title">Reason for malnutrition</span>
                         </md-card-header-text>
                     </md-card-header>
-                    <img src="img/banner.jpg" class="md-card-image" alt="Washed Out" style="height: 150px !important;">
+                    <!--<img src="img/banner.jpg" class="md-card-image" alt="Washed Out" style="height: 150px !important;">-->
                     <md-card-content>
                         <md-list>
                             <md-list-item class="md-2-line">
@@ -73,11 +73,12 @@
                                     <h3>Administrative Area</h3>
                                     <p>{{ctrl.currentOuSelection.displayName}}</p>
                                 </div>
-                                <md-button class="md-secondary md-icon-button" ng-click="ctrl.toggleRightNav()"
+                                <md-button class="md-secondary" ng-click="ctrl.toggleRightNav()"
                                            aria-label="toggle">
                                     <md-icon>
                                         <i class="material-icons">edit_location</i>
                                     </md-icon>
+                                    Change
                                 </md-button>
                             </md-list-item>
                             <md-divider></md-divider>
@@ -105,13 +106,24 @@
                         </md-card-header-text>
                     </md-card-header>
                     <md-card-content>
-                        <canvas class="chart chart-doughnut" chart-options="rctrl.mainChart.options"
-                                chart-data="rctrl.mainChart.data" chart-labels="rctrl.mainChart.labels"
-                                chart-click="rctrl.chartClick"></canvas>
-                        <md-divider></md-divider>
-                        <canvas class="chart chart-doughnut" chart-options="rctrl.subChart.options"
-                                chart-data="rctrl.subChart.data" chart-labels="rctrl.subChart.labels"
-                        ></canvas>
+                        <p class="text-center" ng-if="!rctrl.mainChart.visible">There are no risk identification data recorded for selected division.</p>
+                        <div ng-if="rctrl.mainChart.visible">
+                            <div layout="row" layout-sm="column" layout-align="space-around" ng-if="rctrl.mainChart.loading">
+                                <md-progress-circular md-mode="indeterminate"></md-progress-circular>
+                            </div>
+                            <canvas ng-if="!rctrl.mainChart.loading" class="chart chart-doughnut" chart-options="rctrl.mainChart.options"
+                                    chart-data="rctrl.mainChart.data" chart-labels="rctrl.mainChart.labels"
+                                    chart-click="rctrl.chartClick"></canvas>
+                        </div>
+                        <div ng-if="rctrl.subChart.visible" id="subChart" style="min-height: 250px">
+                            <md-divider></md-divider>
+                            <div layout="row" layout-sm="column" layout-align="space-around" ng-if="rctrl.subChart.loading">
+                                <md-progress-circular md-mode="indeterminate"></md-progress-circular>
+                            </div>
+                            <canvas ng-if="!rctrl.subChart.loading" class="chart chart-doughnut" chart-options="rctrl.subChart.options"
+                                    chart-data="rctrl.subChart.data" chart-labels="rctrl.subChart.labels">
+                            </canvas>
+                        </div>
                     </md-card-content>
                 </md-card>
             </div>

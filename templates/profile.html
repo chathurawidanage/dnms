@@ -17,25 +17,86 @@
                         <span class="md-subhead">Description</span>
                     </md-card-title-text>
                 </md-card-title>-->
+                <ng-map style="width: 100%" zoom="8" center="{{ctrl.getLocation()}}" ng-if="ctrl.getLocation()" >
+                    <marker position="{{ctrl.getLocation()}}" title="marker" animation="Animation.DROP"></marker>
+                </ng-map>
                 <md-card-content>
-                    <table width="100%" class="profile-attributes-table">
-                        <tbody>
-                        <tr ng-repeat="attribute in ctrl.attributes">
-                            <td width="50%">
-                                {{attribute.displayName}}
-                            </td>
-                            <td width="50%">
-                                {{attribute.value}}
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
+
+                    <!--    <table width="100%" class="profile-attributes-table">
+                            <tbody>
+                            <tr ng-repeat="attribute in ctrl.attributes">
+                                <td width="50%">
+                                    {{attribute.displayName}}
+                                </td>
+                                <td width="50%">
+                                    {{attribute.value}}
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>-->
+
+                    <md-list class="tei-attributes">
+                        <md-list-item class="md-2-line" ng-repeat="att in ctrl.teiObj.attributes">
+                            <!--<img ng-src="{{todos[0].face}}?20" class="md-avatar" alt="{{todos[0].who}}" />-->
+                            <md-input-container
+                                    ng-if="ctrl.getDataElement(att.dataElement).valueType=='BOOLEAN' || att.valueType=='TRUE_ONLY'">
+                                <p>{{att.displayName}}</p>
+                                <!--Due to a bug of angular ng-if should be applied to md-switch too-->
+                                <md-switch class="md-secondary md-" ng-model="att.value" aria-label="Switch 2"
+                                           ng-true-value="'true'" ng-false-value="'false'" class="md-warn"
+                                           ng-if="att.valueType=='BOOLEAN' || att.valueType=='TRUE_ONLY'">
+                                    <!--{{att.displayName}}-->
+                                </md-switch>
+                            </md-input-container>
+                            <md-input-container
+                                    ng-if="att.valueType=='NUMBER' || att.valueType=='INTEGER_POSITIVE'">
+                                <label>{{att.displayName}}</label>
+                                <input ng-model="att.value" >
+                            </md-input-container>
+                            <md-input-container class="md-block"
+                                                ng-if="att.valueType=='TEXT' && ctrl.teiAttributes[att.attribute].optionSet">
+                                <label>{{att.displayName}}</label>
+                                <md-select ng-model="att.value">
+                                    <md-option ng-repeat="option in ctrl.teiAttributes[att.attribute].optionSet.options"
+                                               ng-value="option.code">
+                                        {{option.displayName}}
+                                    </md-option>
+                                </md-select>
+                            </md-input-container>
+                            <md-input-container
+                                    ng-if="(att.valueType=='TEXT' || att.valueType=='PHONE_NUMBER') && !ctrl.teiAttributes[att.attribute].optionSet">
+                                <label>{{att.displayName}}</label>
+                                <input ng-model="att.value" >
+                            </md-input-container>
+
+                            <md-input-container ng-if="att.valueType=='DATE'" >
+                                <label>{{att.displayName}}</label>
+                                <md-datepicker ng-model="att.value" name="date1"></md-datepicker>
+                            </md-input-container>
+
+                            <!--  <div ng-if="att.valueType!='BOOLEAN' && att.valueType!='TRUE_ONLY'">
+                                  <p>{{att.displayName}}</p>
+                                  <p>{{att.value}}</p>
+                              </div>-->
+                        </md-list-item>
+                    </md-list>
                 </md-card-content>
-                <md-button class="md-fab md-mini md-primary profile-expand-btn" aria-label="Use Android">
+                <md-divider>
+                    <md-content style="text-align: right">
+                        <span flex></span>
+                        <md-button class="md-secondary" ng-click="ctrl.updateTei()">
+                            <md-icon>
+                                <i class="material-icons">save</i>
+                            </md-icon>
+                            Save Changes
+                        </md-button>
+                    </md-content>
+                </md-divider>
+               <!-- <md-button class="md-fab md-mini md-primary profile-expand-btn" aria-label="Use Android">
                     <md-icon>
                         <i class="material-icons">expand_more</i>
                     </md-icon>
-                </md-button>
+                </md-button>-->
             </md-card>
             <div ng-controller="ViewerController as ctrl" class="dashboard">
                 <md-content layout-padding>
@@ -61,7 +122,7 @@
         <div flex="50">
             <timeline side="right">
                 <timeline-event ng-repeat="event in ctrl.events" side="{{$index%2==0?'left':'right'}}">
-                    <timeline-badge class="{{event.badgeClass}}">
+                    <timeline-badge class="{{event.status=='ACTIVE'?'warning':'success'}}">
                         <i class="material-icons">{{event.badgeIcon}}</i>
                     </timeline-badge>
                     <timeline-panel class="{{event.badgeClass}}">
@@ -82,8 +143,11 @@
             <h1 class="md-toolbar-tools">{{ctrl.selectedEvent.title}}</h1>
         </md-toolbar>
         <md-content layout-margin>
-            <md-list class="md-dense">
-                <md-list-item class="md-2-line" ng-repeat="dv in ctrl.selectedEvent.dataValues">
+            <md-list class="">
+                <md-list-item class="md-2-line" ng-repeat="dv in ctrl.selectedEvent.dataValues" ng-if="ctrl.getDataElement(dv.dataElement).valueType!='COORDINATE'">
+                    <md-tooltip md-direction="right">
+                        Stored by {{dv.storedBy}}
+                    </md-tooltip>
                     <!--<img ng-src="{{todos[0].face}}?20" class="md-avatar" alt="{{todos[0].who}}" />-->
                     <md-input-container
                             ng-if="ctrl.getDataElement(dv.dataElement).valueType=='BOOLEAN' || ctrl.getDataElement(dv.dataElement).valueType=='TRUE_ONLY'">
@@ -99,14 +163,14 @@
                     <md-input-container
                             ng-if="ctrl.getDataElement(dv.dataElement).valueType=='NUMBER' || ctrl.getDataElement(dv.dataElement).valueType=='INTEGER_POSITIVE'">
                         <label>{{ctrl.getDataElement(dv.dataElement).displayName}}</label>
-                        <input ng-model="dv.value" ng-blur="ctrl.updateDataValue(dv)">
+                        <input ng-model="dv.value" ng-blur="ctrl.updateDataValue(dv)"  ng-class="ctrl.getHeightWeightBackgroundColorClass(dv.dataElement)">
                     </md-input-container>
                     <md-input-container
                             ng-if="ctrl.getDataElement(dv.dataElement).valueType=='TEXT' && ctrl.getDataElement(dv.dataElement).optionSet">
                         <label>{{ctrl.getDataElement(dv.dataElement).displayName}}</label>
                         <md-select ng-model="dv.value" ng-change="ctrl.updateDataValue(dv)">
                             <md-option ng-repeat="option in ctrl.getDataElement(dv.dataElement).optionSet.options"
-                                       ng-value="option.name">
+                                       ng-value="option.code">
                                 {{option.displayName}}
                             </md-option>
                         </md-select>
@@ -123,16 +187,33 @@
                 </md-list-item>
             </md-list>
 
+            <md-divider></md-divider>
+            <div ng-if="ctrl.selectedEvent.storedBy">
 
-            <md-button class="md-fab md-mini md-primary" aria-label="Use Android">
-                <md-icon style="color: greenyellow;">
+                <p>Last edited by <i>{{ctrl.selectedEvent.storedBy}}</i></p>
+                <md-divider></md-divider>
+            </div>
+
+
+            <md-button class="md-primary" aria-label="Use Android" ng-click="ctrl.completeEvent()"
+                       ng-if="ctrl.selectedEvent.status=='ACTIVE'">
+                <md-icon>
                     <i class="material-icons">done</i>
                 </md-icon>
+                Mark as reviewed
             </md-button>
-            <md-button ng-click="ctrl.closeNav()" class="md-fab md-mini md-warn">
+            <md-button class="md-primary" aria-label="Use Android" ng-click="ctrl.completeEvent(true)"
+                       ng-if="ctrl.selectedEvent.status=='COMPLETED'">
+                <md-icon>
+                    <i class="material-icons">undo</i>
+                </md-icon>
+                Reopen event
+            </md-button>
+            <md-button ng-click="ctrl.closeNav()" class="md-warn">
                 <md-icon>
                     <i class="material-icons">close</i>
                 </md-icon>
+                Close
             </md-button>
         </md-content>
     </md-sidenav>

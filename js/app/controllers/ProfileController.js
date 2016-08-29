@@ -5,6 +5,7 @@ function ProfileController($location, appService, teiService, $routeParams, toas
                            programService, dataElementService, programIndicatorsService, $q, $scope, $mdSidenav, eventService) {
     var ctrl = this;
     this.tei = $routeParams.tei;
+    this.teiObj = null;
     this.programId = $routeParams.program;
     this.program = {};
     this.teiAttributes = [];
@@ -16,7 +17,9 @@ function ProfileController($location, appService, teiService, $routeParams, toas
     this.selectedEvent = {};
 
     this.knownProgramStages = {
-        riskMonitoring: "vTWcDsFE1rf"
+        riskMonitoring: "vTWcDsFE1rf",
+        registration: "FyR0ymIDsoA",
+        nutritionMonitoring: "wS2i9c9hXXz"
     }
 
     this.childProfile = {
@@ -25,11 +28,53 @@ function ProfileController($location, appService, teiService, $routeParams, toas
         chdrNumber: {key: "WqdldQpOIxm", value: null}
     }
 
+    ctrl.locationCache = null;
+    ctrl.getLocation = function () {
+        if (ctrl.locationCache) {
+            return ctrl.locationCache;
+        }
+        ctrl.events.forEach(function (ev) {
+            if (ev.programStage == ctrl.knownProgramStages.registration && ev.coordinate) {
+                ctrl.locationCache = "[" + ev.coordinate.latitude + "," + ev.coordinate.longitude + "]";
+                console.log(ctrl.locationCache);
+                return ctrl.locationCache;
+            }
+        });
+
+        return false;
+    }
+
     ctrl.openNav = function () {
         $mdSidenav('left').open();
     }
     ctrl.closeNav = function () {
         $mdSidenav('left').close();
+        ctrl.selectedEvent = null;
+    }
+
+    /**
+     * mark event as compete or active
+     * @param reverse true will make event active, false will mark as completed
+     */
+    ctrl.completeEvent = function (reverse) {
+        if (ctrl.selectedEvent) {
+            eventService.completeEvent(ctrl.selectedEvent,reverse).then(function (response) {
+                if (response.httpStatusCode == 200) {
+                    if(reverse){
+                        toastService.showToast("Successfully reopened event.");
+                    }else {
+                        toastService.showToast("Successfully marked as reviewed.");
+                    }
+                } else {
+                    console.log(response);
+                    toastService.showToast("Error occurred. Not marked as reviewed.");
+                    ctrl.selectedEvent.status = "ACTIVE";
+                    if(reverse){
+                        ctrl.selectedEvent.status = "COMPLETED";
+                    }
+                }
+            });
+        }
     }
 
     ctrl.showEvent = function (event) {
@@ -43,24 +88,31 @@ function ProfileController($location, appService, teiService, $routeParams, toas
     }
 
     teiService.getAllTeiAttributes().then(function (teiAttributes) {
-        console.log("tei all attributes loaded");
-        ctrl.teiAttributes = teiAttributes;
+        ctrl.teiAttributes = [];
+        teiAttributes.forEach(function (att) {
+            ctrl.teiAttributes[att.id] = att;
+        });
+
+        console.log("tei all attributes loaded", ctrl.teiAttributes);
     }).then(function () {
         console.log("Loading attributes of ", ctrl.tei);
-        teiService.getAllAttributesForTei(ctrl.tei).then(function (attributes) {
-            console.log(attributes);
-            ctrl.attributes = [];
-            ctrl.attributes = attributes;
+        teiService.getTeiById(ctrl.tei).then(function (tei) {
+            ctrl.teiObj = tei;
 
             //filling known attributes
             var knownAtts = Object.keys(ctrl.childProfile);
-            console.log(knownAtts);
-            ctrl.attributes.forEach(function (attr) {
+            console.log("Attributes", ctrl.teiObj.attributes);
+            ctrl.teiObj.attributes.forEach(function (attr) {
                 knownAtts.forEach(function (knownAtt) {
                     if (!ctrl.childProfile[knownAtt].value && ctrl.childProfile[knownAtt].key == attr.attribute) {
                         ctrl.childProfile[knownAtt].value = attr.value;
                     }
-                })
+                });
+
+                //convert date strings to date objects to make them editable with dn-datepicker
+                if (attr.valueType == "DATE") {
+                    attr.value = new Date(attr.value);
+                }
             });
             console.log(ctrl.childProfile);
         });
@@ -107,8 +159,13 @@ function ProfileController($location, appService, teiService, $routeParams, toas
             }
             teiService.getEventData(ctrl.tei, ctrl.programId).then(function (events) {
                 events.forEach(function (event) {
-                    event.badgeIcon = "insert_chart";
-                    event.badgeClass = "success";
+                    event.badgeIcon = "insert_chart";//nut monitoring
+                    if (event.programStage == ctrl.knownProgramStages.registration) {
+                        event.badgeIcon = "person_pin";
+                    } else if (event.programStage == ctrl.knownProgramStages.riskMonitoring) {
+                        event.badgeIcon = "child_care";
+                    }
+
                     event.title = ctrl.getProgramStageById(event.programStage).displayName;
                     event.content = new Date(event.eventDate).toDateString();
 
@@ -130,7 +187,20 @@ function ProfileController($location, appService, teiService, $routeParams, toas
                         });
                     }
                 })
-                ctrl.events = events.reverse();
+                events.sort(function (a, b) {
+                    var dateA = new Date(a.eventDate);
+                    var dateB = new Date(b.eventDate);
+                    //giving priority for registration
+                    if (a.programStage == ctrl.knownProgramStages.registration) {
+                        return -1;
+                    } else if (b.programStage == ctrl.knownProgramStages.registration) {
+                        return 1;
+                    }
+                    //sort normally
+                    return dateA.getTime() - dateB.getTime();
+                });
+
+                ctrl.events = events;
                 console.log("events loaded", events);
             });
         })
@@ -139,11 +209,29 @@ function ProfileController($location, appService, teiService, $routeParams, toas
     ctrl.updateDataValue = function (dataValue) {
         eventService.updateEventData(ctrl.selectedEvent, dataValue).then(function (data) {
             if (data.httpStatusCode == 200) {
-                console.log(dataValue,ctrl.getDataElement(dataValue.dataElement));
+                console.log(dataValue, ctrl.getDataElement(dataValue.dataElement));
                 toastService.showToast(ctrl.getDataElement(dataValue.dataElement).displayName + " updated to " + dataValue.value);
-            }else{
-                console.log(dataValue,ctrl.getDataElement(dataValue.dataElement));
-                toastService.showToast(ctrl.getDataElement("Something went wrong when updating "+dataValue.dataElement).displayName);
+            } else {
+                console.log(dataValue, ctrl.getDataElement(dataValue.dataElement));
+                toastService.showToast(ctrl.getDataElement("Something went wrong when updating " + dataValue.dataElement).displayName);
+            }
+        })
+    }
+
+    ctrl.updateTei = function () {
+        //re encoding date objects
+        var teiObj = angular.copy(ctrl.teiObj);
+        teiObj.attributes.forEach(function (attr) {
+            if (attr.valueType == "DATE") {
+                attr.value = attr.value.toISOString().substring(0, 10);
+            }
+        });
+
+        teiService.updateTei(teiObj).then(function (data) {
+            if (data.httpStatusCode == 200) {
+                toastService.showToast("Changes Saved.");
+            } else {
+                toastService.showToast(ctrl.getDataElement("Error occurred while saving changes."));
             }
         })
     }
@@ -165,9 +253,75 @@ function ProfileController($location, appService, teiService, $routeParams, toas
         window.close();
     }
 
-    ctrl.debug=function (print) {
+    ctrl.debug = function (print) {
         console.log(print);
     }
+
+    /**
+     *
+     * @param dataElementId
+     * @returns {string}
+     */
+    ctrl.getHeightWeightBackgroundColorClass = function (dataElementId) {
+        var heightWeightDe = {
+            height: "Bpovp931fOZ",
+            weight: "jRceYOPJeCO"
+        }
+        var height = false;
+        if (dataElementId == heightWeightDe.height) {
+            height = true;
+        } else if (dataElementId != heightWeightDe.weight) {
+            console.log("return");
+            return "";//no color
+        }
+
+        var categoryIds = {
+            heightCat: {
+                id: "bYTh3TBpAFF"
+            },
+            weightCat: {
+                id: "qh8ptEnFWmp"
+            }
+        }
+
+        ctrl.selectedEvent.dataValues.forEach(function (dv) {
+            if (dv.dataElement == categoryIds.heightCat.id) {
+                categoryIds.heightCat.value = dv.value;
+            } else if (dv.dataElement == categoryIds.weightCat.id) {
+                categoryIds.weightCat.value = dv.value;
+            }
+        });
+
+
+        var getColor = function (value) {
+            switch (value) {
+                case "More than 2 SD":
+                    return "purple";
+                case "Between -1SD to +2SD" :
+                    return "green";
+                case "Between -1SD to -2SD":
+                    return "light-green";
+                case "Between -2SD to -3SD":
+                    return "orange";
+                case "Less than -3SD":
+                    return "red";
+            }
+        }
+
+
+        /*< -3 SD : Red
+         -2 SD to -3 SD : Orange
+         -1 SD to -2 SD : light green
+         +2 SD to -1 SD : green
+         >+2 SD : Purple*/
+
+        if (height) {
+            return getColor(categoryIds.heightCat.value);
+        } else {
+            return getColor(categoryIds.weightCat.value);
+        }
+    }
+
 
     /*
      this.events = [

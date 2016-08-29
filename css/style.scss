@@ -8,7 +8,7 @@ body {
   right: 15px;
 }
 
-.background-theme{
+.background-theme {
   background-color: #276696 !important;
 }
 
@@ -215,12 +215,11 @@ table {
   color: white;
 }
 
-
-.loader{
+.loader {
   position: fixed;
   width: 100%;
   height: 100%;
-  top:0;
+  top: 0;
 }
 
 .loading-element {
@@ -242,15 +241,47 @@ table {
   }
 }
 
-.event-sidenav{
+.event-sidenav {
   position: fixed;
   height: calc(100% - 64px);
-  top:64px;
+  top: 64px;
   width: 100%;
   md-content {
     h3 {
       white-space: normal !important;
       overflow: visible !important;
     }
+  }
+}
+
+.tei-attributes, .event-sidenav {
+  md-input-container {
+    width: 100%;
+    margin: 10px 0 0 0;
+  }
+
+  .red {
+    background-color: #d32f2f;
+    color:white;
+  }
+
+  .orange {
+    background-color: #EF6C00;
+    color:white;
+  }
+
+  .light-green {
+    background-color: #8BC34A;
+    color:white;
+  }
+
+  .green {
+    background-color: #4CAF50;
+    color:white;
+  }
+
+  .purple{
+    background-color: #4527A0;
+    color:white;
   }
 }

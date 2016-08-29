@@ -1,7 +1,7 @@
-//var serverRoot = 'http://148.251.224.242/nss1/api/';
+//var serverRoot = 'http://lankanets.info:8080/nss/api/';
 var serverRoot = '../../';
 var app = angular.module('long-charts', ['ngMaterial', 'ngRoute', 'longitudinalChartControllers', 'dropzone', 'chart.js'
-    , 'mdColorPicker', 'lfNgMdFileInput', 'angular-timeline', 'forerunnerdb', 'angularTreeview']);
+    , 'mdColorPicker', 'lfNgMdFileInput', 'angular-timeline', 'forerunnerdb', 'angularTreeview', 'ngMap']);
 app.config(['$routeProvider', function ($routeProvider) {
     $routeProvider.when('/', {
         templateUrl: 'templates/dashboard.html'
@@ -21,7 +21,9 @@ app.config(['$routeProvider', function ($routeProvider) {
 //temp config
 app.config(['$httpProvider', function ($httpProvider) {
     console.log($httpProvider);
-    //$httpProvider.defaults.headers.common['Authorization'] = "Basic Y2hhdGh1cmE6Q2hhdGh1ckExMjM=";
+    //$httpProvider.defaults.headers.common['Authorization'] = "Basic Y2hhdGh1cmE6Q2hhdGh1cmExMjM=";
+    //$httpProvider.defaults.headers.common['Authorization'] = "Basic bW9oMTptb2hNT0gxMjM=";//moh
+    //$httpProvider.defaults.headers.common['Authorization'] = "Basic cGhtNDpwaG1QSE0xMjM=";//phm
 }])
 var controllers = angular.module('longitudinalChartControllers', []);
 
@@ -63,6 +65,17 @@ app.factory('eventService', function ($http, $q) {
             return defer.promise;
         },
 
+        completeEvent: function (event, reverse) {
+            event.status = reverse ? "ACTIVE" : "COMPLETED";
+            var defer = $q.defer();
+            $http.put(serverRoot + 'events/' + event.event, angular.toJson(event)).then(function (response) {
+                defer.resolve(response.data);
+            }, function (response) {
+                defer.reject(response);
+            });
+            return defer.promise;
+        },
+
         getEventTeiMap: function (programId) {
             var defer = $q.defer();
             $http.get(serverRoot + 'events.json?ouMode=ACCESSIBLE&skipPaging=true&program=' + programId + '&fields=event,trackedEntityInstance').then(function (response) {
@@ -89,17 +102,17 @@ app.factory('eventService', function ($http, $q) {
                 }]
             };
             var defer = $q.defer();
-            $http.put(serverRoot + 'events/'+event.event+'/'+dataValue.dataElement, angular.toJson(eventCopy)).then(function (response) {
+            $http.put(serverRoot + 'events/' + event.event + '/' + dataValue.dataElement, angular.toJson(eventCopy)).then(function (response) {
                 defer.resolve(response.data);
             }, function (response) {
                 defer.reject(response);
             });
             return defer.promise;
         },
-        
-        getAnalyticsForDe:function (programId,programStageId,ouId,dataElementId) {
+
+        getAnalyticsForDe: function (programId, programStageId, ouId, dataElementId) {
             var defer = $q.defer();
-            $http.get(serverRoot + 'analytics/events/aggregate/'+programId+'.json?stage='+programStageId+'&dimension='+dataElementId+':IN%3A1&dimension=pe:LAST_3_MONTHS&filter=ou:'+ouId+'&outputType=EVENT&displayProperty=NAME').then(function (response) {
+            $http.get(serverRoot + 'analytics/events/aggregate/' + programId + '.json?stage=' + programStageId + '&dimension=' + dataElementId + ':IN%3A1&dimension=pe:LAST_3_MONTHS&filter=ou:' + ouId + '&outputType=EVENT&displayProperty=NAME').then(function (response) {
                 defer.resolve(response.data);
             }, function (response) {
                 console.log(response);
@@ -176,8 +189,29 @@ app.factory('teiService', function ($http, $q, appService) {
          */
         getAllTeiAttributes: function () {
             var defer = $q.defer();
-            $http.get(serverRoot + 'trackedEntityAttributes').then(function (response) {
+            $http.get(serverRoot + 'trackedEntityAttributes?fields=id,displayName,valueType,optionSet[options[:all]]').then(function (response) {
                 defer.resolve(response.data.trackedEntityAttributes);
+            }, function (response) {
+                defer.reject(response);
+            });
+            return defer.promise;
+        },
+
+        getTeiById: function (teiId) {
+            var defer = $q.defer();
+            $http.get(serverRoot + 'trackedEntityInstances/' + teiId + '.json?paging=false').then(function (response) {
+                defer.resolve(response.data);
+            }, function (response) {
+                defer.reject(response);
+            });
+            return defer.promise;
+        },
+
+        updateTei: function (tei) {
+            console.log(tei);
+            var defer = $q.defer();
+            $http.put(serverRoot + 'trackedEntityInstances/' + tei.trackedEntityInstance, angular.toJson(tei)).then(function (response) {
+                defer.resolve(response.data);
             }, function (response) {
                 defer.reject(response);
             });
@@ -488,7 +522,7 @@ app.factory('userService', function ($http, $q) {
     return {
         getCurrentUser: function () {
             var defer = $q.defer();
-            $http.get(serverRoot + 'me.json?fields=:all,organisationUnits[id,displayName,level]').then(function (response) {
+            $http.get(serverRoot + 'me.json?fields=:all,organisationUnits[level,id,displayName,,parent[id,displayName,level],children[level,id,displayName,children[level,id,displayName,children[level,id,displayName,children[level,id,displayName]]]]&paging=false').then(function (response) {
                 defer.resolve(response.data);
             }, function (response) {
                 defer.reject(response);

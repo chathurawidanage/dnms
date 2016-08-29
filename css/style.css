@@ -161,4 +161,22 @@ table {
     white-space: normal !important;
     overflow: visible !important; }
 
+.tei-attributes md-input-container, .event-sidenav md-input-container {
+  width: 100%;
+  margin: 10px 0 0 0; }
+.tei-attributes .red, .event-sidenav .red {
+  background-color: #d32f2f;
+  color: white; }
+.tei-attributes .orange, .event-sidenav .orange {
+  background-color: #EF6C00;
+  color: white; }
+.tei-attributes .light-green, .event-sidenav .light-green {
+  background-color: #8BC34A;
+  color: white; }
+.tei-attributes .green, .event-sidenav .green {
+  background-color: #4CAF50;
+  color: white; }
+.tei-attributes .purple, .event-sidenav .purple {
+  background-color: #4527A0; }
+
 /*# sourceMappingURL=style.css.map */
