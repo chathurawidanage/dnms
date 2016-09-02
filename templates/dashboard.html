@@ -106,21 +106,26 @@
                         </md-card-header-text>
                     </md-card-header>
                     <md-card-content>
-                        <p class="text-center" ng-if="!rctrl.mainChart.visible">There are no risk identification data recorded for selected division.</p>
+                        <p class="text-center" ng-if="!rctrl.mainChart.visible">There are no risk identification data
+                            recorded for selected division.</p>
                         <div ng-if="rctrl.mainChart.visible">
-                            <div layout="row" layout-sm="column" layout-align="space-around" ng-if="rctrl.mainChart.loading">
+                            <div layout="row" layout-sm="column" layout-align="space-around"
+                                 ng-if="rctrl.mainChart.loading">
                                 <md-progress-circular md-mode="indeterminate"></md-progress-circular>
                             </div>
-                            <canvas ng-if="!rctrl.mainChart.loading" class="chart chart-doughnut" chart-options="rctrl.mainChart.options"
+                            <canvas ng-if="!rctrl.mainChart.loading" class="chart chart-doughnut"
+                                    chart-options="rctrl.mainChart.options"
                                     chart-data="rctrl.mainChart.data" chart-labels="rctrl.mainChart.labels"
                                     chart-click="rctrl.chartClick"></canvas>
                         </div>
                         <div ng-if="rctrl.subChart.visible" id="subChart" style="min-height: 250px">
                             <md-divider></md-divider>
-                            <div layout="row" layout-sm="column" layout-align="space-around" ng-if="rctrl.subChart.loading">
+                            <div layout="row" layout-sm="column" layout-align="space-around"
+                                 ng-if="rctrl.subChart.loading">
                                 <md-progress-circular md-mode="indeterminate"></md-progress-circular>
                             </div>
-                            <canvas ng-if="!rctrl.subChart.loading" class="chart chart-doughnut" chart-options="rctrl.subChart.options"
+                            <canvas ng-if="!rctrl.subChart.loading" class="chart chart-doughnut"
+                                    chart-options="rctrl.subChart.options"
                                     chart-data="rctrl.subChart.data" chart-labels="rctrl.subChart.labels">
                             </canvas>
                         </div>
@@ -144,7 +149,118 @@
                     </md-card-content>
                 </md-card>
             </div>-->
+
             <div>
+                <md-card>
+                    <md-card-header class="colored-card-header">
+                        <md-card-header-text>
+                            <span class="md-title main-card-title">Review Summary</span>
+                        </md-card-header-text>
+                    </md-card-header>
+                    <md-card-content>
+                        <md-list>
+                            <md-list-item class="md-2-line">
+                                <img src="img/doctor-icon.png" class="md-avatar" alt="admin-area"/>
+                                <div class="md-list-item-text">
+                                    <h3>500</h3>
+                                    <p>Need your approval</p>
+                                </div>
+
+                            </md-list-item>
+                            <md-list-item>
+                                <md-button class="md-secondary" ng-click="ctrl.toggleRightNav()"
+                                           aria-label="toggle">
+                                    <md-icon>
+                                        <i class="material-icons">done</i>
+                                    </md-icon>
+                                    Approve All
+                                </md-button>
+                                <md-button class="md-secondary" ng-click="ctrl.toggleRightNav()"
+                                           aria-label="toggle">
+                                    <md-icon>
+                                        <i class="material-icons">shuffle</i>
+                                    </md-icon>
+                                    Pick One
+                                </md-button>
+                                <md-button class="md-secondary" ng-click="ctrl.toggleRightNav()"
+                                           aria-label="toggle">
+                                    <md-icon>
+                                        <i class="material-icons">visibility</i>
+                                    </md-icon>
+                                    View All
+                                </md-button>
+                            </md-list-item>
+
+                            <md-divider></md-divider>
+                            <md-list-item class="md-2-line">
+                                <img src="img/review-icon.png" class="md-avatar" alt="admin-area"/>
+                                <div class="md-list-item-text">
+                                    <h3>500</h3>
+                                    <p>Events reviewed by sister</p>
+                                </div>
+                            </md-list-item>
+                            <md-list-item class="md-2-line">
+                                <img src="img/event-icon.png" class="md-avatar" alt="admin-area"/>
+                                <div class="md-list-item-text">
+                                    <h3>2500</h3>
+                                    <p>Events</p>
+                                </div>
+                            </md-list-item>
+                        </md-list>
+                    </md-card-content>
+                </md-card>
+            </div>
+            <!--TEST-->
+            <div>
+                <md-card ng-controller="TeiListController as tctrl">
+                    <md-card-header class="colored-card-header">
+                        <md-card-header-text>
+                            <span class="md-title main-card-title">
+                                {{tctrl.cardTitle}}
+                            </span>
+                        </md-card-header-text>
+                    </md-card-header>
+                    <md-card-content>
+                        <md-input-container md-no-float class="md-block">
+                            <md-icon>
+                                <i class="material-icons">search</i>
+                            </md-icon>
+                            <input ng-model="tctrl.keyword" type="text" placeholder="Search for a child"
+                                   ng-keyup="tctrl.refreshList($event)">
+                        </md-input-container>
+
+                        <md-content class="teiInfiniteScroll">
+                            <table>
+                                <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Gender</td>
+                                    <td>Registering Unit</td>
+                                    <td>CHDR Number</td>
+                                </tr>
+                                </thead>
+                            </table>
+
+                            <md-virtual-repeat-container id="vertical-container">
+                                <table>
+                                    <tbody>
+                                    <tr md-virtual-repeat="item in tctrl.infiniteItems" md-on-demand
+                                        class="repeated-item" flex ng-click="ctrl.openChildProfile(item._id)">
+                                        <td>{{item.fName}} {{item.lName}}</td>
+                                        <td>{{item.gender}}</td>
+                                        <td>{{item.ouName}}</td>
+                                        <td>{{item.chdrNumber}}</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+
+                            </md-virtual-repeat-container>
+                        </md-content>
+                    </md-card-content>
+                </md-card>
+            </div>
+            <!--END TEST-->
+           <!-- <div>
                 <md-card ng-show="ctrl.selectedMalNul">
                     <md-card-header class="colored-card-header">
                         <md-card-header-text>
@@ -181,9 +297,9 @@
                         </md-content>
                     </md-card-content>
                 </md-card>
-            </div>
+            </div>-->
             <!--    <md-content layout-padding flex="100" class="teiInfiniteScroll">-->
-            <div>
+           <!-- <div>
                 <md-card felx="100" class="teiInfiniteScroll">
                     <md-card-header class="colored-card-header">
                         <md-card-header-text>
@@ -228,7 +344,7 @@
                         </md-content>
                     </md-card-content>
                 </md-card>
-            </div>
+            </div>-->
             <!--</md-content>-->
         </div>
     </div>

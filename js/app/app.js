@@ -1,5 +1,5 @@
-//var serverRoot = 'http://lankanets.info:8080/nss/api/';
-var serverRoot = '../../';
+var serverRoot = 'http://lankanets.info:8080/nss/api/';
+//var serverRoot = '../../';
 var app = angular.module('long-charts', ['ngMaterial', 'ngRoute', 'longitudinalChartControllers', 'dropzone', 'chart.js'
     , 'mdColorPicker', 'lfNgMdFileInput', 'angular-timeline', 'forerunnerdb', 'angularTreeview', 'ngMap']);
 app.config(['$routeProvider', function ($routeProvider) {
@@ -21,13 +21,14 @@ app.config(['$routeProvider', function ($routeProvider) {
 //temp config
 app.config(['$httpProvider', function ($httpProvider) {
     console.log($httpProvider);
-    //$httpProvider.defaults.headers.common['Authorization'] = "Basic Y2hhdGh1cmE6Q2hhdGh1cmExMjM=";
+    $httpProvider.defaults.headers.common['Authorization'] = "Basic Y2hhdGh1cmE6Q2hhdGh1cmExMjM=";
     //$httpProvider.defaults.headers.common['Authorization'] = "Basic bW9oMTptb2hNT0gxMjM=";//moh
     //$httpProvider.defaults.headers.common['Authorization'] = "Basic cGhtNDpwaG1QSE0xMjM=";//phm
 }])
 var controllers = angular.module('longitudinalChartControllers', []);
 
 controllers.controller('DashboardController', DashboardController);
+controllers.controller('TeiListController', TeiListController);
 controllers.controller('RiskController', RiskController);
 controllers.controller('ChartController', ChartController);
 controllers.controller('ProfileController', ProfileController);
@@ -52,6 +53,36 @@ angular.module('dropzone', []).directive('dropzone', function () {
     };
 });
 
+app.factory('enrollmentService', function ($http, $q) {
+    return {
+        unenrollTei: function (teiId, program) {
+            var defer = $q.defer();
+            this.getEnrollmentForTei(teiId, program).then(function (enrollments) {
+                var enrollment = enrollments[0];//todo handle multiple
+                console.log(enrollment);
+                enrollment.status = "COMPLETED";
+                $http.put(serverRoot + 'enrollments/' + enrollment.enrollment, angular.toJson(enrollment)).then(function (response) {
+                    defer.resolve(response);
+                }, function (response) {
+                    defer.reject(response);
+                });
+            });
+            return defer.promise;
+        },
+
+        getEnrollmentForTei: function (teiId, programId) {
+            var defer = $q.defer();
+            $http.get(serverRoot + 'enrollments.json?ouMode=ACCESSIBLE&trackedEntityInstance=' + teiId + '&program=' + programId).then(function (response) {
+                defer.resolve(response.data.enrollments);
+            }, function (response) {
+                console.log(response);
+                defer.reject(response);
+            });
+            return defer.promise;
+        }
+    }
+});
+
 app.factory('eventService', function ($http, $q) {
     return {
         getEventAnalytics: function (programId, orgUnit, dataElementId, expectedValue) {//todo dates are hard coded
@@ -71,6 +102,17 @@ app.factory('eventService', function ($http, $q) {
             $http.put(serverRoot + 'events/' + event.event, angular.toJson(event)).then(function (response) {
                 defer.resolve(response.data);
             }, function (response) {
+                event.status = reverse ? "COMPLETE" : "ACTIVE";
+                defer.reject(response);
+            });
+            return defer.promise;
+        },
+
+        deleteEvent: function (event) {
+            var defer = $q.defer();
+            $http.delete(serverRoot + 'events/' + event.event).then(function (response) {
+                defer.resolve(response.data);
+            }, function (response) {
                 defer.reject(response);
             });
             return defer.promise;
@@ -78,7 +120,7 @@ app.factory('eventService', function ($http, $q) {
 
         getEventTeiMap: function (programId) {
             var defer = $q.defer();
-            $http.get(serverRoot + 'events.json?ouMode=ACCESSIBLE&skipPaging=true&program=' + programId + '&fields=event,trackedEntityInstance').then(function (response) {
+            $http.get(serverRoot + 'events.json?ouMode=ACCESSIBLE&skipPaging=true&program=' + programId + '&fields=event,trackedEntityInstance,status').then(function (response) {
                 defer.resolve(response.data.events);
             }, function (response) {
                 console.log(response);
@@ -183,6 +225,28 @@ app.factory('appService', function ($http, $q) {
 
 app.factory('teiService', function ($http, $q, appService) {
     var teiService = {
+        //TEI LIST
+        teiListTitle: "",//title of the currently browsing Tei list
+        teiListObservers: [],
+        teiSearchFunction: null,
+        /**
+         *
+         * @param list
+         * @param title
+         * @param searchFunction a callback function which accepts (regexp,page,limit)
+         */
+        changeTeiList: function (title, searchFunction) {
+            teiService.teiListTitle = title;
+            teiService.teiSearchFunction = searchFunction;
+            teiService.teiListObservers.forEach(function (callback) {
+                callback();
+            })
+        },
+
+        addObserver: function (observerCallbackFunction) {
+            teiService.teiListObservers.push(observerCallbackFunction);
+        },
+        //END OF TEI LIST
         /**
          * Get all the teiAttributes that will be recorded per tei
          * @returns {*|m.promise|{then, catch, finally}|d}
@@ -201,6 +265,16 @@ app.factory('teiService', function ($http, $q, appService) {
             var defer = $q.defer();
             $http.get(serverRoot + 'trackedEntityInstances/' + teiId + '.json?paging=false').then(function (response) {
                 defer.resolve(response.data);
+            }, function (response) {
+                defer.reject(response);
+            });
+            return defer.promise;
+        },
+
+        deleteTei: function (teiId) {
+            var defer = $q.defer();
+            $http.delete(serverRoot + 'trackedEntityInstances/' + teiId).then(function (response) {
+                defer.resolve(response);
             }, function (response) {
                 defer.reject(response);
             });

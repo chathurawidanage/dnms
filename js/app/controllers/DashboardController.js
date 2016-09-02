@@ -94,7 +94,6 @@ function DashboardController($location, $scope, toastService, programService, us
         ouDb.load(function (err, tableStats, metaStats) {
             if (!err && tableStats.foundData && tableStats.rowCount > 0) {
                 console.log("loaded cached org tree successfully");
-                debugDb = ouDb;
                 callback(ouDb.find());
             } else {
                 orgUnitsService.getOrgTree().then(function (orgUnits) {
@@ -114,7 +113,7 @@ function DashboardController($location, $scope, toastService, programService, us
 
     }
 
-    ctrl.buildOrgTree=function (orgUnits) {
+    ctrl.buildOrgTree = function (orgUnits) {
         var orgTreeObj = $scope["orgTree"];
 
         var treeWorker = new Worker("js/app/workers/orgTreeProcess.js");
@@ -153,56 +152,56 @@ function DashboardController($location, $scope, toastService, programService, us
         };
     }
 
-/*    ctrl.fetchOrgUnits(function (orgUnits) {
-        var orgTreeObj = $scope["orgTree"];
+    /*    ctrl.fetchOrgUnits(function (orgUnits) {
+     var orgTreeObj = $scope["orgTree"];
 
-        var treeWorker = new Worker("js/app/workers/orgTreeProcess.js");
-        treeWorker.postMessage(orgUnits);
-        treeWorker.onmessage = function (e) {
-            ctrl.orgTree = [e.data];
-            //init selection
-            orgTreeObj.selectNodeLabel(ctrl.orgTree[0]);
-        };
+     var treeWorker = new Worker("js/app/workers/orgTreeProcess.js");
+     treeWorker.postMessage(orgUnits);
+     treeWorker.onmessage = function (e) {
+     ctrl.orgTree = [e.data];
+     //init selection
+     orgTreeObj.selectNodeLabel(ctrl.orgTree[0]);
+     };
 
-        orgTreeObj.selectNodeHead = function (selectedNode) {
-            //Collapse or Expand
-            selectedNode.collapsed = !selectedNode.collapsed;
+     orgTreeObj.selectNodeHead = function (selectedNode) {
+     //Collapse or Expand
+     selectedNode.collapsed = !selectedNode.collapsed;
 
-            if (!selectedNode.collapsed && selectedNode.childrenTemp) {
-                selectedNode.children = selectedNode.childrenTemp;
-            }
-        };
+     if (!selectedNode.collapsed && selectedNode.childrenTemp) {
+     selectedNode.children = selectedNode.childrenTemp;
+     }
+     };
 
-        orgTreeObj.selectNodeLabel = function (selectedNode) {
+     orgTreeObj.selectNodeLabel = function (selectedNode) {
 
-            //remove highlight from previous node
-            if (orgTreeObj.currentNode && orgTreeObj.currentNode.selected) {
-                orgTreeObj.currentNode.selected = undefined;
-            }
+     //remove highlight from previous node
+     if (orgTreeObj.currentNode && orgTreeObj.currentNode.selected) {
+     orgTreeObj.currentNode.selected = undefined;
+     }
 
-            //set highlight to selected node
-            selectedNode.selected = 'selected';
+     //set highlight to selected node
+     selectedNode.selected = 'selected';
 
-            //set currentNode
-            orgTreeObj.currentNode = selectedNode;
-            ctrl.currentOuSelection = selectedNode;
+     //set currentNode
+     orgTreeObj.currentNode = selectedNode;
+     ctrl.currentOuSelection = selectedNode;
 
-            ctrl.refreshMalNulStats(selectedNode);
-        };
+     ctrl.refreshMalNulStats(selectedNode);
+     };
 
-    });*/
+     });*/
 
     userService.getCurrentUser().then(function (user) {//stage 1
         ctrl.caches.profile = CAHCE_STATUS.loading;
         ctrl.user = user;
         //loading databases
-        ctrl.teiDb = $fdb.db('dnms').collection("teis-" + ctrl.user.id);
-        ctrl.eventsDb = $fdb.db('dnms').collection("events-" + ctrl.user.id);
+        ctrl.teiDb = $fdb.db('dnms').collection("teis");
+        ctrl.eventsDb = $fdb.db('dnms').collection("events");
 
         var orgUnits = ctrl.user.organisationUnits;
         console.log(orgUnits);
         ctrl.buildOrgTree(orgUnits);
-        
+
 
         //finding highest orgUnit
         var lowestLevel = Number.MAX_VALUE;
@@ -290,9 +289,30 @@ function DashboardController($location, $scope, toastService, programService, us
                 })
             });
             ctrl.caches.tei = CAHCE_STATUS.loaded;
+            ctrl.setGlobalTeiSearch();
+
             ctrl.checkProgress();
+            debugDb = ctrl.teiDb;
         });
     };
+
+    ctrl.setGlobalTeiSearch = function () {
+        teiService.changeTeiList("Global Search", function (regexp, page, limit) {
+            return ctrl.teiDb.find({
+                $or: [
+                    {
+                        fName: regexp
+                    },
+                    {
+                        lName: regexp
+                    }
+                ]
+            }, {
+                $page: page,
+                $limit: limit
+            })
+        });
+    }
 
     ctrl.progressCount = 0;
     ctrl.checkProgress = function () {
@@ -321,6 +341,51 @@ function DashboardController($location, $scope, toastService, programService, us
 
     ctrl.showMalNutTeis = function (malNutReason) {
         ctrl.selectedMalNul = malNutReason;
+        teiService.changeTeiList(malNutReason.title, function (regexp, page, limit) {
+            console.log("Page request", page);
+            var lowerBound = page * limit;
+            var upperBound = (page + 1) * limit;
+            if (upperBound > ctrl.selectedMalNul.selectedRecords.length) {
+                upperBound = ctrl.selectedMalNul.selectedRecords.length;
+            }
+            if (lowerBound < upperBound) {
+                var index = lowerBound;
+                var teis = [];
+                while (index < upperBound) {
+                    var eventId = ctrl.selectedMalNul.selectedRecords[index++].eventId;
+                    var event = ctrl.eventsDb.find({event: eventId});
+                    if (event.length > 0) {
+                        var teiId = event[0].trackedEntityInstance;
+                        var teiArr = ctrl.teiDb.find({
+                            $and: [
+                                {_id: teiId},
+                                {
+                                    $or: [
+                                        {
+                                            fName: regexp
+                                        },
+                                        {
+                                            lName: regexp
+                                        }
+                                    ]
+                                }
+                            ]
+                        }, {
+                            $page: page,
+                            $limit: limit
+                        });
+                        if (teiArr.length > 0) {
+                            teis.push(teiArr[0]);
+                        }
+                    } else {
+                        console.log("Unexpecetd events length", index, lowerBound, upperBound,eventId);
+                    }
+                }
+                return teis;
+            } else {
+                return null;
+            }
+        });
         ctrl.malNutInfiniteItems.reset();
     };
 

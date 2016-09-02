@@ -2,7 +2,8 @@
  * @author Chathura Widanage
  */
 function ProfileController($location, appService, teiService, $routeParams, toastService,
-                           programService, dataElementService, programIndicatorsService, $q, $scope, $mdSidenav, eventService) {
+                           programService, dataElementService, programIndicatorsService, $q, $mdDialog, $mdSidenav,
+                           eventService, enrollmentService) {
     var ctrl = this;
     this.tei = $routeParams.tei;
     this.teiObj = null;
@@ -44,6 +45,77 @@ function ProfileController($location, appService, teiService, $routeParams, toas
         return false;
     }
 
+    ctrl.deleteTei = function (ev) {
+        toastService.showConfirm(
+            'Do you really want to delete this profile?',
+            'This action will delete all events and data related to this child.',
+            'Please do it!',
+            "Don't delete",
+            function () {
+                teiService.deleteTei(ctrl.tei).then(function (response) {
+                    if (response.status == 204) {
+                        //ctrl.navBack();
+                    } else {
+                        toastService.showToast("An error occurred while trying to delete this profile. Please retry.");
+                    }
+                })
+            },
+            function () {
+                //do nothing
+            }
+        );
+    }
+
+    ctrl.unenrollTei = function () {
+        toastService.showConfirm(
+            'Do you really want to unenroll this child?',
+            'This action will not delete any data, but will exclude this child from report and dashboard.',
+            'Please do it!',
+            "Don't unenroll",
+            function () {
+                enrollmentService.unenrollTei(ctrl.tei, ctrl.programId).then(function (response) {
+                    if (response.status == 200) {
+                        toastService.showToast("Child unenrolled successfully.");
+                    } else {
+                        console.log(response);
+                        toastService.showToast("Failed to unenroll the child. Please retry.");
+                    }
+                },function (err) {
+                    toastService.showToast("Failed to unenroll the child due to a network failure.");
+                });
+            },
+            function () {
+                //do nothing
+            }
+        );
+    }
+
+    ctrl.deleteEvent = function (event, index) {
+        toastService.showConfirm(
+            'Do you really want to delete this event?',
+            'This action will delete all data recorded in this event.',
+            'Please do it!',
+            "Don't delete",
+            function () {
+                eventService.deleteEvent(event).then(function (response) {
+                    console.log(response);
+                    if (response.httpStatusCode == 200) {
+                        toastService.showToast("Event deleted.");
+                        ctrl.events.splice(index, 1);
+                        console.log("deleted");
+                    } else {
+                        toastService.showToast("An error occurred while trying to delete this profile. Please retry.")
+                    }
+                },function (err) {
+                    toastService.showToast("Delete operation was not successful due to a network failure.");
+                })
+            },
+            function () {
+                //do nothing
+            }
+        );
+    }
+
     ctrl.openNav = function () {
         $mdSidenav('left').open();
     }
@@ -58,21 +130,23 @@ function ProfileController($location, appService, teiService, $routeParams, toas
      */
     ctrl.completeEvent = function (reverse) {
         if (ctrl.selectedEvent) {
-            eventService.completeEvent(ctrl.selectedEvent,reverse).then(function (response) {
+            eventService.completeEvent(ctrl.selectedEvent, reverse).then(function (response) {
                 if (response.httpStatusCode == 200) {
-                    if(reverse){
+                    if (reverse) {
                         toastService.showToast("Successfully reopened event.");
-                    }else {
+                    } else {
                         toastService.showToast("Successfully marked as reviewed.");
                     }
                 } else {
                     console.log(response);
-                    toastService.showToast("Error occurred. Not marked as reviewed.");
+                    toastService.showToast("Error occurred. Event status not changed.");
                     ctrl.selectedEvent.status = "ACTIVE";
-                    if(reverse){
+                    if (reverse) {
                         ctrl.selectedEvent.status = "COMPLETED";
                     }
                 }
+            },function (err) {
+                toastService.showToast("Network failure occurred. Event status not changed.");
             });
         }
     }
