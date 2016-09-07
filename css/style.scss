@@ -282,3 +282,13 @@ div[md-color-picker] {
     color:white;
   }
 }
+
+#main-datepicker{
+  .md-datepicker-button{
+    visibility: hidden;
+  }
+
+  .md-datepicker-input-container{
+    margin-left: -52px;
+  }
+}

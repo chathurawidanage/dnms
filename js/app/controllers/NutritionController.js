@@ -4,14 +4,18 @@
 function NutritionController($location, appService, teiService, $routeParams, toastService,
                              programService, dataElementService, programIndicatorsService, $q, $scope, $mdSidenav, eventService) {
     var nctrl = this;
+    var sqlViews=[{id: "vMzcq7lEtWv", name: "Less than -3SD"},
+            {id: "UWkVK5iP7c6", name: "Between -2SD and -3SD"},
+            {id: "sXrfZU9sHix", name: "Greater than +2SD"}];
+/*    var sqlViews=[{id: "Eq5TZZjmiVQ", name: "Less than -3SD"},
+            {id: "iHDzKAWHtK1", name: "Between -2SD and -3SD"},
+            {id: "nTGbJDnaqiU", name: "Greater than +2SD"}];*/
     nctrl.heightChart = {
         loading: false,
         visible: true,
         data: [],
         dataElementId: "bYTh3TBpAFF",
-        sqlViews: [{id: "Eq5TZZjmiVQ", name: "Less than -3SD"},
-            {id: "iHDzKAWHtK1", name: "Between -2SD and -3SD"},
-            {id: "nTGbJDnaqiU", name: "Greater than +2SD"}],
+        sqlViews: sqlViews,
         labels: [],
         colors: [],
         options: {
@@ -36,9 +40,7 @@ function NutritionController($location, appService, teiService, $routeParams, to
         visible: true,
         data: [],
         dataElementId: "qh8ptEnFWmp",
-        sqlViews: [{id: "Eq5TZZjmiVQ", name: "Less than -3SD"},
-            {id: "iHDzKAWHtK1", name: "Between -2SD and -3SD"},
-            {id: "nTGbJDnaqiU", name: "Greater than +2SD"}],
+        sqlViews: sqlViews,
         labels: [],
         colors: [],
         options: {
@@ -63,9 +65,7 @@ function NutritionController($location, appService, teiService, $routeParams, to
         visible: true,
         data: [],
         dataElementId: "RGmYXRckjv0",
-        sqlViews: [{id: "Eq5TZZjmiVQ", name: "Less than -3SD"},
-            {id: "iHDzKAWHtK1", name: "Between -2SD and -3SD"},
-            {id: "nTGbJDnaqiU", name: "Greater than +2SD"}],
+        sqlViews: sqlViews,
         labels: [],
         colors: [],
         options: {
@@ -86,6 +86,8 @@ function NutritionController($location, appService, teiService, $routeParams, to
         }
     }
 
+    nctrl.date=new Date();
+
     nctrl.charts=[nctrl.heightChart,nctrl.weightChart,nctrl.weightForHeightChart];
 
     nctrl.readyness = {
@@ -103,6 +105,11 @@ function NutritionController($location, appService, teiService, $routeParams, to
         }
     });
 
+    $scope.$watch('ctrl.date', function (date) {
+        nctrl.date = date;
+        nctrl.loadData();
+    });
+
     $scope.$watch('ctrl.currentOuSelection', function (ouSelection) {
         if (ouSelection) {
             nctrl.readyness.ou = true;
@@ -115,11 +122,10 @@ function NutritionController($location, appService, teiService, $routeParams, to
             return;
         }
 
-
         nctrl.charts.forEach(function (chart) {
             chart.reset();
             chart.sqlViews.forEach(function (sqlView) {
-                eventService.getHeightWeightAnalytics(sqlView.id, "2015-06-05", "2016-09-07", $scope.ctrl.currentOuSelection.id, chart.dataElementId).then(function (data) {
+                eventService.getHeightWeightAnalytics(sqlView.id, new Date(0).toDateString(), nctrl.date.toDateString(), $scope.ctrl.currentOuSelection.id, chart.dataElementId).then(function (data) {
                     var rows = data.rows;
                     if (rows.length > 0) {
                         var row = rows[0];

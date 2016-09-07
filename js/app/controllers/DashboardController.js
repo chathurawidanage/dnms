@@ -79,8 +79,9 @@ function DashboardController($location, $scope, toastService, programService, us
 
     ctrl.doneInitLoading = false;
 
-    ctrl.date1=new Date();
-    ctrl.date2=new Date();
+    ctrl.date = new Date();
+
+    ctrl.trendDataElement = undefined;
 
     //side nav
     ctrl.toggleRightNav = function () {
@@ -276,7 +277,6 @@ function DashboardController($location, $scope, toastService, programService, us
             ctrl.eventsDb.insert(events, function (result) {
                 console.log(result);
                 ctrl.updateViewedEventsCount();
-                ctrl.eventsDb.save();
                 //save for future use
 
             });
@@ -555,16 +555,30 @@ function DashboardController($location, $scope, toastService, programService, us
 
     ctrl.viewedEventsCount = 0;
     ctrl.viewedEventUpdateInterval = undefined;
-    ctrl.updateViewedEventsCount = function () {//todo change status to viewed
+    ctrl.updateViewedEventsCount = function () {
         if (ctrl.viewedEventUpdateInterval) {
             $interval.cancel(ctrl.viewedEventUpdateInterval);
         }
         $interval(function () {
             ctrl.viewedEventsCount = ctrl.eventsDb.find({
+                    status: "SCHEDULE"
+                }
+            ).length;
+        }, 5000);
+        ctrl.updateActiveEventsCount();
+    };
+
+    ctrl.activeEventsCount = 0;
+    ctrl.activeEventUpdateInterval = undefined;
+    ctrl.updateActiveEventsCount = function () {
+        if (ctrl.activeEventUpdateInterval) {
+            $interval.cancel(ctrl.activeEventUpdateInterval);
+        }
+        $interval(function () {
+            ctrl.activeEventsCount = ctrl.eventsDb.find({
                     status: "ACTIVE"
                 }
             ).length;
-            console.log(ctrl.viewedEventsCount);
         }, 5000);
     };
 

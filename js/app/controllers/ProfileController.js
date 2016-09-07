@@ -3,7 +3,7 @@
  */
 function ProfileController($location, appService, teiService, $routeParams, toastService,
                            programService, dataElementService, programIndicatorsService, $q, $mdDialog, $mdSidenav,
-                           eventService, enrollmentService, $fdb) {
+                           eventService, enrollmentService, $fdb, userService) {
     var ctrl = this;
     this.tei = $routeParams.tei;
     this.teiObj = null;
@@ -28,6 +28,12 @@ function ProfileController($location, appService, teiService, $routeParams, toas
         lastName: {key: "C8DBAo2wEYN", value: null},
         chdrNumber: {key: "WqdldQpOIxm", value: null}
     }
+
+    this.user;
+
+    userService.getCurrentUser().then(function (user) {
+        ctrl.user = user;
+    })
 
     ctrl.locationCache = null;
     ctrl.getLocation = function () {
@@ -124,6 +130,13 @@ function ProfileController($location, appService, teiService, $routeParams, toas
         ctrl.selectedEvent = null;
     }
 
+    ctrl.getUserEventAction = function () {
+        if (ctrl.user && ctrl.user.level <= 3) {
+            return "COMPLETED";
+        }
+        return "SCHEDULE";
+    }
+
     /**
      * mark event as compete or active
      * @param reverse true will make event active, false will mark as completed
@@ -131,38 +144,23 @@ function ProfileController($location, appService, teiService, $routeParams, toas
     ctrl.completeEvent = function (reverse) {
         //todo make changes to local cache as well
         if (ctrl.selectedEvent) {
-            eventService.completeEvent(ctrl.selectedEvent, reverse).then(function (response) {
+            var oldStatus = ctrl.selectedEvent.status;
+            console.log(oldStatus);
+            var newStatus = ctrl.getUserEventAction();
+            if (reverse) {
+                newStatus = "ACTIVE";
+            }
+            eventService.completeEvent(ctrl.selectedEvent, newStatus).then(function (response) {
                 if (response.httpStatusCode == 200) {
-                    var newStatus = "COMPLETED";
                     if (reverse) {
-                        newStatus = "ACTIVE";
                         toastService.showToast("Successfully reopened event.");
                     } else {
-                        toastService.showToast("Successfully marked as reviewed.");
-                    }
-                    try {
-                        var eventDb = eventService.getEventsDb();
-                        eventDb.load();
-                        console.log(eventDb.find({
-                                status: "ACTIVE"
-                            }
-                        ).length);
-                        debugDb=eventDb;
-                        eventDb.update({event: ctrl.selectedEvent.event}, {status: newStatus});
-                        console.log(eventDb.find({
-                                status: "ACTIVE"
-                            }
-                        ).length)
-                    } catch (e) {
-                        console.error("Error occured while updating local cache", e);
+                        toastService.showToast("Successfully marked as reviewed");
                     }
                 } else {
                     console.log(response);
                     toastService.showToast("Error occurred. Event status not changed.");
-                    ctrl.selectedEvent.status = "ACTIVE";
-                    if (reverse) {
-                        ctrl.selectedEvent.status = "COMPLETED";
-                    }
+                    ctrl.selectedEvent.status = oldStatus;
                 }
             }, function (err) {
                 toastService.showToast("Network failure occurred. Event status not changed.");

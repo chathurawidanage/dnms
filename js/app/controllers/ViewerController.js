@@ -55,6 +55,8 @@ function ViewerController($location, appService, teiService, $routeParams, toast
                 enabled:false
             };
 
+            //chart.options.pointBackgroundColor="white";
+
             //axis labeling
             var chartDependantDataType = parseInt(chart.dependantDataType);
 
@@ -284,13 +286,19 @@ function ViewerController($location, appService, teiService, $routeParams, toast
                     fill: false,
                     label: 'Recorded Data',
                     borderWidth: 2,
-                    pointBackgroundColor: "rgba(0,0,0,0)",//hide points
-                    pointHoverBackgroundColor: "black",
-                    borderColor:"rgba(0,0,0,0)",
+                    pointBackgroundColor: "white",//hide points
+                    pointHoverBackgroundColor: "white",
+                    borderColor:"white",
                     //borderDash: [5, 15],
                     skipNullValues: true,
                     showLines: false
                 }];
+                
+                for(var i=0;i<chart.data.length-1;i++){
+                    chart.dso.push({
+                        pointBackgroundColor: "rgba(0,0,0,0)"
+                    });
+                }
 
                 chart.dso[0].data = data;
                 console.log(data);

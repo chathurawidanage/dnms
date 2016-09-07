@@ -1,4 +1,4 @@
-var displayPoints=false;
+var displayPoints = false;
 (function (factory) {
     'use strict';
     if (typeof exports === 'object') {
@@ -45,7 +45,7 @@ var displayPoints=false;
             return new ChartJsFactory();
         }])
         .directive('chartLine', ['ChartJsFactory', function (ChartJsFactory) {
-            displayPoints=false;
+            displayPoints = false;
             return new ChartJsFactory('line');
         }])
         .directive('chartBar', ['ChartJsFactory', function (ChartJsFactory) {
@@ -58,7 +58,7 @@ var displayPoints=false;
             return new ChartJsFactory('radar');
         }])
         .directive('chartDoughnut', ['ChartJsFactory', function (ChartJsFactory) {
-            displayPoints=true;
+            displayPoints = true;
             return new ChartJsFactory('doughnut');
         }])
         .directive('chartPie', ['ChartJsFactory', function (ChartJsFactory) {
@@ -263,9 +263,9 @@ var displayPoints=false;
             return {
                 backgroundColor: rgba(color, 1),//0.2
                 borderColor: rgba(getDarkerShade(color), 1),//hide points
-                pointBackgroundColor: rgba(color, displayPoints?1:0),
-                pointBorderColor: displayPoints?'#fff':rgba([0,0,0],0),
-                pointHoverBackgroundColor: displayPoints?'#fff':rgba([0,0,0],0),//todo this is a hack, code it properly later
+                pointBackgroundColor: rgba(color, displayPoints ? 1 : 0),
+                pointBorderColor: displayPoints ? rgba(color, 1) : rgba([0, 0, 0], 0),
+                pointHoverBackgroundColor: displayPoints ? rgba(color, 1) : rgba([0, 0, 0], 1),//todo this is a hack, code it properly later
                 pointHoverBorderColor: rgba(color, 0.8)
             };
         }

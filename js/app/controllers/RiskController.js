@@ -146,8 +146,6 @@ function RiskController($location, appService, teiService, $routeParams, toastSe
     ];
     rctrl.riskIdentificationProgStage = "vTWcDsFE1rf";
     rctrl.date2 = new Date();
-    rctrl.date1 = new Date();
-    rctrl.date1.setMonth(rctrl.date2.getMonth() - 3);
 
 
     rctrl.mainChart = {
@@ -231,7 +229,8 @@ function RiskController($location, appService, teiService, $routeParams, toastSe
         })
     });
 
-    $scope.$watch('ctrl.date1', function (date1) {
+    $scope.$watch('ctrl.date', function (date) {
+        rctrl.date2 = date;
         rctrl.loadData();
     });
 
@@ -259,7 +258,7 @@ function RiskController($location, appService, teiService, $routeParams, toastSe
         var grandTotal = 0;
         var count = 0;
         rctrl.risks.forEach(function (mainRisk) {
-            eventService.getAnalyticsForDeCustom(rctrl.date1.toDateString(), rctrl.date2.toDateString(), $scope.ctrl.currentOuSelection.id, mainRisk.id).then(function (data) {
+            eventService.getAnalyticsForDeCustom(new Date(0).toDateString(), rctrl.date2.toDateString(), $scope.ctrl.currentOuSelection.id, mainRisk.id).then(function (data) {
                 var total = 0;
                 if (data.rows.length > 0) {
                     var tableRow = data.rows[0];
@@ -320,10 +319,22 @@ function RiskController($location, appService, teiService, $routeParams, toastSe
 
     }
 
+    rctrl.currentMainRisk = undefined;
     rctrl.chartClick = function (points, evt) {
         var index = points[0]._index;
         console.log(index);
+        $scope.ctrl.trendDataElement = rctrl.risks[index].id;
+        rctrl.currentMainRisk = rctrl.risks[index];
         rctrl.generateSubChart(index, true);
+    }
+
+    rctrl.subChartClick = function (points, evt) {
+        var index = points[0]._index;
+        console.log("Sub chart click", index);
+        if (rctrl.currentMainRisk) {
+            console.log(rctrl.currentMainRisk);
+            $scope.ctrl.trendDataElement = rctrl.currentMainRisk.children[index].id;
+        }
     }
 
     rctrl.generateSubChart = function (mainRiskIndex, keepVisibility) {
@@ -335,7 +346,7 @@ function RiskController($location, appService, teiService, $routeParams, toastSe
         rctrl.subChart.visible = true;
         rctrl.subChart.options.title.text = majorRisk.name;
         majorRisk.children.forEach(function (subRisk) {
-            eventService.getAnalyticsForDeCustom(rctrl.date1.toDateString(), rctrl.date2.toDateString(), $scope.ctrl.currentOuSelection.id, subRisk.id).then(function (data) {
+            eventService.getAnalyticsForDeCustom(new Date(0).toDateString(), rctrl.date2.toDateString(), $scope.ctrl.currentOuSelection.id, subRisk.id).then(function (data) {
                 var total = 0;
                 if (data.rows.length > 0) {
                     var tableRow = data.rows[0];

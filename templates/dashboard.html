@@ -90,7 +90,7 @@
                             </md-card>
                         </md-content>
                     </md-tab>
-                    <md-tab label="Risk Analytics">
+                    <md-tab ng-if="ctrl.user.level<=3" label="Risk Analytics">
                         <md-card ng-controller="RiskController as rctrl">
                             <md-card-header class="colored-card-header">
                                 <md-card-header-text>
@@ -98,18 +98,6 @@
                                 </md-card-header-text>
                             </md-card-header>
                             <md-card-content layout="column">
-                                <div lyout="row" layout-align="space-between stretch">
-                                    <md-input-container>
-                                        <label>First Date</label>
-                                        <md-datepicker ng-model="rctrl.date1" md-placeholder="Enter date"
-                                                       ng-change="rctrl.loadData()" md-open-on-focus></md-datepicker>
-                                    </md-input-container>
-                                    <md-input-container>
-                                        <label>Second Date</label>
-                                        <md-datepicker ng-model="rctrl.date2" md-placeholder="Enter date"
-                                                       ng-change="rctrl.loadData()" md-open-on-focus></md-datepicker>
-                                    </md-input-container>
-                                </div>
                                 <p class="text-center" ng-if="!rctrl.mainChart.visible">There are no risk identification
                                     data
                                     recorded for selected division.</p>
@@ -131,13 +119,14 @@
                                     </div>
                                     <canvas ng-if="!rctrl.subChart.loading" class="chart chart-doughnut"
                                             chart-options="rctrl.subChart.options"
+                                            chart-click="rctrl.subChartClick"
                                             chart-data="rctrl.subChart.data" chart-labels="rctrl.subChart.labels">
                                     </canvas>
                                 </div>
                             </md-card-content>
                         </md-card>
                     </md-tab>
-                    <md-tab label="Height / Weight">
+                    <md-tab ng-if="ctrl.user.level<=3" label="Height / Weight">
                         <md-content class="md-padding">
                             <md-card ng-controller="NutritionController as nctrl">
                                 <md-card-header class="colored-card-header">
@@ -149,7 +138,7 @@
                                 <md-card-content>
                                     <md-list>
                                         <div ng-repeat="nchart in nctrl.charts">
-                                            <md-list-item >
+                                            <md-list-item>
                                                 <canvas class="chart chart-bar"
                                                         chart-options="nchart.options"
                                                         chart-data="nchart.data" chart-labels="nchart.labels"
@@ -162,9 +151,6 @@
                         </md-content>
                     </md-tab>
                 </md-tabs>
-            </div>
-            <div flex="100">
-
             </div>
         </div>
         <div flex="50" layout="column">
@@ -188,7 +174,7 @@
                 <md-card>
                     <md-card-header class="colored-card-header">
                         <md-card-header-text>
-                            <span class="md-title main-card-title">Hello Dr. {{ctrl.user.firstName}}!</span>
+                            <span class="md-title main-card-title">Hello {{ctrl.user.level==3?"Dr. ":""}} {{ctrl.user.firstName}}!</span>
                         </md-card-header-text>
                     </md-card-header>
                     <md-card-content>
@@ -208,51 +194,85 @@
                                 </md-button>
                             </md-list-item>
                             <md-divider></md-divider>
-                            <md-list-item class="md-2-line">
+                            <md-list-item ng-if="ctrl.user.level<=3" class="md-2-line">
                                 <img src="img/calendar-icon.png" class="md-avatar" alt="admin-area"/>
                                 <div class="md-list-item-text">
-                                    <h3>Set your dates</h3>
-                                    <md-datepicker ng-model="ctrl.date1"></md-datepicker> - <md-datepicker ng-model="ctrl.date2"></md-datepicker>
+                                    <h3>Set your report date</h3>
+                                    <md-datepicker ng-model="ctrl.date" id="main-datepicker"
+                                                   md-open-on-focus></md-datepicker>
                                 </div>
                             </md-list-item>
                             <md-divider></md-divider>
-                            <md-list-item class="md-2-line">
+                            <md-list-item class="md-2-line" ng-if="ctrl.user.level<=3" >
                                 <img src="img/doctor-icon.png" class="md-avatar" alt="admin-area"/>
                                 <div class="md-list-item-text">
                                     <h3>{{ctrl.viewedEventsCount}}</h3>
                                     <p>Events need your approval</p>
                                 </div>
                             </md-list-item>
+                            <md-list-item class="md-2-line">
+                                <img src="img/warning-icon.png" class="md-avatar" alt="admin-area"/>
+                                <div class="md-list-item-text">
+                                    <h3>{{ctrl.activeEventsCount}}</h3>
+                                    <p>Events need {{ctrl.user.level<=3?"sisters":"your"}} attention</p>
+                                </div>
+                            </md-list-item>
+                            <md-list-item>
+                                <span flex></span>
+                                <md-button class="md-secondary" ng-click="ctrl.approveAllEvents()"
+                                           aria-label="toggle" ng-if="ctrl.user.level<=3" >
+                                    <md-icon>
+                                        <i class="material-icons">done</i>
+                                    </md-icon>
+                                    Approve All
+                                </md-button>
+                                <md-button class="md-secondary" ng-click="ctrl.pickRandomEvent()"
+                                           aria-label="toggle">
+                                    <md-icon>
+                                        <i class="material-icons">shuffle</i>
+                                    </md-icon>
+                                    Pick One
+                                </md-button>
+                                <md-button class="md-secondary" ng-click="ctrl.viewAllIncompleteEvents()"
+                                           aria-label="toggle">
+                                    <md-icon>
+                                        <i class="material-icons">visibility</i>
+                                    </md-icon>
+                                    View All
+                                </md-button>
+                            </md-list-item>
                         </md-list>
-
                     </md-card-content>
-                    <md-card-actions layout="row">
-                        <span flex></span>
-                        <md-button class="md-secondary" ng-click="ctrl.approveAllEvents()"
-                                   aria-label="toggle">
-                            <md-icon>
-                                <i class="material-icons">done</i>
-                            </md-icon>
-                            Approve All
-                        </md-button>
-                        <md-button class="md-secondary" ng-click="ctrl.pickRandomEvent()"
-                                   aria-label="toggle">
-                            <md-icon>
-                                <i class="material-icons">shuffle</i>
-                            </md-icon>
-                            Pick One
-                        </md-button>
-                        <md-button class="md-secondary" ng-click="ctrl.viewAllIncompleteEvents()"
-                                   aria-label="toggle">
-                            <md-icon>
-                                <i class="material-icons">visibility</i>
-                            </md-icon>
-                            View All
-                        </md-button>
-                        </md-button>
-                    </md-card-actions>
                 </md-card>
             </div>
+
+            <div ng-controller="TrendController as tctrl">
+                <md-card ng-show="tctrl.mainChart.visible">
+                    <md-card-header class="colored-card-header">
+                        <md-card-header-text>
+                            <span class="md-title main-card-title">{{tctrl.mainChart.options.title.text}}</span>
+                        </md-card-header-text>
+                    </md-card-header>
+                    <!--<img src="img/banner.jpg" class="md-card-image" alt="Washed Out" style="height: 150px !important;">-->
+                    <md-card-content>
+                        <md-list>
+                            <md-list-item>
+                                <md-progress-circular ng-show="tctrl.mainChart.loading"></md-progress-circular>
+                                <canvas class="chart chart-line" ng-show="!tctrl.mainChart.loading"
+                                        chart-options="tctrl.mainChart.options"
+                                        chart-data="tctrl.mainChart.data" chart-labels="tctrl.mainChart.labels"
+                                ></canvas>
+                            </md-list-item>
+                            <md-list-item>
+                                <span felx></span>
+                                <md-button class="md-secondary md-warn" ng-click="tctrl.hideChart()">Hide</md-button>
+                            </md-list-item>
+                        </md-list>
+                    </md-card-content>
+                </md-card>
+            </div>
+
+
             <!--TEST-->
             <div>
                 <md-card ng-controller="TeiListController as tctrl">

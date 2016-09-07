@@ -190,4 +190,9 @@ div[md-color-picker] .md-color-picker-preview {
   background-color: #4527A0;
   color: white; }
 
+#main-datepicker .md-datepicker-button {
+  visibility: hidden; }
+#main-datepicker .md-datepicker-input-container {
+  margin-left: -52px; }
+
 /*# sourceMappingURL=style.css.map */

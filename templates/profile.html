@@ -228,7 +228,7 @@
                 Mark as reviewed
             </md-button>
             <md-button class="md-primary" aria-label="Use Android" ng-click="ctrl.completeEvent(true)"
-                       ng-if="ctrl.selectedEvent.status=='COMPLETED'">
+                       ng-if="ctrl.selectedEvent.status!='ACTIVE'">
                 <md-icon>
                     <i class="material-icons">undo</i>
                 </md-icon>

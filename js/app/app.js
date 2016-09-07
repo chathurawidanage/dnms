@@ -1,6 +1,7 @@
-var serverRoot = 'http://lankanets.info:8080/nss/api/';
+//var serverRoot = 'http://lankanets.info:8080/nss/api/';
+//var serverRoot = 'http://dhis.pgim.cmb.ac.lk/nss/api/';
 //var serverRoot = 'http://148.251.224.242/nss1/api/';
-//var serverRoot = '../../';
+var serverRoot = '../../';
 var app = angular.module('long-charts', ['ngMaterial', 'ngRoute', 'longitudinalChartControllers', 'dropzone', 'chart.js'
     , 'mdColorPicker', 'lfNgMdFileInput', 'angular-timeline', 'forerunnerdb', 'angularTreeview', 'ngMap']);
 app.config(['$routeProvider', function ($routeProvider) {
@@ -23,7 +24,7 @@ app.config(['$routeProvider', function ($routeProvider) {
 app.config(['$httpProvider', function ($httpProvider) {
     console.log($httpProvider);
     //$httpProvider.defaults.headers.common['Authorization'] = "Basic Y2hhdGh1cmE6Q2hhdGh1cmExMjM=";
-    $httpProvider.defaults.headers.common['Authorization'] = "Basic bW9oMTptb2hNT0gxMjM=";//moh
+    //$httpProvider.defaults.headers.common['Authorization'] = "Basic bW9oMTptb2hNT0gxMjM=";//moh
     //$httpProvider.defaults.headers.common['Authorization'] = "Basic cGhtNDpwaG1QSE0xMjM=";//phm
 }])
 var controllers = angular.module('longitudinalChartControllers', []);
@@ -32,6 +33,7 @@ controllers.controller('DashboardController', DashboardController);
 controllers.controller('TeiListController', TeiListController);
 controllers.controller('RiskController', RiskController);
 controllers.controller('NutritionController', NutritionController);
+controllers.controller('TrendController', TrendController);
 controllers.controller('ChartController', ChartController);
 controllers.controller('ProfileController', ProfileController);
 controllers.controller('ViewerController', ViewerController);
@@ -115,8 +117,8 @@ app.factory('eventService', function ($http, $q, $fdb) {
             return defer.promise;
         },
 
-        completeEvent: function (event, reverse) {
-            event.status = reverse ? "ACTIVE" : "COMPLETED";
+        completeEvent: function (event, status) {
+            event.status = status;
             var defer = $q.defer();
             $http.put(serverRoot + 'events/' + event.event, angular.toJson(event)).then(function (response) {
                 defer.resolve(response.data);
@@ -171,10 +173,16 @@ app.factory('eventService', function ($http, $q, $fdb) {
             return defer.promise;
         },
 
-        getAnalyticsForDeCustom: function (date1, date2, ouId, dataElementId) {
+        getAnalyticsForDeCustom: function (date1, date2, ouId, dataElementId, index) {
             var defer = $q.defer();
-            $http.get(serverRoot + 'sqlViews/ewmYHyiO0sO/data?var=date1:' + date1 + '&var=date2:' + date2 + '&var=ou:' + ouId + '&var=dataElement:' + dataElementId).then(function (response) {
-                defer.resolve(response.data);
+            //lankanets ewmYHyiO0sO
+            //main ejUWIpcmgTz
+            $http.get(serverRoot + 'sqlViews/ejUWIpcmgTz/data?var=date1:' + date1 + '&var=date2:' + date2 + '&var=ou:' + ouId + '&var=dataElement:' + dataElementId).then(function (response) {
+                if (!index) {//todo remove temp fix
+                    defer.resolve(response.data);
+                } else {
+                    defer.resolve({index: index, data: response.data});
+                }
             }, function (response) {
                 console.log(response);
                 defer.reject(response);
@@ -638,7 +646,20 @@ app.factory('userService', function ($http, $q) {
     return {
         getCurrentUser: function () {
             var defer = $q.defer();
+            var userRoleMap = {//todo remove this temp fix
+                wC9asSQrYO0: 0,
+                Ej7USJV1ccn: 3,//moh
+                uCBJBr2plYV: 4,//sister
+                jpsN0Kh6KTr: 5//mid wife
+            }
             $http.get(serverRoot + 'me.json?fields=:all,organisationUnits[level,id,displayName,,parent[id,displayName,level],children[level,id,displayName,children[level,id,displayName,children[level,id,displayName,children[level,id,displayName]]]]&paging=false').then(function (response) {
+                response.data.level = 5;
+                try {
+                    var userRole = response.data.userCredentials.userRoles[0].id;
+                    response.data.level = userRoleMap[userRole];
+                } catch (e) {
+                    console.error(e);
+                }
                 defer.resolve(response.data);
             }, function (response) {
                 defer.reject(response);
