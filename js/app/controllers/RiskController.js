@@ -145,6 +145,10 @@ function RiskController($location, appService, teiService, $routeParams, toastSe
 
     ];
     rctrl.riskIdentificationProgStage = "vTWcDsFE1rf";
+    rctrl.date2 = new Date();
+    rctrl.date1 = new Date();
+    rctrl.date1.setMonth(rctrl.date2.getMonth() - 3);
+
 
     rctrl.mainChart = {
         loading: false,
@@ -199,10 +203,37 @@ function RiskController($location, appService, teiService, $routeParams, toastSe
     rctrl.readyness = {
         program: false,
         ou: false,
+        namesLoad: false,
         isReady: function () {
-            return this.program && this.ou;
+            return this.program && this.ou && this.namesLoad;
         }
     }
+
+    rctrl.nameRequests = 0;
+    rctrl.nameRequestsDone = 0;
+    rctrl.fetchNameOfRisk = function (risk) {
+        dataElementService.getDataElementNameById(risk.id).then(function (name) {
+            risk.name = name;
+            rctrl.nameRequestsDone++;
+            if (rctrl.nameRequests == rctrl.nameRequestsDone) {
+                rctrl.readyness.namesLoad = true;
+                rctrl.loadData();
+            }
+        })
+    }
+
+    rctrl.risks.forEach(function (risk) {
+        rctrl.nameRequests++;
+        rctrl.fetchNameOfRisk(risk);
+        risk.children.forEach(function (childRisk) {
+            rctrl.nameRequests++;
+            rctrl.fetchNameOfRisk(childRisk);
+        })
+    });
+
+    $scope.$watch('ctrl.date1', function (date1) {
+        rctrl.loadData();
+    });
 
     $scope.$watch('ctrl.selectedProgram', function (selectedProgram) {
         if (selectedProgram) {
@@ -228,35 +259,61 @@ function RiskController($location, appService, teiService, $routeParams, toastSe
         var grandTotal = 0;
         var count = 0;
         rctrl.risks.forEach(function (mainRisk) {
-            eventService.getAnalyticsForDe($scope.ctrl.selectedProgram.id,
-                rctrl.riskIdentificationProgStage,
-                $scope.ctrl.currentOuSelection.id, mainRisk.id).then(function (data) {
-                mainRisk.data = data;//saving for future
-
-                //creating data for main chart
-
+            eventService.getAnalyticsForDeCustom(rctrl.date1.toDateString(), rctrl.date2.toDateString(), $scope.ctrl.currentOuSelection.id, mainRisk.id).then(function (data) {
                 var total = 0;
-                data.rows.forEach(function (row) {
-                    total += parseInt(row[2]);
-                })
-                mainRisk.total = total;
-                rctrl.mainChart.data.push(total);
-                grandTotal += total;
+                if (data.rows.length > 0) {
+                    var tableRow = data.rows[0];
+                    if (tableRow.length > 0) {
+                        total = tableRow[0];
+                    }
+                }
+                //
+                mainRisk.total = parseInt(total);
+                rctrl.mainChart.data.push(mainRisk.total);
+                grandTotal += mainRisk.total;
                 count++;
                 if (count == rctrl.risks.length) {
                     if (grandTotal == 0) {
                         rctrl.mainChart.visible = false;
                     }
                     rctrl.risks.forEach(function (mR) {
-                        try {
-                            rctrl.mainChart.labels.push(mR.data.metaData.names[mR.id] + " [" + (mR.total * 100 / grandTotal).toFixed(2) + "%]");
-                        } catch (e) {
-//todo remove this, this is just in case for demo
-                        }
+                        console.log(mR);
+                        rctrl.mainChart.labels.push(mR.name + " [" + (mR.total * 100 / grandTotal).toFixed(2) + "%]");
                     });
                     rctrl.mainChart.loading = false;
                 }
             });
+            /* eventService.getAnalyticsForDe($scope.ctrl.selectedProgram.id,
+             rctrl.riskIdentificationProgStage,
+             $scope.ctrl.currentOuSelection.id, mainRisk.id).then(function (data) {
+             mainRisk.data = data;//saving for future
+             console.log(data);
+
+             //creating data for main chart
+
+             var total = 0;
+             data.rows.forEach(function (row) {
+             total += parseInt(row[2]);
+             })
+             mainRisk.total = total;
+             rctrl.mainChart.data.push(total);
+             grandTotal += total;
+             count++;
+             if (count == rctrl.risks.length) {
+             if (grandTotal == 0) {
+             rctrl.mainChart.visible = false;
+             }
+             rctrl.risks.forEach(function (mR) {
+             try {
+             rctrl.mainChart.labels.push(mR.data.metaData.names[mR.id] + " [" + (mR.total * 100 / grandTotal).toFixed(2) + "%]");
+             } catch (e) {
+             //todo remove this, this is just in case for demo
+             }
+             });
+             rctrl.mainChart.loading = false;
+             }
+             }
+             );*/
         });
 
         rctrl.mainChart.options.title.text = "Major Risks - " + $scope.ctrl.currentOuSelection.displayName;
@@ -276,32 +333,58 @@ function RiskController($location, appService, teiService, $routeParams, toastSe
         var count = 0;
         rctrl.subChart.loading = true;
         rctrl.subChart.visible = true;
+        rctrl.subChart.options.title.text = majorRisk.name;
         majorRisk.children.forEach(function (subRisk) {
-            eventService.getAnalyticsForDe($scope.ctrl.selectedProgram.id,
-                rctrl.riskIdentificationProgStage,
-                $scope.ctrl.currentOuSelection.id, subRisk.id).then(function (data) {
-                subRisk.data = data;//saving for future
-
-                //creating data for main chart
-
+            eventService.getAnalyticsForDeCustom(rctrl.date1.toDateString(), rctrl.date2.toDateString(), $scope.ctrl.currentOuSelection.id, subRisk.id).then(function (data) {
                 var total = 0;
-                data.rows.forEach(function (row) {
-                    total += parseInt(row[2]);
-                });
-                subRisk.total = total;
-                grandTotal += total;
+                if (data.rows.length > 0) {
+                    var tableRow = data.rows[0];
+                    if (tableRow.length > 0) {
+                        total = tableRow[0];
+                    }
+                }
+                //
+                subRisk.total = parseInt(total);
+                rctrl.subChart.data.push(subRisk.total);
+                grandTotal += subRisk.total;
                 count++;
-                rctrl.subChart.data.push(total);
                 if (count == majorRisk.children.length) {
+                    if (grandTotal == 0) {
+                        rctrl.subChart.visible = false;
+                    }
                     majorRisk.children.forEach(function (sR) {
-                        rctrl.subChart.labels.push(sR.data.metaData.names[sR.id] + " [" + (sR.total * 100 / grandTotal).toFixed(2) + "%]");
+                        rctrl.subChart.labels.push(sR.name + " [" + (sR.total * 100 / grandTotal).toFixed(2) + "%]");
                     });
                     rctrl.subChart.loading = false;
                 }
             });
+
+            /*eventService.getAnalyticsForDe($scope.ctrl.selectedProgram.id,
+             rctrl.riskIdentificationProgStage,
+             $scope.ctrl.currentOuSelection.id, subRisk.id).then(function (data) {
+             subRisk.data = data;//saving for future
+
+             //creating data for main chart
+
+             var total = 0;
+             data.rows.forEach(function (row) {
+             total += parseInt(row[2]);
+             });
+             subRisk.total = total;
+             grandTotal += total;
+             count++;
+             rctrl.subChart.data.push(total);
+             if (count == majorRisk.children.length) {
+             majorRisk.children.forEach(function (sR) {
+             rctrl.subChart.labels.push(sR.data.metaData.names[sR.id] + " [" + (sR.total * 100 / grandTotal).toFixed(2) + "%]");
+             });
+             rctrl.subChart.loading = false;
+             }
+             });*/
         });
-        rctrl.subChart.options.title.text = majorRisk.data.metaData.names[majorRisk.id];
     }
 
+    rctrl.generateTrendLine = function (dataElementId) {
 
+    }
 }

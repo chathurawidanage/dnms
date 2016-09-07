@@ -3,7 +3,7 @@
  */
 function ProfileController($location, appService, teiService, $routeParams, toastService,
                            programService, dataElementService, programIndicatorsService, $q, $mdDialog, $mdSidenav,
-                           eventService, enrollmentService) {
+                           eventService, enrollmentService, $fdb) {
     var ctrl = this;
     this.tei = $routeParams.tei;
     this.teiObj = null;
@@ -80,7 +80,7 @@ function ProfileController($location, appService, teiService, $routeParams, toas
                         console.log(response);
                         toastService.showToast("Failed to unenroll the child. Please retry.");
                     }
-                },function (err) {
+                }, function (err) {
                     toastService.showToast("Failed to unenroll the child due to a network failure.");
                 });
             },
@@ -106,7 +106,7 @@ function ProfileController($location, appService, teiService, $routeParams, toas
                     } else {
                         toastService.showToast("An error occurred while trying to delete this profile. Please retry.")
                     }
-                },function (err) {
+                }, function (err) {
                     toastService.showToast("Delete operation was not successful due to a network failure.");
                 })
             },
@@ -129,13 +129,32 @@ function ProfileController($location, appService, teiService, $routeParams, toas
      * @param reverse true will make event active, false will mark as completed
      */
     ctrl.completeEvent = function (reverse) {
+        //todo make changes to local cache as well
         if (ctrl.selectedEvent) {
             eventService.completeEvent(ctrl.selectedEvent, reverse).then(function (response) {
                 if (response.httpStatusCode == 200) {
+                    var newStatus = "COMPLETED";
                     if (reverse) {
+                        newStatus = "ACTIVE";
                         toastService.showToast("Successfully reopened event.");
                     } else {
                         toastService.showToast("Successfully marked as reviewed.");
+                    }
+                    try {
+                        var eventDb = eventService.getEventsDb();
+                        eventDb.load();
+                        console.log(eventDb.find({
+                                status: "ACTIVE"
+                            }
+                        ).length);
+                        debugDb=eventDb;
+                        eventDb.update({event: ctrl.selectedEvent.event}, {status: newStatus});
+                        console.log(eventDb.find({
+                                status: "ACTIVE"
+                            }
+                        ).length)
+                    } catch (e) {
+                        console.error("Error occured while updating local cache", e);
                     }
                 } else {
                     console.log(response);
@@ -145,7 +164,7 @@ function ProfileController($location, appService, teiService, $routeParams, toas
                         ctrl.selectedEvent.status = "COMPLETED";
                     }
                 }
-            },function (err) {
+            }, function (err) {
                 toastService.showToast("Network failure occurred. Event status not changed.");
             });
         }
@@ -345,7 +364,6 @@ function ProfileController($location, appService, teiService, $routeParams, toas
         if (dataElementId == heightWeightDe.height) {
             height = true;
         } else if (dataElementId != heightWeightDe.weight) {
-            console.log("return");
             return "";//no color
         }
 

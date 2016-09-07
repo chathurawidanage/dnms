@@ -160,7 +160,7 @@ div[md-color-picker] {
 }
 
 //.teiInfiniteScroll{
-table {
+/*table {
   border: none;
   width: 100%;
   border-collapse: collapse;
@@ -187,7 +187,7 @@ table {
       background-color: rgba(0, 0, 0, 0.15);
     }
   }
-}
+}*/
 
 //}
 
@@ -196,17 +196,13 @@ table {
   width: 100%;
 
   .repeated-item {
-    box-sizing: border-box;
-    height: 40px;
+    //box-sizing: border-box;
+    height: 76px;
     padding-top: 10px;
 
     td {
       padding-left: 5px;
     }
-  }
-
-  md-virtual-repeat-container {
-
   }
 }
 
@@ -252,6 +248,7 @@ table {
       overflow: visible !important;
     }
   }
+
 }
 
 .tei-attributes, .event-sidenav {

@@ -3,7 +3,7 @@
  */
 function DashboardController($location, $scope, toastService, programService, userService,
                              chartService, appService, $mdDialog, $timeout, teiService, eventService,
-                             $fdb, $window, orgUnitsService, $mdSidenav) {
+                             $fdb, $window, orgUnitsService, $mdSidenav, $interval) {
     var ctrl = this;
     ctrl.programs = [];
     ctrl.mohUserRole = "Ej7USJV1ccn";
@@ -78,6 +78,9 @@ function DashboardController($location, $scope, toastService, programService, us
     ctrl.selectedMalNutRows = null;//mal nutirtion teis view list
 
     ctrl.doneInitLoading = false;
+
+    ctrl.date1=new Date();
+    ctrl.date2=new Date();
 
     //side nav
     ctrl.toggleRightNav = function () {
@@ -196,7 +199,12 @@ function DashboardController($location, $scope, toastService, programService, us
         ctrl.user = user;
         //loading databases
         ctrl.teiDb = $fdb.db('dnms').collection("teis");
-        ctrl.eventsDb = $fdb.db('dnms').collection("events");
+        //ctrl.eventsDb = $fdb.db('dnms').collection("events");
+        ctrl.eventsDb = eventService.getEventsDb();
+        eventService.listenDbUpdates(function (status) {
+            ctrl.updateViewedEventsCount();
+        })
+        debugDb = ctrl.eventsDb;
 
         var orgUnits = ctrl.user.organisationUnits;
         console.log(orgUnits);
@@ -217,8 +225,10 @@ function DashboardController($location, $scope, toastService, programService, us
                 ctrl.queryOrgUnits.push(orgUnit.id);
             }
         });
-        //loading full list
-        ctrl.infiniteItems.reset();
+
+        if (ctrl.queryOrgUnits.length > 1) {
+            console.warn("More than one root org unit detected. Not supported yet!!!");
+        }
 
         ctrl.caches.profile = CAHCE_STATUS.loaded;
         ctrl.checkProgress();
@@ -261,9 +271,15 @@ function DashboardController($location, $scope, toastService, programService, us
 
     ctrl.buildEventTeiMap = function () {
         ctrl.caches.events = CAHCE_STATUS.loading;
-        eventService.getEventTeiMap(ctrl.selectedProgram.id).then(function (events) {
+        eventService.getEventTeiMap(ctrl.selectedProgram.id, ctrl.queryOrgUnits[0]).then(function (events) {
             var start = new Date().getTime();
-            ctrl.eventsDb.insert(events);
+            ctrl.eventsDb.insert(events, function (result) {
+                console.log(result);
+                ctrl.updateViewedEventsCount();
+                ctrl.eventsDb.save();
+                //save for future use
+
+            });
             var end = new Date().getTime();
             console.info("Event db insertion time", (end - start));
             ctrl.caches.events = CAHCE_STATUS.loaded;
@@ -292,7 +308,6 @@ function DashboardController($location, $scope, toastService, programService, us
             ctrl.setGlobalTeiSearch();
 
             ctrl.checkProgress();
-            debugDb = ctrl.teiDb;
         });
     };
 
@@ -311,7 +326,7 @@ function DashboardController($location, $scope, toastService, programService, us
                 $page: page,
                 $limit: limit
             })
-        });
+        }, true);
     }
 
     ctrl.progressCount = 0;
@@ -337,12 +352,14 @@ function DashboardController($location, $scope, toastService, programService, us
                 ctrl.malNutReasons = e.data;
             });
         }
+
+        //show global search
+        ctrl.setGlobalTeiSearch();
     }
 
     ctrl.showMalNutTeis = function (malNutReason) {
         ctrl.selectedMalNul = malNutReason;
         teiService.changeTeiList(malNutReason.title, function (regexp, page, limit) {
-            console.log("Page request", page);
             var lowerBound = page * limit;
             var upperBound = (page + 1) * limit;
             if (upperBound > ctrl.selectedMalNul.selectedRecords.length) {
@@ -356,29 +373,12 @@ function DashboardController($location, $scope, toastService, programService, us
                     var event = ctrl.eventsDb.find({event: eventId});
                     if (event.length > 0) {
                         var teiId = event[0].trackedEntityInstance;
-                        var teiArr = ctrl.teiDb.find({
-                            $and: [
-                                {_id: teiId},
-                                {
-                                    $or: [
-                                        {
-                                            fName: regexp
-                                        },
-                                        {
-                                            lName: regexp
-                                        }
-                                    ]
-                                }
-                            ]
-                        }, {
-                            $page: page,
-                            $limit: limit
-                        });
+                        var teiArr = ctrl.teiDb.find({_id: teiId});
                         if (teiArr.length > 0) {
                             teis.push(teiArr[0]);
                         }
                     } else {
-                        console.log("Unexpecetd events length", index, lowerBound, upperBound,eventId);
+                        console.log("Unexpecetd events length", index, lowerBound, upperBound, eventId);
                     }
                 }
                 return teis;
@@ -386,126 +386,186 @@ function DashboardController($location, $scope, toastService, programService, us
                 return null;
             }
         });
-        ctrl.malNutInfiniteItems.reset();
     };
 
-    ctrl.malNutInfiniteItems = {
-        teis: [],
-        numLoaded_: 0,
-        toLoad_: 0,
-        // Required.
-        reset: function () {
-            this.teis = [];
-            this.numLoaded_ = 0;
-            this.toLoad_ = ctrl.selectedMalNul.selectedRecords.length;
-        },
+    /* ctrl.malNutInfiniteItems = {
+     teis: [],
+     numLoaded_: 0,
+     toLoad_: 0,
+     // Required.
+     reset: function () {
+     this.teis = [];
+     this.numLoaded_ = 0;
+     this.toLoad_ = ctrl.selectedMalNul.selectedRecords.length;
+     },
 
-        getItemAtIndex: function (index) {
-            if (index >= this.numLoaded_ || !ctrl.doneInitLoading) {
-                this.fetchMoreItems_(index);
-                return null;
-            }
-            return this.teis[index];
-        },
-        // Required.
-        // For infinite scroll behavior, we always return a slightly higher
-        // number than the previously loaded items.
-        getLength: function () {
-            return this.numLoaded_ + 5;
-        },
-        fetchMoreItems_: function (index) {
-            // For demo purposes, we simulate loading more items with a timed
-            // promise. In real code, this function would likely contain an
-            // $http request.
-            var tis = this;
-            if (this.toLoad_ - 1 >= index) {
-                var loadCount = 0;
-                while (loadCount < 25 && index < ctrl.selectedMalNul.selectedRecords.length) {
-                    var eventId = ctrl.selectedMalNul.selectedRecords[index].eventId;
-                    var event = ctrl.eventsDb.find({event: eventId});
-                    if (event.length > 0) {
-                        var teiId = event[0].trackedEntityInstance;
-                        var teiArr = ctrl.teiDb.find({_id: teiId});
-                        if (teiArr.length > 0) {
-                            tis.teis.push(teiArr[0]);
-                        }
-                    } else {
-                        console.log("Unexpecetd events length");
-                    }
-                    index++;
-                    loadCount++;
-                }
-                tis.numLoaded_ = tis.teis.length;
+     getItemAtIndex: function (index) {
+     if (index >= this.numLoaded_ || !ctrl.doneInitLoading) {
+     this.fetchMoreItems_(index);
+     return null;
+     }
+     return this.teis[index];
+     },
+     // Required.
+     // For infinite scroll behavior, we always return a slightly higher
+     // number than the previously loaded items.
+     getLength: function () {
+     return this.numLoaded_ + 5;
+     },
+     fetchMoreItems_: function (index) {
+     // For demo purposes, we simulate loading more items with a timed
+     // promise. In real code, this function would likely contain an
+     // $http request.
+     var tis = this;
+     if (this.toLoad_ - 1 >= index) {
+     var loadCount = 0;
+     while (loadCount < 25 && index < ctrl.selectedMalNul.selectedRecords.length) {
+     var eventId = ctrl.selectedMalNul.selectedRecords[index].eventId;
+     var event = ctrl.eventsDb.find({event: eventId});
+     if (event.length > 0) {
+     var teiId = event[0].trackedEntityInstance;
+     var teiArr = ctrl.teiDb.find({_id: teiId});
+     if (teiArr.length > 0) {
+     tis.teis.push(teiArr[0]);
+     }
+     } else {
+     console.log("Unexpecetd events length");
+     }
+     index++;
+     loadCount++;
+     }
+     tis.numLoaded_ = tis.teis.length;
 
-            }
-        }
-    };
+     }
+     }
+     };*/
 
 
-    ctrl.refreshList = function (event) {
-        if (ctrl.keyword != null && ctrl.keyword.trim() == "") {
-            ctrl.keyword = null;
-        } else if (event.keyCode == 13) {
-            ctrl.infiniteItems.reset();
-        }
-    };
+    /* ctrl.refreshList = function (event) {
+     if (ctrl.keyword != null && ctrl.keyword.trim() == "") {
+     ctrl.keyword = null;
+     } else if (event.keyCode == 13) {
+     ctrl.infiniteItems.reset();
+     }
+     };*/
 
     ctrl.openChildProfile = function (teiId) {
         console.log("Opening child profile", teiId);
         $window.open(location.href + 'profile?tei=' + teiId + "&program=" + ctrl.selectedProgram.id);
     }
+    /*
+     ctrl.infiniteItems = {
+     teis: [],
+     currentPage: 1,
+     totalPages: 1,
+     numLoaded_: 0,
+     toLoad_: 0,
+     // Required.
+     reset: function () {
+     this.teis = [];
+     this.currentPage = 1;
+     this.totalPages = 1;
+     this.numLoaded_ = 0;
+     this.toLoad_ = 0;
+     },
 
-    ctrl.infiniteItems = {
-        teis: [],
-        currentPage: 1,
-        totalPages: 1,
-        numLoaded_: 0,
-        toLoad_: 0,
-        // Required.
-        reset: function () {
-            this.teis = [];
-            this.currentPage = 1;
-            this.totalPages = 1;
-            this.numLoaded_ = 0;
-            this.toLoad_ = 0;
-        },
+     getItemAtIndex: function (index) {
+     if (index > this.numLoaded_ || !ctrl.doneInitLoading) {
+     this.fetchMoreItems_(index);
+     return null;
+     }
+     return this.teis[index];
+     },
+     // Required.
+     // For infinite scroll behavior, we always return a slightly higher
+     // number than the previously loaded items.
+     getLength: function () {
+     return this.numLoaded_ + 5;
+     },
+     fetchMoreItems_: function (index) {
+     // For demo purposes, we simulate loading more items with a timed
+     // promise. In real code, this function would likely contain an
+     // $http request.
+     var tis = this;
+     if (this.toLoad_ < index) {
 
-        getItemAtIndex: function (index) {
-            if (index > this.numLoaded_ || !ctrl.doneInitLoading) {
-                this.fetchMoreItems_(index);
-                return null;
-            }
-            return this.teis[index];
-        },
-        // Required.
-        // For infinite scroll behavior, we always return a slightly higher
-        // number than the previously loaded items.
-        getLength: function () {
-            return this.numLoaded_ + 5;
-        },
-        fetchMoreItems_: function (index) {
-            // For demo purposes, we simulate loading more items with a timed
-            // promise. In real code, this function would likely contain an
-            // $http request.
-            var tis = this;
-            if (this.toLoad_ < index) {
+     if (ctrl.queryOrgUnits.length > 0 && ctrl.selectedProgram) {
+     this.toLoad_ += 20;
+     console.log("selected program inside load", ctrl.selectedProgram);
+     teiService.queryForTeis(ctrl.queryOrgUnits, ctrl.selectedProgram.id, ctrl.keyword, this.currentPage).then(function (data) {
+     tis.teis = tis.teis.concat(data.rows);
+     tis.currentPage = data.metaData.pager.page;
+     tis.totalPages = data.metaData.pager.pageCount;
+     tis.numLoaded_ = tis.teis.length;
+     });
+     }
 
-                if (ctrl.queryOrgUnits.length > 0 && ctrl.selectedProgram) {
-                    this.toLoad_ += 20;
-                    console.log("selected program inside load", ctrl.selectedProgram);
-                    teiService.queryForTeis(ctrl.queryOrgUnits, ctrl.selectedProgram.id, ctrl.keyword, this.currentPage).then(function (data) {
-                        tis.teis = tis.teis.concat(data.rows);
-                        tis.currentPage = data.metaData.pager.page;
-                        tis.totalPages = data.metaData.pager.pageCount;
-                        tis.numLoaded_ = tis.teis.length;
-                    });
+     /!*$timeout(angular.noop, 300).then(angular.bind(this, function () {
+     this.numLoaded_ = this.toLoad_;
+     }));*!/
+     }
+     }
+     };*/
+
+    /*Doctor's approval related operations*/
+
+    ctrl.pickRandomEvent = function () {
+        if (ctrl.eventsDb) {
+            var event = ctrl.eventsDb.find({
+                    status: "ACTIVE"
                 }
+            )[Math.floor(Math.random() * ctrl.viewedEventsCount)];
+            ctrl.openChildProfile(event.trackedEntityInstance);
 
-                /*$timeout(angular.noop, 300).then(angular.bind(this, function () {
-                 this.numLoaded_ = this.toLoad_;
-                 }));*/
-            }
         }
+    }
+
+    ctrl.approveAllEvents = function () {
+        toastService.showConfirm("Do you really want to mark all events as reviewed?",
+            "Marking all events as reviewed without actually reviewing them will leave inaccurate data in the database which in turn will reduce the overall quality of the collected data."
+            , "I am aware of it. Please do it!", "Don't do it", function () {
+                //mark all as deleted
+            }, function () {
+                //do nothing
+            })
+    }
+
+    ctrl.viewAllIncompleteEvents = function () {
+        teiService.changeTeiList("Children having incomplete events", function (regexp, page, limit) {
+            var events = ctrl.eventsDb.find({
+                    status: "ACTIVE"
+                }, {
+                    $page: page,
+                    $limit: limit
+                }
+            );
+
+            var teis = [];
+
+            events.forEach(function (event) {
+                var teiId = event.trackedEntityInstance;
+                var teiArr = ctrl.teiDb.find({_id: teiId});
+                if (teiArr.length > 0) {
+                    teis.push(teiArr[0]);
+                }
+            })
+            return teis;
+        });
+    }
+
+    ctrl.viewedEventsCount = 0;
+    ctrl.viewedEventUpdateInterval = undefined;
+    ctrl.updateViewedEventsCount = function () {//todo change status to viewed
+        if (ctrl.viewedEventUpdateInterval) {
+            $interval.cancel(ctrl.viewedEventUpdateInterval);
+        }
+        $interval(function () {
+            ctrl.viewedEventsCount = ctrl.eventsDb.find({
+                    status: "ACTIVE"
+                }
+            ).length;
+            console.log(ctrl.viewedEventsCount);
+        }, 5000);
     };
 
 

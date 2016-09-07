@@ -58,79 +58,113 @@
     <div layout="row" ng-show="ctrl.doneInitLoading">
         <div flex="50" layout="column">
             <div flex="100">
-                <md-card>
-                    <md-card-header class="colored-card-header">
-                        <md-card-header-text>
-                            <span class="md-title main-card-title">Reason for malnutrition</span>
-                        </md-card-header-text>
-                    </md-card-header>
-                    <!--<img src="img/banner.jpg" class="md-card-image" alt="Washed Out" style="height: 150px !important;">-->
-                    <md-card-content>
-                        <md-list>
-                            <md-list-item class="md-2-line">
-                                <img src="img/location_ico.png" class="md-avatar" alt="admin-area"/>
-                                <div class="md-list-item-text">
-                                    <h3>Administrative Area</h3>
-                                    <p>{{ctrl.currentOuSelection.displayName}}</p>
+                <md-tabs md-dynamic-height md-border-bottom>
+                    <md-tab label="Malnutrition Analysis">
+                        <md-content class="md-padding">
+                            <md-card>
+                                <md-card-header class="colored-card-header">
+                                    <md-card-header-text>
+                                        <span class="md-title main-card-title">Reason for malnutrition</span>
+                                    </md-card-header-text>
+                                </md-card-header>
+                                <!--<img src="img/banner.jpg" class="md-card-image" alt="Washed Out" style="height: 150px !important;">-->
+                                <md-card-content>
+                                    <md-list>
+                                        <md-list-item ng-repeat="malNut in ctrl.malNutReasons" class="noright">
+                                            <img alt="{{ malNut.title }}" ng-src="img/health_ico.png"
+                                                 class="md-avatar"/>
+                                            <p>{{ malNut.title }}</p>
+                                            <md-progress-circular ng-show="!malNut.selectedRecords"
+                                                                  md-mode="indeterminate"
+                                                                  class="md-secondary"
+                                                                  md-diameter="20"></md-progress-circular>
+                                            <md-button ng-click="ctrl.showMalNutTeis(malNut)"
+                                                       ng-show="malNut.selectedRecords"
+                                                       class="md-secondary">
+                                                View <b>{{malNut.selectedRecords.length}}</b>
+                                                children
+                                            </md-button>
+                                        </md-list-item>
+                                    </md-list>
+                                </md-card-content>
+                            </md-card>
+                        </md-content>
+                    </md-tab>
+                    <md-tab label="Risk Analytics">
+                        <md-card ng-controller="RiskController as rctrl">
+                            <md-card-header class="colored-card-header">
+                                <md-card-header-text>
+                                    <span class="md-title main-card-title">Risks Analytics</span>
+                                </md-card-header-text>
+                            </md-card-header>
+                            <md-card-content layout="column">
+                                <div lyout="row" layout-align="space-between stretch">
+                                    <md-input-container>
+                                        <label>First Date</label>
+                                        <md-datepicker ng-model="rctrl.date1" md-placeholder="Enter date"
+                                                       ng-change="rctrl.loadData()" md-open-on-focus></md-datepicker>
+                                    </md-input-container>
+                                    <md-input-container>
+                                        <label>Second Date</label>
+                                        <md-datepicker ng-model="rctrl.date2" md-placeholder="Enter date"
+                                                       ng-change="rctrl.loadData()" md-open-on-focus></md-datepicker>
+                                    </md-input-container>
                                 </div>
-                                <md-button class="md-secondary" ng-click="ctrl.toggleRightNav()"
-                                           aria-label="toggle">
-                                    <md-icon>
-                                        <i class="material-icons">edit_location</i>
-                                    </md-icon>
-                                    Change
-                                </md-button>
-                            </md-list-item>
-                            <md-divider></md-divider>
-                            <md-list-item ng-repeat="malNut in ctrl.malNutReasons" class="noright">
-                                <img alt="{{ malNut.title }}" ng-src="img/health_ico.png" class="md-avatar"/>
-                                <p>{{ malNut.title }}</p>
-                                <md-progress-circular ng-show="!malNut.selectedRecords" md-mode="indeterminate"
-                                                      class="md-secondary"
-                                                      md-diameter="20"></md-progress-circular>
-                                <md-button ng-click="ctrl.showMalNutTeis(malNut)" ng-show="malNut.selectedRecords"
-                                           class="md-secondary">
-                                    View <b>{{malNut.selectedRecords.length}}</b>
-                                    children
-                                </md-button>
-                            </md-list-item>
-                        </md-list>
-                    </md-card-content>
-                </md-card>
+                                <p class="text-center" ng-if="!rctrl.mainChart.visible">There are no risk identification
+                                    data
+                                    recorded for selected division.</p>
+                                <div ng-if="rctrl.mainChart.visible">
+                                    <div layout="row" layout-sm="column" layout-align="space-around"
+                                         ng-if="rctrl.mainChart.loading">
+                                        <md-progress-circular md-mode="indeterminate"></md-progress-circular>
+                                    </div>
+                                    <canvas ng-if="!rctrl.mainChart.loading" class="chart chart-doughnut"
+                                            chart-options="rctrl.mainChart.options"
+                                            chart-data="rctrl.mainChart.data" chart-labels="rctrl.mainChart.labels"
+                                            chart-click="rctrl.chartClick"></canvas>
+                                </div>
+                                <div ng-if="rctrl.subChart.visible" id="subChart" style="min-height: 250px">
+                                    <md-divider></md-divider>
+                                    <div layout="row" layout-sm="column" layout-align="space-around"
+                                         ng-if="rctrl.subChart.loading">
+                                        <md-progress-circular md-mode="indeterminate"></md-progress-circular>
+                                    </div>
+                                    <canvas ng-if="!rctrl.subChart.loading" class="chart chart-doughnut"
+                                            chart-options="rctrl.subChart.options"
+                                            chart-data="rctrl.subChart.data" chart-labels="rctrl.subChart.labels">
+                                    </canvas>
+                                </div>
+                            </md-card-content>
+                        </md-card>
+                    </md-tab>
+                    <md-tab label="Height / Weight">
+                        <md-content class="md-padding">
+                            <md-card ng-controller="NutritionController as nctrl">
+                                <md-card-header class="colored-card-header">
+                                    <md-card-header-text>
+                                        <span class="md-title main-card-title">Height/Weight Analysis</span>
+                                    </md-card-header-text>
+                                </md-card-header>
+                                <!--<img src="img/banner.jpg" class="md-card-image" alt="Washed Out" style="height: 150px !important;">-->
+                                <md-card-content>
+                                    <md-list>
+                                        <div ng-repeat="nchart in nctrl.charts">
+                                            <md-list-item >
+                                                <canvas class="chart chart-bar"
+                                                        chart-options="nchart.options"
+                                                        chart-data="nchart.data" chart-labels="nchart.labels"
+                                                ></canvas>
+                                            </md-list-item>
+                                        </div>
+                                    </md-list>
+                                </md-card-content>
+                            </md-card>
+                        </md-content>
+                    </md-tab>
+                </md-tabs>
             </div>
             <div flex="100">
-                <md-card ng-controller="RiskController as rctrl">
-                    <md-card-header class="colored-card-header">
-                        <md-card-header-text>
-                            <span class="md-title main-card-title">Risks Analytics</span>
-                        </md-card-header-text>
-                    </md-card-header>
-                    <md-card-content>
-                        <p class="text-center" ng-if="!rctrl.mainChart.visible">There are no risk identification data
-                            recorded for selected division.</p>
-                        <div ng-if="rctrl.mainChart.visible">
-                            <div layout="row" layout-sm="column" layout-align="space-around"
-                                 ng-if="rctrl.mainChart.loading">
-                                <md-progress-circular md-mode="indeterminate"></md-progress-circular>
-                            </div>
-                            <canvas ng-if="!rctrl.mainChart.loading" class="chart chart-doughnut"
-                                    chart-options="rctrl.mainChart.options"
-                                    chart-data="rctrl.mainChart.data" chart-labels="rctrl.mainChart.labels"
-                                    chart-click="rctrl.chartClick"></canvas>
-                        </div>
-                        <div ng-if="rctrl.subChart.visible" id="subChart" style="min-height: 250px">
-                            <md-divider></md-divider>
-                            <div layout="row" layout-sm="column" layout-align="space-around"
-                                 ng-if="rctrl.subChart.loading">
-                                <md-progress-circular md-mode="indeterminate"></md-progress-circular>
-                            </div>
-                            <canvas ng-if="!rctrl.subChart.loading" class="chart chart-doughnut"
-                                    chart-options="rctrl.subChart.options"
-                                    chart-data="rctrl.subChart.data" chart-labels="rctrl.subChart.labels">
-                            </canvas>
-                        </div>
-                    </md-card-content>
-                </md-card>
+
             </div>
         </div>
         <div flex="50" layout="column">
@@ -154,60 +188,69 @@
                 <md-card>
                     <md-card-header class="colored-card-header">
                         <md-card-header-text>
-                            <span class="md-title main-card-title">Review Summary</span>
+                            <span class="md-title main-card-title">Hello Dr. {{ctrl.user.firstName}}!</span>
                         </md-card-header-text>
                     </md-card-header>
                     <md-card-content>
                         <md-list>
                             <md-list-item class="md-2-line">
-                                <img src="img/doctor-icon.png" class="md-avatar" alt="admin-area"/>
+                                <img src="img/location_ico.png" class="md-avatar" alt="admin-area"/>
                                 <div class="md-list-item-text">
-                                    <h3>500</h3>
-                                    <p>Need your approval</p>
+                                    <h3>Set your location</h3>
+                                    <p>{{ctrl.currentOuSelection.displayName}}</p>
                                 </div>
-
-                            </md-list-item>
-                            <md-list-item>
                                 <md-button class="md-secondary" ng-click="ctrl.toggleRightNav()"
                                            aria-label="toggle">
                                     <md-icon>
-                                        <i class="material-icons">done</i>
+                                        <i class="material-icons">edit_location</i>
                                     </md-icon>
-                                    Approve All
-                                </md-button>
-                                <md-button class="md-secondary" ng-click="ctrl.toggleRightNav()"
-                                           aria-label="toggle">
-                                    <md-icon>
-                                        <i class="material-icons">shuffle</i>
-                                    </md-icon>
-                                    Pick One
-                                </md-button>
-                                <md-button class="md-secondary" ng-click="ctrl.toggleRightNav()"
-                                           aria-label="toggle">
-                                    <md-icon>
-                                        <i class="material-icons">visibility</i>
-                                    </md-icon>
-                                    View All
+                                    Change
                                 </md-button>
                             </md-list-item>
-
                             <md-divider></md-divider>
                             <md-list-item class="md-2-line">
-                                <img src="img/review-icon.png" class="md-avatar" alt="admin-area"/>
+                                <img src="img/calendar-icon.png" class="md-avatar" alt="admin-area"/>
                                 <div class="md-list-item-text">
-                                    <h3>500</h3>
-                                    <p>Events reviewed by sister</p>
+                                    <h3>Set your dates</h3>
+                                    <md-datepicker ng-model="ctrl.date1"></md-datepicker> - <md-datepicker ng-model="ctrl.date2"></md-datepicker>
                                 </div>
                             </md-list-item>
+                            <md-divider></md-divider>
                             <md-list-item class="md-2-line">
-                                <img src="img/event-icon.png" class="md-avatar" alt="admin-area"/>
+                                <img src="img/doctor-icon.png" class="md-avatar" alt="admin-area"/>
                                 <div class="md-list-item-text">
-                                    <h3>2500</h3>
-                                    <p>Events</p>
+                                    <h3>{{ctrl.viewedEventsCount}}</h3>
+                                    <p>Events need your approval</p>
                                 </div>
                             </md-list-item>
                         </md-list>
+
                     </md-card-content>
+                    <md-card-actions layout="row">
+                        <span flex></span>
+                        <md-button class="md-secondary" ng-click="ctrl.approveAllEvents()"
+                                   aria-label="toggle">
+                            <md-icon>
+                                <i class="material-icons">done</i>
+                            </md-icon>
+                            Approve All
+                        </md-button>
+                        <md-button class="md-secondary" ng-click="ctrl.pickRandomEvent()"
+                                   aria-label="toggle">
+                            <md-icon>
+                                <i class="material-icons">shuffle</i>
+                            </md-icon>
+                            Pick One
+                        </md-button>
+                        <md-button class="md-secondary" ng-click="ctrl.viewAllIncompleteEvents()"
+                                   aria-label="toggle">
+                            <md-icon>
+                                <i class="material-icons">visibility</i>
+                            </md-icon>
+                            View All
+                        </md-button>
+                        </md-button>
+                    </md-card-actions>
                 </md-card>
             </div>
             <!--TEST-->
@@ -221,38 +264,54 @@
                         </md-card-header-text>
                     </md-card-header>
                     <md-card-content>
-                        <md-input-container md-no-float class="md-block">
+                        <md-input-container md-no-float class="md-block" style="margin-bottom: -15px"
+                                            ng-if="tctrl.global">
                             <md-icon>
                                 <i class="material-icons">search</i>
                             </md-icon>
                             <input ng-model="tctrl.keyword" type="text" placeholder="Search for a child"
                                    ng-keyup="tctrl.refreshList($event)">
                         </md-input-container>
+                        <md-button ng-click="ctrl.setGlobalTeiSearch()" ng-if="!tctrl.global" class="md-secondary">
+                            <md-icon>
+                                <i class="material-icons">arrow_back</i>
+                            </md-icon>
+                            Back to global Search
+                        </md-button>
 
-                        <md-content class="teiInfiniteScroll">
-                            <table>
-                                <thead>
-                                <tr>
-                                    <td>Name</td>
-                                    <td>Gender</td>
-                                    <td>Registering Unit</td>
-                                    <td>CHDR Number</td>
-                                </tr>
-                                </thead>
-                            </table>
-
-                            <md-virtual-repeat-container id="vertical-container">
-                                <table>
-                                    <tbody>
-                                    <tr md-virtual-repeat="item in tctrl.infiniteItems" md-on-demand
-                                        class="repeated-item" flex ng-click="ctrl.openChildProfile(item._id)">
-                                        <td>{{item.fName}} {{item.lName}}</td>
-                                        <td>{{item.gender}}</td>
-                                        <td>{{item.ouName}}</td>
-                                        <td>{{item.chdrNumber}}</td>
-                                    </tr>
-                                    </tbody>
-                                </table>
+                        <md-content class="teiInfiniteScroll" style="background: white">
+                            <md-virtual-repeat-container id="vertical-container"
+                                                         md-top-index="tctrl.infiniteItems.topIndex">
+                                <md-list class="md-dense">
+                                    <div md-virtual-repeat="item in tctrl.infiniteItems"
+                                         md-on-demand flex class="repeated-item">
+                                        <md-list-item class="md-3-line " ng-if="item.fName || item.lName">
+                                            <img ng-src="img/{{item.gender=='male'?'boy':'girl'}}_ico.png"
+                                                 class="md-avatar"
+                                                 alt="gender icon"/>
+                                            <div class="md-list-item-text" layout="column">
+                                                <h3>{{item.fName}} {{item.lName}}</h3>
+                                                <h4>{{item.ouName}}</h4>
+                                                <p>{{item.chdrNumber}}</p>
+                                            </div>
+                                            <md-button class="md-secondary" ng-click="ctrl.openChildProfile(item._id)">
+                                                Profile
+                                            </md-button>
+                                        </md-list-item>
+                                        <md-divider></md-divider>
+                                    </div>
+                                </md-list>
+                                <!-- <table>
+                                     <tbody>
+                                     <tr md-virtual-repeat="item in tctrl.infiniteItems" md-on-demand
+                                         class="repeated-item" flex ng-click="ctrl.openChildProfile(item._id)">
+                                         <td>{{item.fName}} {{item.lName}}</td>
+                                         <td>{{item.gender}}</td>
+                                         <td>{{item.ouName}}</td>
+                                         <td></td>
+                                     </tr>
+                                     </tbody>
+                                 </table>-->
 
                             </md-virtual-repeat-container>
                         </md-content>
@@ -260,91 +319,91 @@
                 </md-card>
             </div>
             <!--END TEST-->
-           <!-- <div>
-                <md-card ng-show="ctrl.selectedMalNul">
-                    <md-card-header class="colored-card-header">
-                        <md-card-header-text>
-                            <span class="md-title main-card-title">{{ctrl.selectedMalNul.title}}</span>
-                        </md-card-header-text>
-                    </md-card-header>
-                    <md-card-content>
-                        <md-content class="teiInfiniteScroll">
-                            <table>
-                                <thead>
-                                <tr>
-                                    <td>Name</td>
-                                    <td>Gender</td>
-                                    <td>Registering Unit</td>
-                                    <td>CHDR Number</td>
-                                </tr>
-                                </thead>
-                            </table>
+            <!-- <div>
+                 <md-card ng-show="ctrl.selectedMalNul">
+                     <md-card-header class="colored-card-header">
+                         <md-card-header-text>
+                             <span class="md-title main-card-title">{{ctrl.selectedMalNul.title}}</span>
+                         </md-card-header-text>
+                     </md-card-header>
+                     <md-card-content>
+                         <md-content class="teiInfiniteScroll">
+                             <table>
+                                 <thead>
+                                 <tr>
+                                     <td>Name</td>
+                                     <td>Gender</td>
+                                     <td>Registering Unit</td>
+                                     <td>CHDR Number</td>
+                                 </tr>
+                                 </thead>
+                             </table>
 
-                            <md-virtual-repeat-container id="vertical-container">
-                                <table>
-                                    <tbody>
-                                    <tr md-virtual-repeat="item in ctrl.malNutInfiniteItems" md-on-demand
-                                        class="repeated-item" flex ng-click="ctrl.openChildProfile(item._id)">
-                                        <td>{{item.fName}} {{item.lName}}</td>
-                                        <td>{{item.gender}}</td>
-                                        <td>{{item.ouName}}</td>
-                                        <td>{{item.chdrNumber}}</td>
-                                    </tr>
-                                    </tbody>
-                                </table>
+                             <md-virtual-repeat-container id="vertical-container">
+                                 <table>
+                                     <tbody>
+                                     <tr md-virtual-repeat="item in ctrl.malNutInfiniteItems" md-on-demand
+                                         class="repeated-item" flex ng-click="ctrl.openChildProfile(item._id)">
+                                         <td>{{item.fName}} {{item.lName}}</td>
+                                         <td>{{item.gender}}</td>
+                                         <td>{{item.ouName}}</td>
+                                         <td>{{item.chdrNumber}}</td>
+                                     </tr>
+                                     </tbody>
+                                 </table>
 
-                            </md-virtual-repeat-container>
-                        </md-content>
-                    </md-card-content>
-                </md-card>
-            </div>-->
+                             </md-virtual-repeat-container>
+                         </md-content>
+                     </md-card-content>
+                 </md-card>
+             </div>-->
             <!--    <md-content layout-padding flex="100" class="teiInfiniteScroll">-->
-           <!-- <div>
-                <md-card felx="100" class="teiInfiniteScroll">
-                    <md-card-header class="colored-card-header">
-                        <md-card-header-text>
-                            <span class="md-title main-card-title">Global Search</span>
-                        </md-card-header-text>
-                    </md-card-header>
-                    <md-card-content>
-                        <md-input-container md-no-float class="md-block">
-                            <md-icon>
-                                <i class="material-icons">search</i>
-                            </md-icon>
-                            <input ng-model="ctrl.keyword" type="text" placeholder="Search for a child"
-                                   ng-keyup="ctrl.refreshList($event)">
-                        </md-input-container>
+            <!-- <div>
+                 <md-card felx="100" class="teiInfiniteScroll">
+                     <md-card-header class="colored-card-header">
+                         <md-card-header-text>
+                             <span class="md-title main-card-title">Global Search</span>
+                         </md-card-header-text>
+                     </md-card-header>
+                     <md-card-content>
+                         <md-input-container md-no-float class="md-block">
+                             <md-icon>
+                                 <i class="material-icons">search</i>
+                             </md-icon>
+                             <input ng-model="ctrl.keyword" type="text" placeholder="Search for a child"
+                                    ng-keyup="ctrl.refreshList($event)">
+                         </md-input-container>
 
-                        <md-content class="tei-table-container">
-                            <table>
-                                <thead>
-                                <tr>
-                                    <td>Name</td>
-                                    <td>Gender</td>
-                                    <td>Registering Unit</td>
-                                    <td>CHDR Number</td>
-                                </tr>
-                                </thead>
-                            </table>
+                         <md-content class="tei-table-container">
+                             <table>
+                                 <thead>
+                                 <tr>
+                                     <td>Name</td>
+                                     <td>Gender</td>
+                                     <td>Registering Unit</td>
+                                     <td>CHDR Number</td>
+                                 </tr>
+                                 </thead>
+                             </table>
 
-                            <md-virtual-repeat-container id="vertical-container">
-                                <table>
-                                    <tbody>
-                                    <tr md-virtual-repeat="item in ctrl.infiniteItems" md-on-demand
-                                        class="repeated-item" flex ng-click="ctrl.openChildProfile(item[0])">
-                                        <td>{{item[7]}} {{item[8]}}</td>
-                                        <td>{{item[9]}}</td>
-                                        <td>{{item[4]}}</td>
-                                        <td>{{item[12]}}</td>
-                                    </tr>
-                                    </tbody>
-                                </table>
+                             <md-virtual-repeat-container id="vertical-container">
+                                 <table>
+                                     <tbody>
+                                     <tr md-virtual-repeat="item in ctrl.infiniteItems" md-on-demand
+                                         class="repeated-item" flex ng-click="ctrl.openChildProfile(item[0])">
+                                         <td>{{item[7]}} {{item[8]}}</td>
+                                         <td>{{item[9]}}</td>
+                                         <td>{{item[4]}}</td>
+                                         <td>{{item[12]}}</td>
+                                     </tr>
+                                     </tbody>
+                                 </table>
 
-                            </md-virtual-repeat-container>
-                        </md-content>
-                    </md-card-content>
-                </md-card>
-            </div>-->
+                             </md-virtual-repeat-container>
+                         </md-content>
+                     </md-card-content>
+                 </md-card>
+             </div>-->
             <!--</md-content>-->
         </div>
     </div>

@@ -104,29 +104,39 @@ div[md-color-picker] .md-color-picker-preview {
 .tei-table-container {
   margin-top: -35px; }
 
-table {
+/*table {
   border: none;
   width: 100%;
-  border-collapse: collapse; }
-  table thead tr {
-    font-weight: bold; }
-    table thead tr td {
-      width: 25%;
-      padding: 5px; }
-  table tbody tr {
-    cursor: pointer; }
-    table tbody tr td {
-      width: 25%;
-      border: none; }
-  table tbody tr:hover {
-    background-color: rgba(0, 0, 0, 0.15); }
+  border-collapse: collapse;
+  thead {
+    tr {
+      font-weight: bold;
+      td {
+        width: 25%;
+        padding: 5px;
+      }
+    }
+  }
 
+  tbody {
+    tr {
+      cursor: pointer;
+      td {
+        width: 25%;
+        border: none;
+      }
+    }
+
+    tr:hover {
+      background-color: rgba(0, 0, 0, 0.15);
+    }
+  }
+}*/
 .teiInfiniteScroll #vertical-container {
   height: 292px;
   width: 100%; }
   .teiInfiniteScroll #vertical-container .repeated-item {
-    box-sizing: border-box;
-    height: 40px;
+    height: 76px;
     padding-top: 10px; }
     .teiInfiniteScroll #vertical-container .repeated-item td {
       padding-left: 5px; }
@@ -177,6 +187,7 @@ table {
   background-color: #4CAF50;
   color: white; }
 .tei-attributes .purple, .event-sidenav .purple {
-  background-color: #4527A0; }
+  background-color: #4527A0;
+  color: white; }
 
 /*# sourceMappingURL=style.css.map */

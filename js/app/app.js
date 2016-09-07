@@ -1,4 +1,5 @@
 var serverRoot = 'http://lankanets.info:8080/nss/api/';
+//var serverRoot = 'http://148.251.224.242/nss1/api/';
 //var serverRoot = '../../';
 var app = angular.module('long-charts', ['ngMaterial', 'ngRoute', 'longitudinalChartControllers', 'dropzone', 'chart.js'
     , 'mdColorPicker', 'lfNgMdFileInput', 'angular-timeline', 'forerunnerdb', 'angularTreeview', 'ngMap']);
@@ -21,8 +22,8 @@ app.config(['$routeProvider', function ($routeProvider) {
 //temp config
 app.config(['$httpProvider', function ($httpProvider) {
     console.log($httpProvider);
-    $httpProvider.defaults.headers.common['Authorization'] = "Basic Y2hhdGh1cmE6Q2hhdGh1cmExMjM=";
-    //$httpProvider.defaults.headers.common['Authorization'] = "Basic bW9oMTptb2hNT0gxMjM=";//moh
+    //$httpProvider.defaults.headers.common['Authorization'] = "Basic Y2hhdGh1cmE6Q2hhdGh1cmExMjM=";
+    $httpProvider.defaults.headers.common['Authorization'] = "Basic bW9oMTptb2hNT0gxMjM=";//moh
     //$httpProvider.defaults.headers.common['Authorization'] = "Basic cGhtNDpwaG1QSE0xMjM=";//phm
 }])
 var controllers = angular.module('longitudinalChartControllers', []);
@@ -30,6 +31,7 @@ var controllers = angular.module('longitudinalChartControllers', []);
 controllers.controller('DashboardController', DashboardController);
 controllers.controller('TeiListController', TeiListController);
 controllers.controller('RiskController', RiskController);
+controllers.controller('NutritionController', NutritionController);
 controllers.controller('ChartController', ChartController);
 controllers.controller('ProfileController', ProfileController);
 controllers.controller('ViewerController', ViewerController);
@@ -83,11 +85,28 @@ app.factory('enrollmentService', function ($http, $q) {
     }
 });
 
-app.factory('eventService', function ($http, $q) {
-    return {
+app.factory('eventService', function ($http, $q, $fdb) {
+    console.log("Creating service");
+    var eventDb = $fdb.db('dnms').collection("events");
+    var eventDbListeners = [];
+    eventDb.on("update", function (status) {
+        console.log(status);
+        eventDbListeners.forEach(function (callback) {
+            callback(status);
+        })
+    });
+    var eventService = {
+        getEventsDb: function (drop) {
+            return eventDb;
+        },
+        listenDbUpdates: function (callback) {
+            eventDbListeners.push(callback);
+        },
         getEventAnalytics: function (programId, orgUnit, dataElementId, expectedValue) {//todo dates are hard coded
             var defer = $q.defer();
-            $http.get(serverRoot + 'analytics/events/query/' + programId + '?dimension=' + dataElementId + ':EQ:' + expectedValue + '&startDate=1992-08-16&endDate=2016-12-12&dimension=ou:' + orgUnit).then(function (response) {
+            var url = serverRoot + 'analytics/events/query/' + programId + '?dimension=' + dataElementId + ':EQ:' + expectedValue + '&startDate=1992-08-16&endDate=2016-12-12&dimension=ou:' + orgUnit;
+            console.log(url);
+            $http.get(url).then(function (response) {
                 defer.resolve(response.data);
             }, function (response) {
                 console.log(response);
@@ -118,9 +137,9 @@ app.factory('eventService', function ($http, $q) {
             return defer.promise;
         },
 
-        getEventTeiMap: function (programId) {
+        getEventTeiMap: function (programId, ou) {
             var defer = $q.defer();
-            $http.get(serverRoot + 'events.json?ouMode=ACCESSIBLE&skipPaging=true&program=' + programId + '&fields=event,trackedEntityInstance,status').then(function (response) {
+            $http.get(serverRoot + 'events.json?orgUnit=' + ou + '&ouMode=DESCENDANTS&skipPaging=true&program=' + programId + '&fields=event,trackedEntityInstance,status').then(function (response) {
                 defer.resolve(response.data.events);
             }, function (response) {
                 console.log(response);
@@ -152,6 +171,28 @@ app.factory('eventService', function ($http, $q) {
             return defer.promise;
         },
 
+        getAnalyticsForDeCustom: function (date1, date2, ouId, dataElementId) {
+            var defer = $q.defer();
+            $http.get(serverRoot + 'sqlViews/ewmYHyiO0sO/data?var=date1:' + date1 + '&var=date2:' + date2 + '&var=ou:' + ouId + '&var=dataElement:' + dataElementId).then(function (response) {
+                defer.resolve(response.data);
+            }, function (response) {
+                console.log(response);
+                defer.reject(response);
+            });
+            return defer.promise;
+        },
+
+        getHeightWeightAnalytics: function (sqlViewId, date1, date2, ouId, dataElementId) {
+            var defer = $q.defer();
+            $http.get(serverRoot + 'sqlViews/' + sqlViewId + '/data?var=date1:' + date1 + '&var=date2:' + date2 + '&var=ou:' + ouId + '&var=dataElement:' + dataElementId).then(function (response) {
+                defer.resolve(response.data);
+            }, function (response) {
+                console.log(response);
+                defer.reject(response);
+            });
+            return defer.promise;
+        },
+
         getAnalyticsForDe: function (programId, programStageId, ouId, dataElementId) {
             var defer = $q.defer();
             $http.get(serverRoot + 'analytics/events/aggregate/' + programId + '.json?stage=' + programStageId + '&dimension=' + dataElementId + ':IN%3A1&dimension=pe:LAST_3_MONTHS&filter=ou:' + ouId + '&outputType=EVENT&displayProperty=NAME').then(function (response) {
@@ -175,6 +216,7 @@ app.factory('eventService', function ($http, $q) {
             return defer.promise;
         }
     }
+    return eventService;
 });
 
 app.factory('orgUnitsService', function ($http, $q) {
@@ -235,11 +277,11 @@ app.factory('teiService', function ($http, $q, appService) {
          * @param title
          * @param searchFunction a callback function which accepts (regexp,page,limit)
          */
-        changeTeiList: function (title, searchFunction) {
+        changeTeiList: function (title, searchFunction, global) {
             teiService.teiListTitle = title;
             teiService.teiSearchFunction = searchFunction;
             teiService.teiListObservers.forEach(function (callback) {
-                callback();
+                callback(global);
             })
         },
 
