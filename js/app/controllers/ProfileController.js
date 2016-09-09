@@ -42,9 +42,21 @@ function ProfileController($location, appService, teiService, $routeParams, toas
         }
         ctrl.events.forEach(function (ev) {
             if (ev.programStage == ctrl.knownProgramStages.registration && ev.coordinate) {
-                ctrl.locationCache = "[" + ev.coordinate.latitude + "," + ev.coordinate.longitude + "]";
-                console.log(ctrl.locationCache);
-                return ctrl.locationCache;
+                var lat = ev.coordinate.latitude;
+                var lon = ev.coordinate.longitude;
+
+                var latUp = 9.88;
+                var lonLeft = 79.3;
+                var latDown = 5.56;
+                var lonRight = 82.4;
+
+                console.log(ev.coordinate);
+                if (lat > latDown && lat < latUp && lon > lonLeft && lon < lonRight) {
+                    ctrl.locationCache = "[" + ev.coordinate.latitude + "," + ev.coordinate.longitude + "]";
+                    return ctrl.locationCache;
+                } else {
+                    return false;
+                }
             }
         });
 
@@ -130,13 +142,6 @@ function ProfileController($location, appService, teiService, $routeParams, toas
         ctrl.selectedEvent = null;
     }
 
-    ctrl.getUserEventAction = function () {
-        if (ctrl.user && ctrl.user.level <= 3) {
-            return "COMPLETED";
-        }
-        return "SCHEDULE";
-    }
-
     /**
      * mark event as compete or active
      * @param reverse true will make event active, false will mark as completed
@@ -144,26 +149,10 @@ function ProfileController($location, appService, teiService, $routeParams, toas
     ctrl.completeEvent = function (reverse) {
         //todo make changes to local cache as well
         if (ctrl.selectedEvent) {
-            var oldStatus = ctrl.selectedEvent.status;
-            console.log(oldStatus);
-            var newStatus = ctrl.getUserEventAction();
-            if (reverse) {
-                newStatus = "ACTIVE";
-            }
-            eventService.completeEvent(ctrl.selectedEvent, newStatus).then(function (response) {
-                if (response.httpStatusCode == 200) {
-                    if (reverse) {
-                        toastService.showToast("Successfully reopened event.");
-                    } else {
-                        toastService.showToast("Successfully marked as reviewed");
-                    }
-                } else {
-                    console.log(response);
-                    toastService.showToast("Error occurred. Event status not changed.");
-                    ctrl.selectedEvent.status = oldStatus;
-                }
-            }, function (err) {
-                toastService.showToast("Network failure occurred. Event status not changed.");
+            eventService.completeEvent(ctrl.selectedEvent, reverse).then(function (response) {
+                toastService.showToast(response);
+            }, function (msg) {
+                toastService.showToast(msg);
             });
         }
     }
