@@ -23,6 +23,9 @@ app.config(['$routeProvider', function ($routeProvider) {
 //temp config
 app.config(['$httpProvider', function ($httpProvider) {
     console.log($httpProvider);
+    //$httpProvider.defaults.headers.common['Authorization'] = "Basic Y2hhdGh1cmE6Q2hhdGh1cmExMjM=";
+    //$httpProvider.defaults.headers.common['Authorization'] = "Basic bW9oMTptb2hNT0gxMjM=";//moh
+    //$httpProvider.defaults.headers.common['Authorization'] = "Basic cGhtNDpwaG1QSE0xMjM=";//phm
 }]);
 
 app.run(function (userService) {

@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="03d0cf71-6066-453f-bd09-a9c09c27a2ce" name="Default" comment="">
+    <list default="true" id="03d0cf71-6066-453f-bd09-a9c09c27a2ce" name="Default" comment="Remove idea files.">
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/DNMS.iml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/compiler.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/copyright/profiles_settings.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/modules.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/watcherTasks.xml" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/js/app/controllers/DashboardController.js" afterPath="$PROJECT_DIR$/js/app/controllers/DashboardController.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/js/app/controllers/ProfileController.js" afterPath="$PROJECT_DIR$/js/app/controllers/ProfileController.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/templates/dashboard.html" afterPath="$PROJECT_DIR$/templates/dashboard.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/templates/profile.html" afterPath="$PROJECT_DIR$/templates/profile.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/js/app/app.js" afterPath="$PROJECT_DIR$/js/app/app.js" />
     </list>
     <ignored path="DNMS.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -38,34 +42,32 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="EnrollmentService.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/js/app/services/EnrollmentService.js">
+      <file leaf-file-name="app.js" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/js/app/app.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="521">
-              <caret line="31" column="1" selection-start-line="31" selection-start-column="1" selection-end-line="31" selection-end-column="1" />
+            <state relative-caret-position="216">
+              <caret line="24" column="31" selection-start-line="24" selection-start-column="31" selection-end-line="27" selection-end-column="97" />
               <folding>
-                <element signature="n#!!doc;n#EnrollmentService#0" expanded="false" />
+                <element signature="n#!!doc" expanded="true" />
+                <element signature="e#2217#2643#0" expanded="false" />
+                <element signature="e#3412#4679#0" expanded="false" />
+                <element signature="e#15736#19167#0" expanded="false" />
+                <element signature="e#19216#19425#0" expanded="false" />
+                <element signature="e#19581#20298#0" expanded="false" />
+                <element signature="e#20398#20840#0" expanded="false" />
+                <element signature="e#20927#21349#0" expanded="false" />
+                <element signature="e#21480#24416#0" expanded="false" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="app.js" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/js/app/app.js">
+      <file leaf-file-name=".gitignore" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/.gitignore">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="432">
-              <caret line="24" column="31" selection-start-line="24" selection-start-column="31" selection-end-line="24" selection-end-column="31" />
-              <folding>
-                <element signature="n#!!doc" expanded="true" />
-                <element signature="e#1920#2346#0" expanded="false" />
-                <element signature="e#3115#4382#0" expanded="false" />
-                <element signature="e#15439#18870#0" expanded="false" />
-                <element signature="e#18919#19128#0" expanded="false" />
-                <element signature="e#19284#20001#0" expanded="false" />
-                <element signature="e#20101#20543#0" expanded="false" />
-                <element signature="e#20630#21052#0" expanded="false" />
-                <element signature="e#21183#24119#0" expanded="false" />
-              </folding>
+            <state relative-caret-position="18">
+              <caret line="1" column="5" selection-start-line="1" selection-start-column="5" selection-end-line="1" selection-end-column="5" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -192,7 +194,6 @@
         <option value="$PROJECT_DIR$/css/style.css" />
         <option value="$PROJECT_DIR$/test.json" />
         <option value="$PROJECT_DIR$/js/app/workers/orgTreeProcess.js" />
-        <option value="$PROJECT_DIR$/.gitignore" />
         <option value="$PROJECT_DIR$/vendor/timeline/angular-timeline.css" />
         <option value="$PROJECT_DIR$/js/app/workers/teiRegExpSearch.js" />
         <option value="$PROJECT_DIR$/js/app/workers/childou.js" />
@@ -212,6 +213,7 @@
         <option value="$PROJECT_DIR$/js/app/controllers/ProfileController.js" />
         <option value="$PROJECT_DIR$/js/app/controllers/DashboardController.js" />
         <option value="$PROJECT_DIR$/templates/profile.html" />
+        <option value="$PROJECT_DIR$/.gitignore" />
         <option value="$PROJECT_DIR$/js/app/app.js" />
       </list>
     </option>
@@ -312,118 +314,6 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="vendor" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="DNMS" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="DNMS" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="templates" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="DNMS" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="DNMS" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="js" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="DNMS" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="DNMS" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="js" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="app" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="DNMS" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="DNMS" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="js" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="app" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="workers" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="DNMS" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="DNMS" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="js" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="app" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="services" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="DNMS" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="DNMS" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="js" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="app" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="controllers" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -909,7 +799,7 @@
       <workItem from="1473180590362" duration="12987000" />
       <workItem from="1473252085411" duration="26412000" />
       <workItem from="1473312247341" duration="879000" />
-      <workItem from="1473393332532" duration="25825000" />
+      <workItem from="1473393332532" duration="27001000" />
     </task>
     <task id="LOCAL-00001" summary="Added organization tree support and some parallel processing with web workers">
       <created>1471770823965</created>
@@ -981,11 +871,18 @@
       <option name="project" value="LOCAL" />
       <updated>1473432206813</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="Added seperate view all buttons for doctors and phmws in non reviewed events.&#10;Fix permission model in completing events.">
+      <created>1473446619344</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1473446619344</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="309878000" />
+    <option name="totallyTimeSpent" value="311054000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1370" height="744" extended-state="0" />
@@ -997,7 +894,7 @@
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3290469" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.83076924" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.45470086" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3289689" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32998326" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -1065,7 +962,8 @@
     <MESSAGE value="Trend charts." />
     <MESSAGE value="Hide map if coordinates are outside Sri Lanka" />
     <MESSAGE value="Displays all attributes in profile and events." />
-    <option name="LAST_COMMIT_MESSAGE" value="Displays all attributes in profile and events." />
+    <MESSAGE value="Added seperate view all buttons for doctors and phmws in non reviewed events.&#10;Fix permission model in completing events." />
+    <option name="LAST_COMMIT_MESSAGE" value="Added seperate view all buttons for doctors and phmws in non reviewed events.&#10;Fix permission model in completing events." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1091,14 +989,14 @@
           <caret line="452" column="43" selection-start-line="452" selection-start-column="43" selection-end-line="452" selection-end-column="43" />
           <folding>
             <element signature="n#!!doc" expanded="true" />
-            <element signature="e#1920#2346#0" expanded="false" />
-            <element signature="e#3115#4382#0" expanded="false" />
-            <element signature="e#15439#18870#0" expanded="false" />
-            <element signature="e#18919#19128#0" expanded="false" />
-            <element signature="e#19284#20001#0" expanded="false" />
-            <element signature="e#20101#20543#0" expanded="false" />
-            <element signature="e#20630#21052#0" expanded="false" />
-            <element signature="e#21183#24119#0" expanded="false" />
+            <element signature="e#2217#2643#0" expanded="false" />
+            <element signature="e#3412#4679#0" expanded="false" />
+            <element signature="e#15736#19167#0" expanded="false" />
+            <element signature="e#19216#19425#0" expanded="false" />
+            <element signature="e#19581#20298#0" expanded="false" />
+            <element signature="e#20398#20840#0" expanded="false" />
+            <element signature="e#20927#21349#0" expanded="false" />
+            <element signature="e#21480#24416#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -1238,14 +1136,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/.gitignore">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="36">
-          <caret line="2" column="0" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1461,20 +1351,28 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="18">
+          <caret line="1" column="5" selection-start-line="1" selection-start-column="5" selection-end-line="1" selection-end-column="5" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/js/app/app.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="432">
-          <caret line="24" column="31" selection-start-line="24" selection-start-column="31" selection-end-line="24" selection-end-column="31" />
+        <state relative-caret-position="216">
+          <caret line="24" column="31" selection-start-line="24" selection-start-column="31" selection-end-line="27" selection-end-column="97" />
           <folding>
             <element signature="n#!!doc" expanded="true" />
-            <element signature="e#1920#2346#0" expanded="false" />
-            <element signature="e#3115#4382#0" expanded="false" />
-            <element signature="e#15439#18870#0" expanded="false" />
-            <element signature="e#18919#19128#0" expanded="false" />
-            <element signature="e#19284#20001#0" expanded="false" />
-            <element signature="e#20101#20543#0" expanded="false" />
-            <element signature="e#20630#21052#0" expanded="false" />
-            <element signature="e#21183#24119#0" expanded="false" />
+            <element signature="e#2217#2643#0" expanded="false" />
+            <element signature="e#3412#4679#0" expanded="false" />
+            <element signature="e#15736#19167#0" expanded="false" />
+            <element signature="e#19216#19425#0" expanded="false" />
+            <element signature="e#19581#20298#0" expanded="false" />
+            <element signature="e#20398#20840#0" expanded="false" />
+            <element signature="e#20927#21349#0" expanded="false" />
+            <element signature="e#21480#24416#0" expanded="false" />
           </folding>
         </state>
       </provider>
