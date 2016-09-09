@@ -510,12 +510,19 @@ function DashboardController($location, $scope, toastService, programService, us
      }
      };*/
 
+    /**
+     * User levels above MOH user are considered as elevated in this context
+     * @returns {*|boolean}
+     */
+    ctrl.isElevatedUser = function () {
+        return userService.hasRole(userService.MOH_USER);
+    }
     /*Doctor's approval related operations*/
 
-    ctrl.pickRandomEvent = function () {
+    ctrl.pickRandomEvent = function (active) {
         if (ctrl.eventsDb) {
             var event = ctrl.eventsDb.find({
-                    status: "ACTIVE"
+                    status: active ? "ACTIVE" : "SCHEDULE"
                 }
             )[Math.floor(Math.random() * ctrl.viewedEventsCount)];
             ctrl.openChildProfile(event.trackedEntityInstance);
@@ -533,10 +540,14 @@ function DashboardController($location, $scope, toastService, programService, us
             })
     }
 
-    ctrl.viewAllIncompleteEvents = function () {
+    /**
+     *
+     * @param active true if ACTIVE events false if sister approved events
+     */
+    ctrl.viewAllIncompleteEvents = function (active) {
         teiService.changeTeiList("Children having incomplete events", function (regexp, page, limit) {
             var events = ctrl.eventsDb.find({
-                    status: "ACTIVE"
+                    status: active ? "ACTIVE" : "SCHEDULE"
                 }, {
                     $page: page,
                     $limit: limit

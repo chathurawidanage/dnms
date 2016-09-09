@@ -143,6 +143,15 @@ function ProfileController($location, appService, teiService, $routeParams, toas
     }
 
     /**
+     * User levels above MOH user are considered as elevated in this context
+     * @returns {*|boolean}
+     */
+    ctrl.isElevatedUser = function () {
+        console.log(userService.hasRole(userService.MOH_USER));
+        return userService.hasRole(userService.MOH_USER);
+    }
+
+    /**
      * mark event as compete or active
      * @param reverse true will make event active, false will mark as completed
      */
@@ -204,7 +213,7 @@ function ProfileController($location, appService, teiService, $routeParams, toas
             });
             //fill other attributes
             Object.keys(ctrl.teiAttributes).forEach(function (attId) {
-                if (teiObjAttributesIds.indexOf(attId) <0) {
+                if (teiObjAttributesIds.indexOf(attId) < 0) {
                     var newAttribute = ctrl.teiAttributes[attId]
                     ctrl.teiObj.attributes.push({
                         attribute: newAttribute.id,

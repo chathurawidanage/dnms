@@ -90,7 +90,7 @@
                             </md-card>
                         </md-content>
                     </md-tab>
-                    <md-tab ng-if="ctrl.user.level<=3" label="Risk Analytics">
+                    <md-tab ng-if="ctrl.isElevatedUser()" label="Risk Analytics">
                         <md-card ng-controller="RiskController as rctrl">
                             <md-card-header class="colored-card-header">
                                 <md-card-header-text>
@@ -126,7 +126,7 @@
                             </md-card-content>
                         </md-card>
                     </md-tab>
-                    <md-tab ng-if="ctrl.user.level<=3" label="Height / Weight">
+                    <md-tab ng-if="ctrl.isElevatedUser()" label="Height / Weight">
                         <md-content class="md-padding">
                             <md-card ng-controller="NutritionController as nctrl">
                                 <md-card-header class="colored-card-header">
@@ -174,7 +174,7 @@
                 <md-card>
                     <md-card-header class="colored-card-header">
                         <md-card-header-text>
-                            <span class="md-title main-card-title">Hello {{ctrl.user.level==3?"Dr. ":""}} {{ctrl.user.firstName}}!</span>
+                            <span class="md-title main-card-title">Hello {{ctrl.isElevatedUser()?"Dr. ":""}} {{ctrl.user.firstName}}!</span>
                         </md-card-header-text>
                     </md-card-header>
                     <md-card-content>
@@ -194,7 +194,7 @@
                                 </md-button>
                             </md-list-item>
                             <md-divider></md-divider>
-                            <md-list-item ng-if="ctrl.user.level<=3" class="md-2-line">
+                            <md-list-item ng-if="ctrl.isElevatedUser()" class="md-2-line">
                                 <img src="img/calendar-icon.png" class="md-avatar" alt="admin-area"/>
                                 <div class="md-list-item-text">
                                     <h3>Set your report date</h3>
@@ -203,42 +203,78 @@
                                 </div>
                             </md-list-item>
                             <md-divider></md-divider>
-                            <md-list-item class="md-2-line" ng-if="ctrl.user.level<=3" >
+                            <md-list-item class="md-2-line" ng-if="ctrl.isElevatedUser()">
                                 <img src="img/doctor-icon.png" class="md-avatar" alt="admin-area"/>
                                 <div class="md-list-item-text">
                                     <h3>{{ctrl.viewedEventsCount}}</h3>
                                     <p>Events need your approval</p>
                                 </div>
+                                <md-button class="md-secondary md-icon-button md-raised"
+                                           ng-click="ctrl.approveAllEvents(false)"
+                                           aria-label="toggle" ng-if="ctrl.isElevatedUser()">
+                                    <md-icon>
+                                        <i class="material-icons">done</i>
+                                    </md-icon>
+                                    <md-tooltip md-direction="bottom">
+                                        Approve All
+                                    </md-tooltip>
+                                </md-button>
+                                <md-button class="md-secondary md-icon-button md-raised"
+                                           ng-click="ctrl.pickRandomEvent(false)"
+                                           aria-label="toggle">
+                                    <md-icon>
+                                        <i class="material-icons">shuffle</i>
+                                    </md-icon>
+                                    <md-tooltip md-direction="bottom">
+                                        Pick One
+                                    </md-tooltip>
+                                </md-button>
+                                <md-button class="md-secondary md-icon-button md-raised"
+                                           ng-click="ctrl.viewAllIncompleteEvents(false)"
+                                           aria-label="toggle">
+                                    <md-icon>
+                                        <i class="material-icons">visibility</i>
+                                    </md-icon>
+                                    <md-tooltip md-direction="bottom">
+                                        View All
+                                    </md-tooltip>
+                                </md-button>
                             </md-list-item>
                             <md-list-item class="md-2-line">
                                 <img src="img/warning-icon.png" class="md-avatar" alt="admin-area"/>
                                 <div class="md-list-item-text">
                                     <h3>{{ctrl.activeEventsCount}}</h3>
-                                    <p>Events need {{ctrl.user.level<=3?"sisters":"your"}} attention</p>
+                                    <p>Events need {{ctrl.isElevatedUser()?"sisters":"your"}} attention</p>
                                 </div>
-                            </md-list-item>
-                            <md-list-item>
-                                <span flex></span>
-                                <md-button class="md-secondary" ng-click="ctrl.approveAllEvents()"
-                                           aria-label="toggle" ng-if="ctrl.user.level<=3" >
+                                <md-button class="md-secondary md-icon-button md-raised"
+                                           ng-click="ctrl.approveAllEvents(true)"
+                                           aria-label="toggle" ng-if="ctrl.isElevatedUser()">
                                     <md-icon>
                                         <i class="material-icons">done</i>
                                     </md-icon>
-                                    Approve All
+                                    <md-tooltip md-direction="bottom">
+                                        Approve All
+                                    </md-tooltip>
                                 </md-button>
-                                <md-button class="md-secondary" ng-click="ctrl.pickRandomEvent()"
+                                <md-button class="md-secondary md-icon-button md-raised"
+                                           ng-click="ctrl.pickRandomEvent(true)"
                                            aria-label="toggle">
                                     <md-icon>
                                         <i class="material-icons">shuffle</i>
                                     </md-icon>
-                                    Pick One
+                                    <md-tooltip md-direction="bottom">
+                                        Pick One
+                                    </md-tooltip>
                                 </md-button>
-                                <md-button class="md-secondary" ng-click="ctrl.viewAllIncompleteEvents()"
+                                <md-button class="md-secondary md-icon-button md-raised"
+                                           ng-click="ctrl.viewAllIncompleteEvents(true)"
                                            aria-label="toggle">
                                     <md-icon>
                                         <i class="material-icons">visibility</i>
                                     </md-icon>
-                                    View All
+                                    <md-tooltip md-direction="bottom">
+                                        View All
+                                    </md-tooltip>
                                 </md-button>
                             </md-list-item>
                         </md-list>

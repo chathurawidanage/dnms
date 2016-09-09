@@ -223,15 +223,22 @@
 
 
             <md-button class="md-primary" aria-label="Use Android" ng-click="ctrl.completeEvent()"
-                       ng-if="ctrl.selectedEvent.status=='ACTIVE'">
+                       ng-if="ctrl.selectedEvent.status!='COMPLETED' && ctrl.isElevatedUser()">
+                <md-icon>
+                    <i class="material-icons">done</i>
+                </md-icon>
+                Mark as Completed
+            </md-button>
+            <md-button class="md-primary" aria-label="Use Android" ng-click="ctrl.completeEvent()"
+                       ng-if="ctrl.selectedEvent.status=='ACTIVE' && !ctrl.isElevatedUser()">
                 <md-icon>
                     <i class="material-icons">done</i>
                 </md-icon>
                 Mark as reviewed
             </md-button>
             <md-button class="md-primary" aria-label="Use Android" ng-click="ctrl.completeEvent(true)"
-                       ng-if="ctrl.selectedEvent.status!='ACTIVE'">
-                <md-icon>
+                       ng-if="(ctrl.selectedEvent.status!='ACTIVE' && !ctrl.isElevatedUser() && ctrl.selectedEvent.status!='COMPLETED') || (ctrl.selectedEvent.status=='COMPLETED' && ctrl.isElevatedUser())">
+                <md-icon><!--Trying to avoid the intermediate staus as much as possible in the logic-->
                     <i class="material-icons">undo</i>
                 </md-icon>
                 Reopen event

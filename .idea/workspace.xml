@@ -2,14 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="03d0cf71-6066-453f-bd09-a9c09c27a2ce" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/js/app/services/EnrollmentService.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/js/app/services/EventService.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/js/app/services/UserService.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/index.html" afterPath="$PROJECT_DIR$/index.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/js/app/app.js" afterPath="$PROJECT_DIR$/js/app/app.js" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/js/app/controllers/DashboardController.js" afterPath="$PROJECT_DIR$/js/app/controllers/DashboardController.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/js/app/controllers/ProfileController.js" afterPath="$PROJECT_DIR$/js/app/controllers/ProfileController.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/templates/dashboard.html" afterPath="$PROJECT_DIR$/templates/dashboard.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/templates/profile.html" afterPath="$PROJECT_DIR$/templates/profile.html" />
     </list>
     <ignored path="DNMS.iws" />
@@ -74,13 +70,31 @@
           </provider>
         </entry>
       </file>
+      <file leaf-file-name="dashboard.html" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/templates/dashboard.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="167">
+              <caret line="205" column="86" selection-start-line="205" selection-start-column="72" selection-end-line="205" selection-end-column="86" />
+              <folding>
+                <element signature="n#div#1;n#div#0;n#!!top" expanded="false" />
+                <element signature="n#md-tab#0;n#md-tabs#0;n#div#0;n#div#0;n#div#2;n#div#0;n#!!top" expanded="false" />
+                <element signature="n#md-card#0;n#md-content#0;n#md-tab#0;n#md-tabs#0;n#div#0;n#div#0;n#div#2;n#div#0;n#!!top" expanded="false" />
+                <element signature="n#md-tab#1;n#md-tabs#0;n#div#0;n#div#0;n#div#2;n#div#0;n#!!top" expanded="false" />
+                <element signature="n#md-tab#2;n#md-tabs#0;n#div#0;n#div#0;n#div#2;n#div#0;n#!!top" expanded="false" />
+                <element signature="e#22744#24672#0" expanded="false" />
+                <element signature="e#24773#27116#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="ProfileController.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/js/app/controllers/ProfileController.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="356">
-              <caret line="206" column="57" selection-start-line="206" selection-start-column="57" selection-end-line="206" selection-end-column="57" />
+            <state relative-caret-position="86">
+              <caret line="144" column="2" selection-start-line="144" selection-start-column="2" selection-end-line="151" selection-end-column="5" />
               <folding>
-                <element signature="e#8912#9701#0" expanded="false" />
+                <element signature="e#9203#9992#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -89,8 +103,8 @@
       <file leaf-file-name="UserService.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/js/app/services/UserService.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="792">
-              <caret line="46" column="90" selection-start-line="46" selection-start-column="90" selection-end-line="46" selection-end-column="90" />
+            <state relative-caret-position="291">
+              <caret line="49" column="8" selection-start-line="49" selection-start-column="8" selection-end-line="49" selection-end-column="8" />
               <folding>
                 <element signature="n#!!doc;n#UserService#0" expanded="false" />
               </folding>
@@ -102,7 +116,7 @@
         <entry file="file://$PROJECT_DIR$/js/app/controllers/DashboardController.js">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="194">
-              <caret line="97" column="55" selection-start-line="97" selection-start-column="55" selection-end-line="97" selection-end-column="55" />
+              <caret line="516" column="39" selection-start-line="516" selection-start-column="39" selection-end-line="516" selection-end-column="39" />
               <folding>
                 <element signature="e#753#1717#0" expanded="false" />
                 <element signature="e#1745#1812#0" expanded="false" />
@@ -129,8 +143,8 @@
       <file leaf-file-name="EventService.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/js/app/services/EventService.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-1759">
-              <caret line="19" column="8" selection-start-line="19" selection-start-column="8" selection-end-line="19" selection-end-column="8" />
+            <state relative-caret-position="185">
+              <caret line="32" column="8" selection-start-line="32" selection-start-column="8" selection-end-line="32" selection-end-column="8" />
               <folding>
                 <element signature="n#!!doc;n#EventService#0" expanded="false" />
               </folding>
@@ -141,8 +155,8 @@
       <file leaf-file-name="profile.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/templates/profile.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="395">
-              <caret line="61" column="62" selection-start-line="61" selection-start-column="62" selection-end-line="61" selection-end-column="62" />
+            <state relative-caret-position="293">
+              <caret line="240" column="100" selection-start-line="240" selection-start-column="100" selection-end-line="240" selection-end-column="100" />
               <folding />
             </state>
           </provider>
@@ -186,7 +200,6 @@
         <option value="$PROJECT_DIR$/js/app/controllers/RiskController.js" />
         <option value="$PROJECT_DIR$/css/style.scss" />
         <option value="$PROJECT_DIR$/js/app/controllers/TrendController.js" />
-        <option value="$PROJECT_DIR$/templates/dashboard.html" />
         <option value="$PROJECT_DIR$/js/app/controllers/NutritionController.js" />
         <option value="$PROJECT_DIR$/js/angular-chart.js" />
         <option value="$PROJECT_DIR$/js/angular-chart-v1.js" />
@@ -195,8 +208,9 @@
         <option value="$PROJECT_DIR$/index.html" />
         <option value="$PROJECT_DIR$/js/app/services/UserService.js" />
         <option value="$PROJECT_DIR$/js/app/services/EventService.js" />
-        <option value="$PROJECT_DIR$/js/app/controllers/DashboardController.js" />
+        <option value="$PROJECT_DIR$/templates/dashboard.html" />
         <option value="$PROJECT_DIR$/js/app/controllers/ProfileController.js" />
+        <option value="$PROJECT_DIR$/js/app/controllers/DashboardController.js" />
         <option value="$PROJECT_DIR$/templates/profile.html" />
         <option value="$PROJECT_DIR$/js/app/app.js" />
       </list>
@@ -895,7 +909,7 @@
       <workItem from="1473180590362" duration="12987000" />
       <workItem from="1473252085411" duration="26412000" />
       <workItem from="1473312247341" duration="879000" />
-      <workItem from="1473393332532" duration="22233000" />
+      <workItem from="1473393332532" duration="25825000" />
     </task>
     <task id="LOCAL-00001" summary="Added organization tree support and some parallel processing with web workers">
       <created>1471770823965</created>
@@ -960,11 +974,18 @@
       <option name="project" value="LOCAL" />
       <updated>1473420044535</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="Displays all attributes in profile and events.">
+      <created>1473432206813</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1473432206813</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="306286000" />
+    <option name="totallyTimeSpent" value="309878000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1370" height="744" extended-state="0" />
@@ -1043,7 +1064,8 @@
     <MESSAGE value="Thumbnail icons" />
     <MESSAGE value="Trend charts." />
     <MESSAGE value="Hide map if coordinates are outside Sri Lanka" />
-    <option name="LAST_COMMIT_MESSAGE" value="Hide map if coordinates are outside Sri Lanka" />
+    <MESSAGE value="Displays all attributes in profile and events." />
+    <option name="LAST_COMMIT_MESSAGE" value="Displays all attributes in profile and events." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1093,7 +1115,7 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="e#8912#9701#0" expanded="false" />
+            <element signature="e#9203#9992#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -1285,25 +1307,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/templates/dashboard.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="167">
-          <caret line="176" column="72" selection-start-line="176" selection-start-column="67" selection-end-line="176" selection-end-column="72" />
-          <folding>
-            <element signature="n#div#1;n#div#0;n#!!top" expanded="false" />
-            <element signature="n#md-tab#0;n#md-tabs#0;n#div#0;n#div#0;n#div#2;n#div#0;n#!!top" expanded="false" />
-            <element signature="n#md-card#0;n#md-content#0;n#md-tab#0;n#md-tabs#0;n#div#0;n#div#0;n#div#2;n#div#0;n#!!top" expanded="false" />
-            <element signature="n#md-tab#1;n#md-tabs#0;n#div#0;n#div#0;n#div#2;n#div#0;n#!!top" expanded="false" />
-            <element signature="n#md-tab#2;n#md-tabs#0;n#div#0;n#div#0;n#div#2;n#div#0;n#!!top" expanded="false" />
-            <element signature="n#md-list-item#1;n#md-list#0;n#md-card-content#0;n#md-card#0;n#div#0;n#div#1;n#div#2;n#div#0;n#!!top" expanded="false" />
-            <element signature="n#style#0;n#md-input-container#0;n#md-card-content#0;n#md-card#0;n#div#2;n#div#1;n#div#2;n#div#0;n#!!top" expanded="false" />
-            <element signature="n#style#0;n#md-content#0;n#md-card-content#0;n#md-card#0;n#div#2;n#div#1;n#div#2;n#div#0;n#!!top" expanded="false" />
-            <element signature="e#20367#22295#0" expanded="false" />
-            <element signature="e#22396#24739#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/js/app/controllers/RiskController.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1782">
@@ -1372,26 +1375,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/js/app/services/UserService.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="792">
-          <caret line="46" column="90" selection-start-line="46" selection-start-column="90" selection-end-line="46" selection-end-column="90" />
-          <folding>
-            <element signature="n#!!doc;n#UserService#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/js/app/services/EventService.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1759">
-          <caret line="19" column="8" selection-start-line="19" selection-start-column="8" selection-end-line="19" selection-end-column="8" />
-          <folding>
-            <element signature="n#!!doc;n#EventService#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/js/app/controllers/TeiListController.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="113">
@@ -1400,10 +1383,64 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="278">
+          <caret line="104" column="66" selection-start-line="104" selection-start-column="66" selection-end-line="104" selection-end-column="66" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/js/app/services/UserService.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="291">
+          <caret line="49" column="8" selection-start-line="49" selection-start-column="8" selection-end-line="49" selection-end-column="8" />
+          <folding>
+            <element signature="n#!!doc;n#UserService#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/js/app/services/EventService.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="185">
+          <caret line="32" column="8" selection-start-line="32" selection-start-column="8" selection-end-line="32" selection-end-column="8" />
+          <folding>
+            <element signature="n#!!doc;n#EventService#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/dashboard.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="167">
+          <caret line="205" column="86" selection-start-line="205" selection-start-column="72" selection-end-line="205" selection-end-column="86" />
+          <folding>
+            <element signature="n#div#1;n#div#0;n#!!top" expanded="false" />
+            <element signature="n#md-tab#0;n#md-tabs#0;n#div#0;n#div#0;n#div#2;n#div#0;n#!!top" expanded="false" />
+            <element signature="n#md-card#0;n#md-content#0;n#md-tab#0;n#md-tabs#0;n#div#0;n#div#0;n#div#2;n#div#0;n#!!top" expanded="false" />
+            <element signature="n#md-tab#1;n#md-tabs#0;n#div#0;n#div#0;n#div#2;n#div#0;n#!!top" expanded="false" />
+            <element signature="n#md-tab#2;n#md-tabs#0;n#div#0;n#div#0;n#div#2;n#div#0;n#!!top" expanded="false" />
+            <element signature="e#22744#24672#0" expanded="false" />
+            <element signature="e#24773#27116#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/js/app/controllers/ProfileController.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="86">
+          <caret line="144" column="2" selection-start-line="144" selection-start-column="2" selection-end-line="151" selection-end-column="5" />
+          <folding>
+            <element signature="e#9203#9992#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/js/app/controllers/DashboardController.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="194">
-          <caret line="97" column="55" selection-start-line="97" selection-start-column="55" selection-end-line="97" selection-end-column="55" />
+          <caret line="516" column="39" selection-start-line="516" selection-start-column="39" selection-end-line="516" selection-end-column="39" />
           <folding>
             <element signature="e#753#1717#0" expanded="false" />
             <element signature="e#1745#1812#0" expanded="false" />
@@ -1416,28 +1453,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/js/app/controllers/ProfileController.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="356">
-          <caret line="206" column="57" selection-start-line="206" selection-start-column="57" selection-end-line="206" selection-end-column="57" />
-          <folding>
-            <element signature="e#8912#9701#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/templates/profile.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="395">
-          <caret line="61" column="62" selection-start-line="61" selection-start-column="62" selection-end-line="61" selection-end-column="62" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/index.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="278">
-          <caret line="104" column="66" selection-start-line="104" selection-start-column="66" selection-end-line="104" selection-end-column="66" />
+        <state relative-caret-position="293">
+          <caret line="240" column="100" selection-start-line="240" selection-start-column="100" selection-end-line="240" selection-end-column="100" />
           <folding />
         </state>
       </provider>
