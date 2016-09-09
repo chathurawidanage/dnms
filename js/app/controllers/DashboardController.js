@@ -290,7 +290,7 @@ function DashboardController($location, $scope, toastService, programService, us
     ctrl.cacheTeis = function () {
         ctrl.caches.tei = CAHCE_STATUS.loading;
         //todo firstname and last name attributes are hard coded
-        teiService.queryForAllTeis(["izuwkaOUgFg", "C8DBAo2wEYN", "BZEpuufLyDE", "WqdldQpOIxm"]).then(function (data) {
+        teiService.queryForAllTeis(["izuwkaOUgFg", "C8DBAo2wEYN", "BZEpuufLyDE", "WqdldQpOIxm"], ctrl.selectedProgram.id).then(function (data) {
             var rows = data.rows;
             ctrl.loadingText = "Saving children data...";
             rows.forEach(function (row) {
@@ -320,6 +320,9 @@ function DashboardController($location, $scope, toastService, programService, us
                     },
                     {
                         lName: regexp
+                    },
+                    {
+                        chdrNumber: regexp
                     }
                 ]
             }, {

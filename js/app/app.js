@@ -23,10 +23,13 @@ app.config(['$routeProvider', function ($routeProvider) {
 //temp config
 app.config(['$httpProvider', function ($httpProvider) {
     console.log($httpProvider);
-    //$httpProvider.defaults.headers.common['Authorization'] = "Basic Y2hhdGh1cmE6Q2hhdGh1cmExMjM=";
-    //$httpProvider.defaults.headers.common['Authorization'] = "Basic bW9oMTptb2hNT0gxMjM=";//moh
-    //$httpProvider.defaults.headers.common['Authorization'] = "Basic cGhtNDpwaG1QSE0xMjM=";//phm
-}])
+}]);
+
+app.run(function (userService) {
+    userService.getCurrentUser();
+})
+
+
 var controllers = angular.module('longitudinalChartControllers', []);
 
 controllers.controller('DashboardController', DashboardController);
@@ -57,175 +60,9 @@ angular.module('dropzone', []).directive('dropzone', function () {
     };
 });
 
-app.factory('enrollmentService', function ($http, $q) {
-    return {
-        unenrollTei: function (teiId, program) {
-            var defer = $q.defer();
-            this.getEnrollmentForTei(teiId, program).then(function (enrollments) {
-                var enrollment = enrollments[0];//todo handle multiple
-                console.log(enrollment);
-                enrollment.status = "COMPLETED";
-                $http.put(serverRoot + 'enrollments/' + enrollment.enrollment, angular.toJson(enrollment)).then(function (response) {
-                    defer.resolve(response);
-                }, function (response) {
-                    defer.reject(response);
-                });
-            });
-            return defer.promise;
-        },
+app.factory('enrollmentService', EnrollmentService);
 
-        getEnrollmentForTei: function (teiId, programId) {
-            var defer = $q.defer();
-            $http.get(serverRoot + 'enrollments.json?ouMode=ACCESSIBLE&trackedEntityInstance=' + teiId + '&program=' + programId).then(function (response) {
-                defer.resolve(response.data.enrollments);
-            }, function (response) {
-                console.log(response);
-                defer.reject(response);
-            });
-            return defer.promise;
-        }
-    }
-});
-
-app.factory('eventService', function ($http, $q, $fdb) {
-    console.log("Creating service");
-    var eventDb = $fdb.db('dnms').collection("events");
-    var eventDbListeners = [];
-    eventDb.on("update", function (status) {
-        console.log(status);
-        eventDbListeners.forEach(function (callback) {
-            callback(status);
-        })
-    });
-    var eventService = {
-        getEventsDb: function (drop) {
-            return eventDb;
-        },
-        listenDbUpdates: function (callback) {
-            eventDbListeners.push(callback);
-        },
-        getEventAnalytics: function (programId, orgUnit, dataElementId, expectedValue) {//todo dates are hard coded
-            var defer = $q.defer();
-            var url = serverRoot + 'analytics/events/query/' + programId + '?dimension=' + dataElementId + ':EQ:' + expectedValue + '&startDate=1992-08-16&endDate=2016-12-12&dimension=ou:' + orgUnit;
-            console.log(url);
-            $http.get(url).then(function (response) {
-                defer.resolve(response.data);
-            }, function (response) {
-                console.log(response);
-                defer.reject(response);
-            });
-            return defer.promise;
-        },
-
-        completeEvent: function (event, status) {
-            event.status = status;
-            var defer = $q.defer();
-            $http.put(serverRoot + 'events/' + event.event, angular.toJson(event)).then(function (response) {
-                defer.resolve(response.data);
-            }, function (response) {
-                event.status = reverse ? "COMPLETE" : "ACTIVE";
-                defer.reject(response);
-            });
-            return defer.promise;
-        },
-
-        deleteEvent: function (event) {
-            var defer = $q.defer();
-            $http.delete(serverRoot + 'events/' + event.event).then(function (response) {
-                defer.resolve(response.data);
-            }, function (response) {
-                defer.reject(response);
-            });
-            return defer.promise;
-        },
-
-        getEventTeiMap: function (programId, ou) {
-            var defer = $q.defer();
-            $http.get(serverRoot + 'events.json?orgUnit=' + ou + '&ouMode=DESCENDANTS&skipPaging=true&program=' + programId + '&fields=event,trackedEntityInstance,status').then(function (response) {
-                defer.resolve(response.data.events);
-            }, function (response) {
-                console.log(response);
-                defer.reject(response);
-            });
-            return defer.promise;
-        },
-
-        updateEventData: function (event, dataValue) {
-            var eventCopy = {
-                event: event.event,
-                orgUnit: event.orgUnit,
-                program: event.program,
-                programStage: event.programStage,
-                status: event.status,
-                trackedEntityInstance: event.trackedEntityInstance,
-                dataValues: [{
-                    dataElement: dataValue.dataElement,
-                    value: dataValue.value,
-                    providedElseWhere: dataValue.providedElseWhere
-                }]
-            };
-            var defer = $q.defer();
-            $http.put(serverRoot + 'events/' + event.event + '/' + dataValue.dataElement, angular.toJson(eventCopy)).then(function (response) {
-                defer.resolve(response.data);
-            }, function (response) {
-                defer.reject(response);
-            });
-            return defer.promise;
-        },
-
-        getAnalyticsForDeCustom: function (date1, date2, ouId, dataElementId, index) {
-            var defer = $q.defer();
-            //lankanets ewmYHyiO0sO
-            //main ejUWIpcmgTz
-            $http.get(serverRoot + 'sqlViews/ejUWIpcmgTz/data?var=date1:' + date1 + '&var=date2:' + date2 + '&var=ou:' + ouId + '&var=dataElement:' + dataElementId).then(function (response) {
-                if (!index) {//todo remove temp fix
-                    defer.resolve(response.data);
-                } else {
-                    defer.resolve({index: index, data: response.data});
-                }
-            }, function (response) {
-                console.log(response);
-                defer.reject(response);
-            });
-            return defer.promise;
-        },
-
-        getHeightWeightAnalytics: function (sqlViewId, date1, date2, ouId, dataElementId) {
-            var defer = $q.defer();
-            $http.get(serverRoot + 'sqlViews/' + sqlViewId + '/data?var=date1:' + date1 + '&var=date2:' + date2 + '&var=ou:' + ouId + '&var=dataElement:' + dataElementId).then(function (response) {
-                defer.resolve(response.data);
-            }, function (response) {
-                console.log(response);
-                defer.reject(response);
-            });
-            return defer.promise;
-        },
-
-        getAnalyticsForDe: function (programId, programStageId, ouId, dataElementId) {
-            var defer = $q.defer();
-            $http.get(serverRoot + 'analytics/events/aggregate/' + programId + '.json?stage=' + programStageId + '&dimension=' + dataElementId + ':IN%3A1&dimension=pe:LAST_3_MONTHS&filter=ou:' + ouId + '&outputType=EVENT&displayProperty=NAME').then(function (response) {
-                defer.resolve(response.data);
-            }, function (response) {
-                console.log(response);
-                defer.reject(response);
-            });
-            return defer.promise;
-        },
-
-        //todo remove this
-        getEventData: function (programId) {
-            var defer = $q.defer();
-            $http.get(serverRoot + 'events.json?ouMode=ACCESSIBLE&skipPaging=true&program=' + programId + '&fields=programStage,id,eventDate,lastUpdated,trackedEntityInstance,dataValues[dataElement,value]').then(function (response) {
-                defer.resolve(response.data.events);
-            }, function (response) {
-                console.log(response);
-                defer.reject(response);
-            });
-            return defer.promise;
-        }
-    }
-    return eventService;
-});
+app.factory('eventService', EventService);
 
 app.factory('orgUnitsService', function ($http, $q) {
     return {
@@ -357,38 +194,15 @@ app.factory('teiService', function ($http, $q, appService) {
             return defer.promise;
         },
 
-        queryForAllTeis: function (attributes) {
+        queryForAllTeis: function (attributes, program) {
             var defer = $q.defer();
-            var url = serverRoot + 'trackedEntityInstances/query.json?ouMode=ACCESSIBLE';
+            var url = serverRoot + 'trackedEntityInstances/query.json?ouMode=ACCESSIBLE&programStatus=ACTIVE&program=' + program;
             if (attributes) {
                 attributes.forEach(function (attr) {
                     url += "&attribute=" + attr;
                 })
             }
             $http.get(url).then(function (response) {
-                defer.resolve(response.data);
-            }, function (response) {
-                defer.reject(response);
-            });
-            return defer.promise;
-        },
-        queryForTeis: function (orgUnits, program, keyword, page) {
-            var defer = $q.defer();
-            var query = serverRoot + 'trackedEntityInstances/query.json?ou=';
-            if (orgUnits.length == 1) {
-                query += orgUnits[0] + "&ouMode=DESCENDANTS";
-            } else {
-                query += orgUnits.join(";");
-            }
-            query += "&program=" + program;
-
-            if (keyword) {
-                query += "&query=LIKE:" + keyword;
-            }
-
-            query += "&pageSize=50&totalPages=true&page=" + page;
-
-            $http.get(query).then(function (response) {
                 defer.resolve(response.data);
             }, function (response) {
                 defer.reject(response);
@@ -642,32 +456,7 @@ app.factory('validationService', function () {
 /**
  * User Service
  **/
-app.factory('userService', function ($http, $q) {
-    return {
-        getCurrentUser: function () {
-            var defer = $q.defer();
-            var userRoleMap = {//todo remove this temp fix
-                wC9asSQrYO0: 0,
-                Ej7USJV1ccn: 3,//moh
-                uCBJBr2plYV: 4,//sister
-                jpsN0Kh6KTr: 5//mid wife
-            }
-            $http.get(serverRoot + 'me.json?fields=:all,organisationUnits[level,id,displayName,,parent[id,displayName,level],children[level,id,displayName,children[level,id,displayName,children[level,id,displayName,children[level,id,displayName]]]]&paging=false').then(function (response) {
-                response.data.level = 5;
-                try {
-                    var userRole = response.data.userCredentials.userRoles[0].id;
-                    response.data.level = userRoleMap[userRole];
-                } catch (e) {
-                    console.error(e);
-                }
-                defer.resolve(response.data);
-            }, function (response) {
-                defer.reject(response);
-            });
-            return defer.promise;
-        }
-    }
-});
+app.factory('userService', UserService);
 
 /**
  * Toast Service
@@ -798,3 +587,4 @@ app.factory('programService', function ($http, $q) {
         }
     }
 });
+

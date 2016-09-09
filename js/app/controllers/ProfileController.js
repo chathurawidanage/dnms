@@ -13,7 +13,7 @@ function ProfileController($location, appService, teiService, $routeParams, toas
     this.attributes = [];
     this.events = [];
 
-    this.dataElemets = [];
+    this.dataElemets = $fdb.db('dnms').collection("dataelements");
 
     this.selectedEvent = {};
 
@@ -164,7 +164,13 @@ function ProfileController($location, appService, teiService, $routeParams, toas
     }
 
     ctrl.getDataElement = function (dataElementId) {
-        return ctrl.dataElemets[dataElementId];
+        if (dataElementId) {
+            console.log(ctrl.dataElemets.find({id: dataElementId})[0], dataElementId);
+            var de = ctrl.dataElemets.find({id: dataElementId})[0];
+            return de;
+        } else {
+            return null;
+        }
     }
 
     teiService.getAllTeiAttributes().then(function (teiAttributes) {
@@ -182,7 +188,9 @@ function ProfileController($location, appService, teiService, $routeParams, toas
             //filling known attributes
             var knownAtts = Object.keys(ctrl.childProfile);
             console.log("Attributes", ctrl.teiObj.attributes);
+            var teiObjAttributesIds = [];
             ctrl.teiObj.attributes.forEach(function (attr) {
+                teiObjAttributesIds.push(attr.attribute);
                 knownAtts.forEach(function (knownAtt) {
                     if (!ctrl.childProfile[knownAtt].value && ctrl.childProfile[knownAtt].key == attr.attribute) {
                         ctrl.childProfile[knownAtt].value = attr.value;
@@ -194,6 +202,19 @@ function ProfileController($location, appService, teiService, $routeParams, toas
                     attr.value = new Date(attr.value);
                 }
             });
+            //fill other attributes
+            Object.keys(ctrl.teiAttributes).forEach(function (attId) {
+                if (teiObjAttributesIds.indexOf(attId) <0) {
+                    var newAttribute = ctrl.teiAttributes[attId]
+                    ctrl.teiObj.attributes.push({
+                        attribute: newAttribute.id,
+                        displayName: newAttribute.displayName,
+                        valueType: newAttribute.valueType,
+                        newAttribute: true
+                    });
+                }
+            });
+
             console.log(ctrl.childProfile);
         });
     }).then(function () {
@@ -201,14 +222,16 @@ function ProfileController($location, appService, teiService, $routeParams, toas
         programService.getProgramById(ctrl.programId).then(function (program) {
             ctrl.program = program;
             console.log("loaded program", program);
-            //Mapping data elements
+            //Mapping data elements & program stages
+            console.log("data elements", ctrl.dataElemets);
             ctrl.program.programStages.forEach(function (programStage) {
                 programStage.programStageDataElements.forEach(function (pStateDataElement) {
-                    ctrl.dataElemets[pStateDataElement.dataElement.id] = pStateDataElement.dataElement;
+                    var de = pStateDataElement.dataElement;
+                    de.programStage = programStage.id;
+                    ctrl.dataElemets.insert(de);
+                    //ctrl.dataElemets[pStateDataElement.dataElement.id] = pStateDataElement.dataElement;
                 })
             });
-
-            console.log("data elements", ctrl.dataElemets);
         }).then(function () {
             console.log("loading events for tei");
             var romanToHindu = function (roman) {
@@ -249,12 +272,27 @@ function ProfileController($location, appService, teiService, $routeParams, toas
                     event.title = ctrl.getProgramStageById(event.programStage).displayName;
                     event.content = new Date(event.eventDate).toDateString();
 
+                    //add missing datavalues to event
+                    var eventAllDataValues = ctrl.dataElemets.find({programStage: event.programStage});
+                    var availableDataValues = [];
+                    event.dataValues.forEach(function (dv) {
+                        availableDataValues.push(dv.dataElement);
+                    });
+
+                    eventAllDataValues.forEach(function (de) {
+                        if (availableDataValues.indexOf(de.id) < 0) {
+                            event.dataValues.push({
+                                dataElement: de.id
+                            });
+                        }
+                    });
+
 
                     //soring riskMonitoring Program Stage
                     if (event.programStage == ctrl.knownProgramStages.riskMonitoring) {
                         event.dataValues.sort(function (risk1, risk2) {
-                            var risk1DE = ctrl.dataElemets[risk1.dataElement].displayName;
-                            var risk2DE = ctrl.dataElemets[risk2.dataElement].displayName;
+                            var risk1DE = ctrl.dataElemets.find({id: risk1.dataElement})[0].displayName;
+                            var risk2DE = ctrl.dataElemets.find({id: risk2.dataElement})[0].displayName;
                             var risk1DESplit = risk1DE.split(".");
                             var risk2DESplit = risk2DE.split(".");
 
@@ -299,10 +337,15 @@ function ProfileController($location, appService, teiService, $routeParams, toas
     }
 
     ctrl.updateTei = function () {
-        //re encoding date objects
+        //re encoding date objects & newAttributes to known format
         var teiObj = angular.copy(ctrl.teiObj);
         teiObj.attributes.forEach(function (attr) {
-            if (attr.valueType == "DATE") {
+            if (attr.newAttribute) {
+                delete attr.newAttribute;
+                delete attr.id;
+            }
+
+            if (attr.value && attr.valueType == "DATE") {
                 attr.value = attr.value.toISOString().substring(0, 10);
             }
         });
