@@ -464,15 +464,17 @@
         </div>
     </div>
 
-    <md-sidenav class="md-sidenav-right md-whiteframe-4dp" md-component-id="right">
+    <md-sidenav class="md-sidenav-right md-whiteframe-4dp event-sidenav " md-component-id="right">
         <md-toolbar class="background-theme">
-            <h2 class="md-toolbar-tools">Administrative Areas</h2><!--
-            <span flex></span>
-            <md-button class="md-icon-button" ng-click="ctrl.toggleRightNav()">
-                <md-icon>
-                    <i class="material-icons">settings</i>
-                </md-icon>
-            </md-button>-->
+            <div class="md-toolbar-tools background-theme">
+                <h2>Administrative Areas</h2>
+                <span flex></span>
+                <md-button ng-click="ctrl.closeNav()" class="md-icon-button">
+                    <md-icon>
+                        <i class="material-icons">close</i>
+                    </md-icon>
+                </md-button>
+            </div>
         </md-toolbar>
         <md-content layout-padding>
             <div

@@ -183,9 +183,17 @@
     <md-sidenav class="md-sidenav-left event-sidenav" md-component-id="left"
                 md-disable-backdrop md-whiteframe="4">
         <md-toolbar class="md-theme-indigo background-theme">
-            <h1 class="md-toolbar-tools">{{ctrl.selectedEvent.title}}</h1>
+            <div class="md-toolbar-tools background-theme">
+                <h2>{{ctrl.selectedEvent.title}}</h2>
+                <span flex></span>
+                <md-button ng-click="ctrl.closeNav()" class="md-icon-button">
+                    <md-icon>
+                        <i class="material-icons">close</i>
+                    </md-icon>
+                </md-button>
+            </div>
         </md-toolbar>
-        <md-content layout-margin>
+        <md-content layout-margin flex>
             <md-list class="">
                 <div ng-repeat="dv in ctrl.selectedEvent.dataValues" ng-init="de=ctrl.getDataElement(dv.dataElement)">
                     <md-list-item class="md-2-line"
@@ -262,12 +270,6 @@
                     <i class="material-icons">undo</i>
                 </md-icon>
                 Reopen event
-            </md-button>
-            <md-button ng-click="ctrl.closeNav()" class="md-warn">
-                <md-icon>
-                    <i class="material-icons">close</i>
-                </md-icon>
-                Close
             </md-button>
         </md-content>
     </md-sidenav>

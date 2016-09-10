@@ -599,5 +599,9 @@ function DashboardController($location, $scope, toastService, programService, us
         }, 5000);
     };
 
+    ctrl.closeNav=function () {
+        $mdSidenav('right').close();
+    }
+
 
 }
