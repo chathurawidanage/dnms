@@ -50,7 +50,6 @@ function ProfileController($location, appService, teiService, $routeParams, toas
                 var latDown = 5.56;
                 var lonRight = 82.4;
 
-                console.log(ev.coordinate);
                 if (lat > latDown && lat < latUp && lon > lonLeft && lon < lonRight) {
                     ctrl.locationCache = "[" + ev.coordinate.latitude + "," + ev.coordinate.longitude + "]";
                     return ctrl.locationCache;
@@ -147,7 +146,6 @@ function ProfileController($location, appService, teiService, $routeParams, toas
      * @returns {*|boolean}
      */
     ctrl.isElevatedUser = function () {
-        console.log(userService.hasRole(userService.MOH_USER));
         return userService.hasRole(userService.MOH_USER);
     }
 

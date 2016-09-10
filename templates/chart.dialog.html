@@ -1,0 +1,25 @@
+<md-dialog aria-label="Chart">
+    <md-toolbar>
+        <div class="md-toolbar-tools background-theme">
+            <h2>{{chart.title}}</h2>
+            <span flex></span>
+            <md-switch ng-model="chart.options.legend.display" aria-label="legend switch" ng-true-value="true" ng-false-value="false">
+                Legend
+            </md-switch>
+            <md-button class="md-icon-button" ng-click="close()">
+                <md-icon aria-label="Close dialog">
+                    <i class="material-icons">close</i>
+                </md-icon>
+            </md-button>
+        </div>
+    </md-toolbar>
+    <md-dialog-content style="width: 800px;height: 600px">
+        <div class="md-dialog-content">
+            <canvas class="chart chart-line" chart-data="chart.data" chart-labels="chart.labels"
+                    chart-series="chart.series" chart-colors="chart.dataColors"
+                    chart-options="chart.options"
+                    chart-dataset-override="chart.dso"
+                    id="chart-preview"></canvas>
+        </div>
+    </md-dialog-content>
+</md-dialog>

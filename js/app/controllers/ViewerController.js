@@ -2,7 +2,7 @@
  * Created by chathura on 6/1/16.
  */
 function ViewerController($location, appService, teiService, $routeParams, toastService, chartService,
-                          programService, dataElementService, programIndicatorsService, $q) {
+                          programService, dataElementService, programIndicatorsService, $q, $mdDialog) {
     var ctrl = this;
     this.tei = $routeParams.tei;
     this.program = $routeParams.program;
@@ -33,6 +33,11 @@ function ViewerController($location, appService, teiService, $routeParams, toast
                 //loading TEI data
                 teiService.getEventData(ctrl.tei, ctrl.program).then(function (events) {
                     ctrl.teiEventData = events;
+
+                    //sort events by event date
+                    ctrl.teiEventData.sort(function (a, b) {
+                        return new Date(a.eventDate).getTime() - new Date(b.eventDate).getTime();
+                    })
                     //drawing in progress
                     ctrl.refineCharts();//draw the charts first, let's leisurely refine them
                 })
@@ -51,8 +56,8 @@ function ViewerController($location, appService, teiService, $routeParams, toast
             chart.options.legend = {
                 display: true
             }
-            chart.options.tooltips={
-                enabled:false
+            chart.options.tooltips = {
+                enabled: false
             };
 
             //chart.options.pointBackgroundColor="white";
@@ -113,15 +118,17 @@ function ViewerController($location, appService, teiService, $routeParams, toast
                 min: Number.MAX_VALUE
             }
             ctrl.teiEventData.forEach(function (event) {
-                event.dataValues.forEach(function (dataValue) {
-                    if (chartDependantDataType == 0 || chartDependantDataType == 2) {//time span is important only in these two types
-                        var updatedDate = new Date(dataValue.lastUpdated);
-                        var timeFromBirth = ctrl.getDateDiffInDays(updatedDate, ctrl.teiDob);
-                        console.log("time from birth", timeFromBirth);
-                        if (maxTimeSpanInDays < timeFromBirth) {
-                            maxTimeSpanInDays = timeFromBirth;
-                        }
+                if (chartDependantDataType == 0 || chartDependantDataType == 2) {//time span is important only in these two types
+                    //var updatedDate = new Date(dataValue.lastUpdated);
+                    var updatedDate = new Date(event.eventDate);
+                    var timeFromBirth = ctrl.getDateDiffInDays(updatedDate, ctrl.teiDob);
+                    console.log("time from birth", timeFromBirth);
+                    if (maxTimeSpanInDays < timeFromBirth) {
+                        maxTimeSpanInDays = timeFromBirth;
                     }
+                }
+                event.dataValues.forEach(function (dataValue) {
+                    dataValue.event = event;
                     //
                     if (dataValue.dataElement == yAxisVariable1) {
                         dataValues1.push(dataValue);
@@ -203,7 +210,8 @@ function ViewerController($location, appService, teiService, $routeParams, toast
                     var intervalDays = intervalInDays[selectedRefData.xAxisPeriod];
                     var dataToPlot = [];
                     dataValues1.forEach(function (dataValue) {
-                        var updatedDate = new Date(dataValue.lastUpdated);
+                        //var updatedDate = new Date(dataValue.lastUpdated);
+                        var updatedDate = new Date(dataValue.event.eventDate);
                         console.log(updatedDate, dob, intervalDays);
                         var timePlot = Math.floor((updatedDate - dob) / (1000 * 60 * 60 * 24 * intervalDays));
                         var plotObject = {
@@ -223,7 +231,7 @@ function ViewerController($location, appService, teiService, $routeParams, toast
                  * in this case, priority is given to the latest data. RefData is chosen such that it will cover latest data
                  */
                 chart.refData.forEach(function (refData, index) {
-                    var centile = refData.centiles[Math.floor(refData.centiles.length/2)];
+                    var centile = refData.centiles[Math.floor(refData.centiles.length / 2)];
                     var lowestX = centile.data[0].x;
                     var highestX = centile.data[centile.data.length - 1].x;
                     var refDataObj = {
@@ -286,15 +294,15 @@ function ViewerController($location, appService, teiService, $routeParams, toast
                     fill: false,
                     label: 'Recorded Data',
                     borderWidth: 2,
-                    pointBackgroundColor: "white",//hide points
-                    pointHoverBackgroundColor: "white",
-                    borderColor:"white",
+                    pointBackgroundColor: "black",//hide points
+                    pointHoverBackgroundColor: "black",
+                    borderColor: "black",
                     //borderDash: [5, 15],
                     skipNullValues: true,
                     showLines: false
                 }];
-                
-                for(var i=0;i<chart.data.length-1;i++){
+
+                for (var i = 0; i < chart.data.length - 1; i++) {
                     chart.dso.push({
                         pointBackgroundColor: "rgba(0,0,0,0)"
                     });
@@ -311,5 +319,19 @@ function ViewerController($location, appService, teiService, $routeParams, toast
     }
 
     this.loadData();
+
+    this.enlargeChart = function (chart, ev) {
+        console.log(chart, ev);
+        $mdDialog.show({
+            controller: ChartController,
+            templateUrl: 'templates/chart.dialog.html',
+            parent: angular.element(document.body),
+            targetEvent: ev,
+            clickOutsideToClose: true,
+            locals: {
+                chart: chart
+            }
+        })
+    }
 
 }

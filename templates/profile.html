@@ -1,6 +1,7 @@
 <div ng-controller="ProfileController as ctrl" class="dashboard">
     <md-content layout-padding layout="row" layout-align="left">
         <div flex="50">
+            <!--Profile Details-->
             <md-card class="profile-card">
                 <md-card-header>
                     <md-card-avatar>
@@ -110,14 +111,28 @@
                      </md-icon>
                  </md-button>-->
             </md-card>
-            <div ng-controller="ViewerController as ctrl" class="dashboard">
-                <md-content layout-padding>
-                    <!--<h3>Longitudinal Charts</h3>-->
+            <!--End of profile Details-->
 
+            <!--Charts Widget-->
+            <div ng-controller="ViewerController as vctrl" class="dashboard">
+                <md-content layout-padding>
                     <md-tabs md-selected="selectedIndex" md-border-bottom md-autoselect md-dynamic-height>
-                        <md-tab ng-repeat="chart in ctrl.charts"
+                        <md-tab ng-repeat="chart in vctrl.charts"
                                 ng-disabled="chart.disabled"
                                 label="{{chart.title}}">
+                            <md-button class="md-secondary" ng-click="vctrl.enlargeChart(chart,$event)">
+                                <md-icon>
+                                    <i class="material-icons">zoom_out_map</i>
+                                </md-icon>
+                                Maximize
+                            </md-button>
+                            <md-button class="md-secondary"
+                                       ng-click="chart.options.legend.display=!chart.options.legend.display">
+                                <md-icon>
+                                    <i class="material-icons">view_list</i>
+                                </md-icon>
+                                {{chart.options.legend.display?'Hide':'Show'}} Legend
+                            </md-button>
                             <div style="padding: 25px; text-align: center;">
                                 <canvas class="chart chart-line" chart-data="chart.data" chart-labels="chart.labels"
                                         chart-series="chart.series" chart-colors="chart.dataColors"
@@ -130,7 +145,9 @@
 
                 </md-content>
             </div>
+            <!--End of Charts Widget-->
         </div>
+        <!--Events time line-->
         <div flex="50">
             <timeline side="right">
                 <timeline-event ng-repeat="event in ctrl.events" side="{{$index%2==0?'left':'right'}}">
@@ -158,8 +175,10 @@
                 </timeline-event>
             </timeline>
         </div>
+        <!--End of events time line-->
     </md-content>
 
+    <!--Event Side bar-->
     <md-sidenav class="md-sidenav-left event-sidenav" md-component-id="left"
                 md-disable-backdrop md-whiteframe="4">
         <md-toolbar class="md-theme-indigo background-theme">
@@ -251,6 +270,7 @@
             </md-button>
         </md-content>
     </md-sidenav>
+    <!--End of event side bar-->
 
     <md-button class="md-fab md-fab md-fab-bottom-right md-faded" aria-label="Add Chart" ng-click="ctrl.navBack()"
                style="position: fixed; right: 20px">
