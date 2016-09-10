@@ -112,7 +112,9 @@
                  </md-button>-->
             </md-card>
             <!--End of profile Details-->
+        </div>
 
+        <div flex="50" layout="column">
             <!--Charts Widget-->
             <div ng-controller="ViewerController as vctrl" class="dashboard">
                 <md-content layout-padding>
@@ -133,7 +135,7 @@
                                 </md-icon>
                                 {{chart.options.legend.display?'Hide':'Show'}} Legend
                             </md-button>
-                            <div style="padding: 25px; text-align: center;">
+                            <div style="padding: 25px; text-align: center;" ng-show="!chart.processing">
                                 <canvas class="chart chart-line" chart-data="chart.data" chart-labels="chart.labels"
                                         chart-series="chart.series" chart-colors="chart.dataColors"
                                         chart-options="chart.options"
@@ -146,9 +148,8 @@
                 </md-content>
             </div>
             <!--End of Charts Widget-->
-        </div>
-        <!--Events time line-->
-        <div flex="50">
+
+            <!--Events time line-->
             <timeline side="right">
                 <timeline-event ng-repeat="event in ctrl.events" side="{{$index%2==0?'left':'right'}}">
                     <timeline-badge class="{{event.status=='ACTIVE'?'warning':'success'}}">
@@ -174,8 +175,8 @@
                     </timeline-panel>
                 </timeline-event>
             </timeline>
+            <!--End of events time line-->
         </div>
-        <!--End of events time line-->
     </md-content>
 
     <!--Event Side bar-->

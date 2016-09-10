@@ -53,6 +53,7 @@ function ViewerController($location, appService, teiService, $routeParams, toast
 
     this.refineCharts = function () {
         this.charts.forEach(function (chart) {
+            chart.processing = true;
             chart.options.legend = {
                 display: true
             }
@@ -310,6 +311,7 @@ function ViewerController($location, appService, teiService, $routeParams, toast
 
                 chart.dso[0].data = data;
                 console.log(data);
+                chart.processing = false;
             }, function (error) {
                 toastService.showToast(error);
             })
