@@ -555,12 +555,15 @@ function DashboardController($location, $scope, toastService, programService, us
             );
 
             var teis = [];
-
+            var selectedTeis = [];
             events.forEach(function (event) {
                 var teiId = event.trackedEntityInstance;
-                var teiArr = ctrl.teiDb.find({_id: teiId});
-                if (teiArr.length > 0) {
-                    teis.push(teiArr[0]);
+                if (selectedTeis.indexOf(teiId) < 0) {
+                    selectedTeis.push(teiId);
+                    var teiArr = ctrl.teiDb.find({_id: teiId});
+                    if (teiArr.length > 0) {
+                        teis.push(teiArr[0]);
+                    }
                 }
             })
             return teis;
