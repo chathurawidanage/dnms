@@ -489,12 +489,12 @@
     </md-sidenav>
 
 
-    <!--    <md-button class="md-fab md-fab md-fab-bottom-right md-faded" aria-label="Add Chart" ng-click="ctrl.showOptions()"
-                   style="position: fixed; right: 100px">
-            <md-icon>
-                <i class="material-icons">settings</i>
-            </md-icon>
-        </md-button>
+    <md-button class="md-fab md-fab md-fab-bottom-right md-faded" aria-label="Add Chart" ng-click="ctrl.showSettings()"
+               style="position: fixed" ng-show="ctrl.doneInitLoading && ctrl.isSuperUser()">
+        <md-icon>
+            <i class="material-icons">settings</i>
+        </md-icon>
+    </md-button><!--
         <md-button class="md-fab md-fab md-fab-bottom-right md-primary" aria-label="Add Chart" ng-click="ctrl.new()"
                    style="position: fixed">
             <md-icon>

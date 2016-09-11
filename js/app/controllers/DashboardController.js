@@ -386,12 +386,23 @@ function DashboardController($location, $scope, toastService, programService, us
         console.log("Opening child profile", teiId);
         $window.open(location.href + 'profile?tei=' + teiId + "&program=" + ctrl.selectedProgram.id);
     }
+
+    ctrl.showSettings = function (teiId) {
+        console.log("Opening child profile", teiId);
+        $window.open(location.href + 'settings');
+    }
+
+
     /**
      * User levels above MOH user are considered as elevated in this context
      * @returns {*|boolean}
      */
     ctrl.isElevatedUser = function () {
         return userService.hasRole(userService.MOH_USER);
+    }
+    
+    ctrl.isSuperUser=function () {
+        return userService.hasRole(userService.SUPER_USER);
     }
 
     /*Doctor's approval related operations*/

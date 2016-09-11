@@ -3,7 +3,7 @@
 //var serverRoot = 'http://148.251.224.242/nss1/api/';
 var serverRoot = '../../';
 var app = angular.module('long-charts', ['ngMaterial', 'ngRoute', 'longitudinalChartControllers', 'dropzone', 'chart.js'
-    , 'mdColorPicker', 'lfNgMdFileInput', 'angular-timeline', 'forerunnerdb', 'angularTreeview', 'ngMap']);
+    , 'mdColorPicker', 'lfNgMdFileInput', 'angular-timeline', 'forerunnerdb', 'angularTreeview', 'ngMap','dndLists']);
 app.config(['$routeProvider', function ($routeProvider) {
     $routeProvider.when('/', {
         templateUrl: 'templates/dashboard.html'
@@ -11,8 +11,8 @@ app.config(['$routeProvider', function ($routeProvider) {
         templateUrl: 'templates/profile.html'
     }).when('/chart/:id', {
         templateUrl: 'templates/new-chart.html'
-    }).when('/trackerEndPoint', {
-        templateUrl: 'templates/view.html'
+    }).when('/settings', {
+        templateUrl: 'templates/settings.html'
     }).otherwise({
         redirectTo: '/'
     });
@@ -42,6 +42,7 @@ controllers.controller('ProfileController', ProfileController);
 controllers.controller('ViewerController', ViewerController);
 controllers.controller('OptionsController', OptionsController);
 controllers.controller('RefDataController', RefDataController);
+controllers.controller('SettingsController', SettingsController);
 
 /*Drop Zone*/
 angular.module('dropzone', []).directive('dropzone', function () {
@@ -63,6 +64,7 @@ angular.module('dropzone', []).directive('dropzone', function () {
 app.factory('enrollmentService', EnrollmentService);
 
 app.factory('eventService', EventService);
+app.factory('settingsService', SettingsService);
 
 app.factory('orgUnitsService', function ($http, $q) {
     return {

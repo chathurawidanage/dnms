@@ -219,4 +219,12 @@ div[md-color-picker] .md-color-picker-preview {
 #main-datepicker .md-datepicker-input-container {
   margin-left: -52px; }
 
+.dndPlaceholder {
+  display: block;
+  background-color: #ddd;
+  min-height: 42px; }
+
+.dndDraggingSource {
+  display: none; }
+
 /*# sourceMappingURL=style.css.map */

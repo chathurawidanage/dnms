@@ -3,7 +3,7 @@
  */
 function ProfileController($location, appService, teiService, $routeParams, toastService,
                            programService, dataElementService, programIndicatorsService, $q, $mdDialog, $mdSidenav,
-                           eventService, enrollmentService, $fdb, userService, NgMap) {
+                           eventService, enrollmentService, $fdb, userService, settingsService) {
     var ctrl = this;
     this.tei = $routeParams.tei;
     this.teiObj = null;
@@ -59,14 +59,6 @@ function ProfileController($location, appService, teiService, $routeParams, toas
                 }
             }
         });
-
-        NgMap.getMap().then(function (map) {
-            console.log(map.getCenter());
-            console.log('markers', map.markers);
-            console.log('shapes', map.shapes);
-            debugDb = map;
-        });
-
         return false;
     }
 
@@ -228,6 +220,14 @@ function ProfileController($location, appService, teiService, $routeParams, toas
                         newAttribute: true
                     });
                 }
+            });
+
+            //ordering attributes
+            settingsService.teiAttributes.get().then(function (teiAttOrder) {
+                console.log("TEI ATT ORDER", teiAttOrder);
+                ctrl.teiObj.attributes.sort(function (a, b) {
+                    return teiAttOrder.indexOf(a.attribute) - teiAttOrder.indexOf(b.attribute);
+                });
             });
 
             console.log(ctrl.childProfile);
