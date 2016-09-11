@@ -202,17 +202,13 @@ function DashboardController($location, $scope, toastService, programService, us
         ctrl.teiDb = $fdb.db('dnms').collection("teis");
         //ctrl.eventsDb = $fdb.db('dnms').collection("events");
         ctrl.eventsDb = eventService.getEventsDb();
-        eventService.listenDbUpdates(function (status) {
-            ctrl.updateViewedEventsCount();
-        })
-        debugDb = ctrl.eventsDb;
 
         var orgUnits = ctrl.user.organisationUnits;
         console.log(orgUnits);
         ctrl.buildOrgTree(orgUnits);
 
 
-        //finding highest orgUnit
+        //finding lowest orgUnit (lowest = Sri Lanka)
         var lowestLevel = Number.MAX_VALUE;
         orgUnits.forEach(function (orgUnit) {
             if (orgUnit.level < lowestLevel) {
@@ -273,15 +269,12 @@ function DashboardController($location, $scope, toastService, programService, us
     ctrl.buildEventTeiMap = function () {
         ctrl.caches.events = CAHCE_STATUS.loading;
         eventService.getEventTeiMap(ctrl.selectedProgram.id, ctrl.queryOrgUnits[0]).then(function (events) {
-            var start = new Date().getTime();
             ctrl.eventsDb.insert(events, function (result) {
                 console.log(result);
                 ctrl.updateViewedEventsCount();
                 //save for future use
 
             });
-            var end = new Date().getTime();
-            console.info("Event db insertion time", (end - start));
             ctrl.caches.events = CAHCE_STATUS.loaded;
             ctrl.checkProgress();
         });
@@ -305,13 +298,13 @@ function DashboardController($location, $scope, toastService, programService, us
                 })
             });
             ctrl.caches.tei = CAHCE_STATUS.loaded;
-            ctrl.setGlobalTeiSearch();
+            ctrl.showGlobalTeiSearch();
 
             ctrl.checkProgress();
         });
     };
 
-    ctrl.setGlobalTeiSearch = function () {
+    ctrl.showGlobalTeiSearch = function () {
         teiService.changeTeiList("Global Search", function (regexp, page, limit) {
             return ctrl.teiDb.find({
                 $or: [
@@ -334,9 +327,7 @@ function DashboardController($location, $scope, toastService, programService, us
 
     ctrl.progressCount = 0;
     ctrl.checkProgress = function () {
-        //ctrl.doneInitLoading = true;
         ctrl.progressCount++;
-        console.log(ctrl.progressCount);
         if (ctrl.progressCount == Object.keys(ctrl.caches).length) {
             ctrl.doneInitLoading = true;
         }
@@ -357,7 +348,7 @@ function DashboardController($location, $scope, toastService, programService, us
         }
 
         //show global search
-        ctrl.setGlobalTeiSearch();
+        ctrl.showGlobalTeiSearch();
     }
 
     ctrl.showMalNutTeis = function (malNutReason) {
@@ -391,125 +382,10 @@ function DashboardController($location, $scope, toastService, programService, us
         });
     };
 
-    /* ctrl.malNutInfiniteItems = {
-     teis: [],
-     numLoaded_: 0,
-     toLoad_: 0,
-     // Required.
-     reset: function () {
-     this.teis = [];
-     this.numLoaded_ = 0;
-     this.toLoad_ = ctrl.selectedMalNul.selectedRecords.length;
-     },
-
-     getItemAtIndex: function (index) {
-     if (index >= this.numLoaded_ || !ctrl.doneInitLoading) {
-     this.fetchMoreItems_(index);
-     return null;
-     }
-     return this.teis[index];
-     },
-     // Required.
-     // For infinite scroll behavior, we always return a slightly higher
-     // number than the previously loaded items.
-     getLength: function () {
-     return this.numLoaded_ + 5;
-     },
-     fetchMoreItems_: function (index) {
-     // For demo purposes, we simulate loading more items with a timed
-     // promise. In real code, this function would likely contain an
-     // $http request.
-     var tis = this;
-     if (this.toLoad_ - 1 >= index) {
-     var loadCount = 0;
-     while (loadCount < 25 && index < ctrl.selectedMalNul.selectedRecords.length) {
-     var eventId = ctrl.selectedMalNul.selectedRecords[index].eventId;
-     var event = ctrl.eventsDb.find({event: eventId});
-     if (event.length > 0) {
-     var teiId = event[0].trackedEntityInstance;
-     var teiArr = ctrl.teiDb.find({_id: teiId});
-     if (teiArr.length > 0) {
-     tis.teis.push(teiArr[0]);
-     }
-     } else {
-     console.log("Unexpecetd events length");
-     }
-     index++;
-     loadCount++;
-     }
-     tis.numLoaded_ = tis.teis.length;
-
-     }
-     }
-     };*/
-
-
-    /* ctrl.refreshList = function (event) {
-     if (ctrl.keyword != null && ctrl.keyword.trim() == "") {
-     ctrl.keyword = null;
-     } else if (event.keyCode == 13) {
-     ctrl.infiniteItems.reset();
-     }
-     };*/
-
     ctrl.openChildProfile = function (teiId) {
         console.log("Opening child profile", teiId);
         $window.open(location.href + 'profile?tei=' + teiId + "&program=" + ctrl.selectedProgram.id);
     }
-    /*
-     ctrl.infiniteItems = {
-     teis: [],
-     currentPage: 1,
-     totalPages: 1,
-     numLoaded_: 0,
-     toLoad_: 0,
-     // Required.
-     reset: function () {
-     this.teis = [];
-     this.currentPage = 1;
-     this.totalPages = 1;
-     this.numLoaded_ = 0;
-     this.toLoad_ = 0;
-     },
-
-     getItemAtIndex: function (index) {
-     if (index > this.numLoaded_ || !ctrl.doneInitLoading) {
-     this.fetchMoreItems_(index);
-     return null;
-     }
-     return this.teis[index];
-     },
-     // Required.
-     // For infinite scroll behavior, we always return a slightly higher
-     // number than the previously loaded items.
-     getLength: function () {
-     return this.numLoaded_ + 5;
-     },
-     fetchMoreItems_: function (index) {
-     // For demo purposes, we simulate loading more items with a timed
-     // promise. In real code, this function would likely contain an
-     // $http request.
-     var tis = this;
-     if (this.toLoad_ < index) {
-
-     if (ctrl.queryOrgUnits.length > 0 && ctrl.selectedProgram) {
-     this.toLoad_ += 20;
-     console.log("selected program inside load", ctrl.selectedProgram);
-     teiService.queryForTeis(ctrl.queryOrgUnits, ctrl.selectedProgram.id, ctrl.keyword, this.currentPage).then(function (data) {
-     tis.teis = tis.teis.concat(data.rows);
-     tis.currentPage = data.metaData.pager.page;
-     tis.totalPages = data.metaData.pager.pageCount;
-     tis.numLoaded_ = tis.teis.length;
-     });
-     }
-
-     /!*$timeout(angular.noop, 300).then(angular.bind(this, function () {
-     this.numLoaded_ = this.toLoad_;
-     }));*!/
-     }
-     }
-     };*/
-
     /**
      * User levels above MOH user are considered as elevated in this context
      * @returns {*|boolean}
@@ -517,16 +393,16 @@ function DashboardController($location, $scope, toastService, programService, us
     ctrl.isElevatedUser = function () {
         return userService.hasRole(userService.MOH_USER);
     }
-    /*Doctor's approval related operations*/
 
+    /*Doctor's approval related operations*/
     ctrl.pickRandomEvent = function (active) {
         if (ctrl.eventsDb) {
-            var event = ctrl.eventsDb.find({
+            var filteredEvents = ctrl.eventsDb.find({
                     status: active ? "ACTIVE" : "SCHEDULE"
                 }
-            )[Math.floor(Math.random() * ctrl.viewedEventsCount)];
+            );
+            var event = filteredEvents[Math.floor(Math.random() * filteredEvents.length)];
             ctrl.openChildProfile(event.trackedEntityInstance);
-
         }
     }
 
@@ -556,7 +432,7 @@ function DashboardController($location, $scope, toastService, programService, us
 
             var teis = [];
             var selectedTeis = [];
-            events.forEach(function (event) {
+            events.forEach(function (event) {//remove duplicate teis
                 var teiId = event.trackedEntityInstance;
                 if (selectedTeis.indexOf(teiId) < 0) {
                     selectedTeis.push(teiId);
@@ -599,7 +475,7 @@ function DashboardController($location, $scope, toastService, programService, us
         }, 5000);
     };
 
-    ctrl.closeNav=function () {
+    ctrl.closeNav = function () {
         $mdSidenav('right').close();
     }
 

@@ -3,19 +3,9 @@
  */
 function EventService($http, $q, $fdb, userService) {
     var eventDb = $fdb.db('dnms').collection("events");
-    var eventDbListeners = [];
-    eventDb.on("update", function (status) {
-        console.log(status);
-        eventDbListeners.forEach(function (callback) {
-            callback(status);
-        })
-    });
     var eventService = {
         getEventsDb: function (drop) {
             return eventDb;
-        },
-        listenDbUpdates: function (callback) {
-            eventDbListeners.push(callback);
         },
         getEventAnalytics: function (programId, orgUnit, dataElementId, expectedValue) {//todo dates are hard coded
             var defer = $q.defer();

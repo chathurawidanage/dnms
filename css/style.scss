@@ -247,10 +247,18 @@ div[md-color-picker] {
   top: 64px;
   overflow-y: hidden;
   width: 100%;
+
+  @media (max-width: 959px) and (min-width: 0px) {
+    top:48px;
+    height: calc(100% - 48px);
+  }
   md-toolbar{
     position: fixed;
     top:0;
-    height: 64px !important;
+    height: 64px;
+    @media (max-width: 959px) and (min-width: 0px) {
+      height:48px;
+    }
   }
 
   md-content {
@@ -258,10 +266,15 @@ div[md-color-picker] {
       white-space: normal !important;
       overflow-x: visible !important;
     }
+    padding-top: 10px;
 
     overflow-y: scroll !important;
-    height: calc(100% - 64px) !important;
-    margin-top: 64px !important;
+    height: calc(100% - 64px);
+    margin-top: 64px;
+    @media (max-width: 959px) and (min-width: 0px) {
+      height: calc(100% - 48px) ;
+      margin-top: 48px;
+    }
   }
 
 }

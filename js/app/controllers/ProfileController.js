@@ -52,6 +52,7 @@ function ProfileController($location, appService, teiService, $routeParams, toas
 
                 if (lat > latDown && lat < latUp && lon > lonLeft && lon < lonRight) {
                     ctrl.locationCache = "[" + ev.coordinate.latitude + "," + ev.coordinate.longitude + "]";
+                    console.log("Location",ctrl.locationCache);
                     return ctrl.locationCache;
                 } else {
                     return false;

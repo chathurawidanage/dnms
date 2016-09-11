@@ -171,17 +171,29 @@ div[md-color-picker] .md-color-picker-preview {
   top: 64px;
   overflow-y: hidden;
   width: 100%; }
+  @media (max-width: 959px) and (min-width: 0px) {
+    .event-sidenav {
+      top: 48px;
+      height: calc(100% - 48px); } }
   .event-sidenav md-toolbar {
     position: fixed;
     top: 0;
-    height: 64px !important; }
+    height: 64px; }
+    @media (max-width: 959px) and (min-width: 0px) {
+      .event-sidenav md-toolbar {
+        height: 48px; } }
   .event-sidenav md-content {
+    padding-top: 10px;
     overflow-y: scroll !important;
-    height: calc(100% - 64px) !important;
-    margin-top: 64px !important; }
+    height: calc(100% - 64px);
+    margin-top: 64px; }
     .event-sidenav md-content h3 {
       white-space: normal !important;
       overflow-x: visible !important; }
+    @media (max-width: 959px) and (min-width: 0px) {
+      .event-sidenav md-content {
+        height: calc(100% - 48px);
+        margin-top: 48px; } }
 
 .tei-attributes md-input-container, .event-sidenav md-input-container {
   width: 100%;
