@@ -3,7 +3,7 @@
  */
 function ProfileController($location, appService, teiService, $routeParams, toastService,
                            programService, dataElementService, programIndicatorsService, $q, $mdDialog, $mdSidenav,
-                           eventService, enrollmentService, $fdb, userService) {
+                           eventService, enrollmentService, $fdb, userService, NgMap) {
     var ctrl = this;
     this.tei = $routeParams.tei;
     this.teiObj = null;
@@ -51,13 +51,20 @@ function ProfileController($location, appService, teiService, $routeParams, toas
                 var lonRight = 82.4;
 
                 if (lat > latDown && lat < latUp && lon > lonLeft && lon < lonRight) {
-                    ctrl.locationCache = "[" + ev.coordinate.latitude + "," + ev.coordinate.longitude + "]";
-                    console.log("Location",ctrl.locationCache);
+                    ctrl.locationCache = ev.coordinate.latitude + "," + ev.coordinate.longitude;
+                    console.log("Location", ctrl.locationCache);
                     return ctrl.locationCache;
                 } else {
                     return false;
                 }
             }
+        });
+
+        NgMap.getMap().then(function (map) {
+            console.log(map.getCenter());
+            console.log('markers', map.markers);
+            console.log('shapes', map.shapes);
+            debugDb = map;
         });
 
         return false;
