@@ -4,7 +4,7 @@
 function SettingsController(teiService, settingsService, toastService) {
     var sctrl = this;
     this.settings = {};
-
+//todo restrict this page only for super users
     sctrl.teiAttributes = [];
     sctrl.selectedAttribute = undefined;
 
