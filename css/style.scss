@@ -1,5 +1,19 @@
 body {
-  background-color: white !important;
+  background-color: rgb(250,250,250) !important;
+}
+
+.animate-show.ng-hide {
+  //line-height: -100px;
+  max-height: 0px;
+  overflow: hidden;
+  //opacity: 0;
+}
+.animate-show{
+  max-height: 1024px;//assuming dnms will never have a widget of height 1024px :-P
+}
+.animate-show.ng-hide-add, .animate-show.ng-hide-remove {
+  transition: all linear 0.5s;
+  overflow: hidden;
 }
 
 .btn-add {
