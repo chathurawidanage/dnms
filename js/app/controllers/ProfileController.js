@@ -3,7 +3,7 @@
  */
 function ProfileController($location, appService, teiService, $routeParams, toastService,
                            programService, dataElementService, programIndicatorsService, $q, $mdDialog, $mdSidenav,
-                           eventService, enrollmentService, $fdb, userService, settingsService) {
+                           eventService, enrollmentService, $fdb, userService, settingsService, sdCategoryService) {
     var ctrl = this;
     this.tei = $routeParams.tei;
     this.teiObj = null;
@@ -26,8 +26,21 @@ function ProfileController($location, appService, teiService, $routeParams, toas
     this.childProfile = {
         firstName: {key: "izuwkaOUgFg", value: null},
         lastName: {key: "C8DBAo2wEYN", value: null},
-        chdrNumber: {key: "WqdldQpOIxm", value: null}
+        chdrNumber: {key: "WqdldQpOIxm", value: null},
+        dob: {key: "AtK3fDqU8uu", value: null},
+        gender: {key: "BZEpuufLyDE", value: null}
     }
+
+    this.knownDataElements = {
+        weight: "jRceYOPJeCO",
+        height: "Bpovp931fOZ",
+        weightCategory: "qh8ptEnFWmp",
+        heightCategory: "bYTh3TBpAFF",
+        weightHeightCategory: "RGmYXRckjv0",
+        ageOfChildInMonths: "GDhOcklahIq"
+    }
+
+    this.hidenDataElements=["GDhOcklahIq","RGmYXRckjv0","bYTh3TBpAFF","qh8ptEnFWmp"];
 
     this.user;
 
@@ -165,14 +178,21 @@ function ProfileController($location, appService, teiService, $routeParams, toas
     }
 
     ctrl.showEvent = function (event) {
+        //check for known attributes which are used to generate SD categories
+        if (ctrl.childProfile.dob.value == null) {
+            toastService.showToast("Date of Birth of this child is invalid. Please set it correctly to proceed.");
+            return;
+        } else if (ctrl.childProfile.gender.value == null) {
+            toastService.showToast("Gender of this child is invalid. Please set it correctly to proceed.");
+            return;
+        }
         ctrl.openNav();
         ctrl.selectedEvent = event;
-        console.log(event);
     }
 
     ctrl.getDataElement = function (dataElementId) {
         if (dataElementId) {
-            console.log(ctrl.dataElemets.find({id: dataElementId})[0], dataElementId);
+//            console.log(ctrl.dataElemets.find({id: dataElementId})[0], dataElementId);
             var de = ctrl.dataElemets.find({id: dataElementId})[0];
             return de;
         } else {
@@ -348,7 +368,46 @@ function ProfileController($location, appService, teiService, $routeParams, toas
                 console.log(dataValue, ctrl.getDataElement(dataValue.dataElement));
                 toastService.showToast(ctrl.getDataElement("Something went wrong when updating " + dataValue.dataElement).displayName);
             }
-        })
+        });
+
+        console.log(ctrl.selectedEvent);
+
+        //updating categories in nutrition monitoring
+        if (ctrl.selectedEvent.programStage == ctrl.knownProgramStages.nutritionMonitoring) {
+            if (ctrl.knownDataElements.height == dataValue.dataElement || ctrl.knownDataElements.weight == dataValue.dataElement) {
+                var deIdDataValueMap = [];
+                var male = ctrl.childProfile.gender.value != "female";
+                var ageInMonths = (new Date(ctrl.selectedEvent.eventDate) - new Date(ctrl.childProfile.dob.value)) / (1000 * 60 * 60 * 24 * 30);
+                ctrl.selectedEvent.dataValues.forEach(function (dv) {
+                    deIdDataValueMap[dv.dataElement] = dv;
+                });
+                /*Updating height weight category*/
+                var heightWeightCategory = sdCategoryService.getHeightWeightCategory(male, ageInMonths,
+                    deIdDataValueMap[ctrl.knownDataElements.height].value,
+                    deIdDataValueMap[ctrl.knownDataElements.weight].value);
+                //update only if different
+                if (deIdDataValueMap[ctrl.knownDataElements.weightHeightCategory].value != heightWeightCategory.code) {
+                    deIdDataValueMap[ctrl.knownDataElements.weightHeightCategory].value = heightWeightCategory.code;
+                    ctrl.updateDataValue(deIdDataValueMap[ctrl.knownDataElements.weightHeightCategory]);
+                }
+
+                /*Updating Height Category*/
+                if (ctrl.knownDataElements.height == dataValue.dataElement) {
+                    var heightCategory = sdCategoryService.getHeightCategory(male, ageInMonths, deIdDataValueMap[ctrl.knownDataElements.height].value);
+                    if (deIdDataValueMap[ctrl.knownDataElements.heightCategory].value != heightCategory.code) {
+                        deIdDataValueMap[ctrl.knownDataElements.heightCategory].value = heightCategory.code
+                        ctrl.updateDataValue(deIdDataValueMap[ctrl.knownDataElements.heightCategory]);
+                    }
+                } else if (ctrl.knownDataElements.weight == dataValue.dataElement) {
+                    var weightCategory = sdCategoryService.getWeightCategory(male, ageInMonths, deIdDataValueMap[ctrl.knownDataElements.weight].value);
+                    if (deIdDataValueMap[ctrl.knownDataElements.weightCategory].value != weightCategory.code) {
+                        deIdDataValueMap[ctrl.knownDataElements.weightCategory].value = weightCategory.code
+                        ctrl.updateDataValue(deIdDataValueMap[ctrl.knownDataElements.weightCategory]);
+                    }
+                }
+            }
+        }
+
     }
 
     ctrl.updateTei = function () {
@@ -397,37 +456,12 @@ function ProfileController($location, appService, teiService, $routeParams, toas
 
     /**
      *
-     * @param dataElementId
+     * @param dataValue
      * @returns {string}
      */
-    ctrl.getHeightWeightBackgroundColorClass = function (dataElementId) {
-        var heightWeightDe = {
-            height: "Bpovp931fOZ",
-            weight: "jRceYOPJeCO"
-        }
-        var height = false;
-        if (dataElementId == heightWeightDe.height) {
-            height = true;
-        } else if (dataElementId != heightWeightDe.weight) {
-            return "";//no color
-        }
-
-        var categoryIds = {
-            heightCat: {
-                id: "bYTh3TBpAFF"
-            },
-            weightCat: {
-                id: "qh8ptEnFWmp"
-            }
-        }
-
-        ctrl.selectedEvent.dataValues.forEach(function (dv) {
-            if (dv.dataElement == categoryIds.heightCat.id) {
-                categoryIds.heightCat.value = dv.value;
-            } else if (dv.dataElement == categoryIds.weightCat.id) {
-                categoryIds.weightCat.value = dv.value;
-            }
-        });
+    ctrl.getHeightWeightBackgroundColorClass = function (dataValue) {
+        var male = ctrl.childProfile.gender.value != "female";
+        var ageInMonths = (new Date(ctrl.selectedEvent.eventDate).getTime() - new Date(ctrl.childProfile.dob.value).getTime()) / (1000 * 60 * 60 * 24 * 30);
 
 
         var getColor = function (value) {
@@ -444,19 +478,18 @@ function ProfileController($location, appService, teiService, $routeParams, toas
                     return "red";
             }
         }
-
-
+        if (dataValue.dataElement == ctrl.knownDataElements.height) {
+            return getColor(sdCategoryService.getHeightCategory(male, ageInMonths, dataValue.value).code);
+        } else if (dataValue.dataElement == ctrl.knownDataElements.weight) {
+            return getColor(sdCategoryService.getWeightCategory(male, ageInMonths, dataValue.value).code);
+        } else {
+            return "";
+        }
         /*< -3 SD : Red
          -2 SD to -3 SD : Orange
          -1 SD to -2 SD : light green
          +2 SD to -1 SD : green
          >+2 SD : Purple*/
-
-        if (height) {
-            return getColor(categoryIds.heightCat.value);
-        } else {
-            return getColor(categoryIds.weightCat.value);
-        }
     }
 
 

@@ -8,8 +8,7 @@
 var intervals = ["Daily", "Weekly", "Monthly", "Yearly"];
 var intervalNoun = ["Days", "Weeks", "Months", "Years"];
 var intervalInDays = [1, 7, 30, 365];
-var gender=["Any","Male","Female"];
-
+var gender = ["Any", "Male", "Female"];
 /**
  * Local modals
  * */
@@ -21,9 +20,9 @@ function Options() {
     }
 }
 
-function ReferenceData(){
+function ReferenceData() {
     this.centiles;
-    this.gender=0;//0:any,1:male,2:female
+    this.gender = 0;//0:any,1:male,2:female
     this.xAxisPeriod;
 }
 
@@ -44,8 +43,8 @@ function LongitudinalChart() {
     this.centiles = [];
     this.img;
     this.dependantDataType = 0;
-    
-    this.refData=[];
+
+    this.refData = [];
 
     this.enabled = false;
 

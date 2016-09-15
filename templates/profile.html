@@ -197,7 +197,7 @@
             <md-list class="">
                 <div ng-repeat="dv in ctrl.selectedEvent.dataValues" ng-init="de=ctrl.getDataElement(dv.dataElement)">
                     <md-list-item class="md-2-line"
-                                  ng-if="de.valueType!='COORDINATE'">
+                                  ng-if="de.valueType!='COORDINATE'" ng-show="ctrl.hidenDataElements.indexOf(de.id)<0">
                         <md-tooltip md-direction="right">
                             Stored by {{dv.storedBy}}
                         </md-tooltip>
@@ -217,7 +217,7 @@
                                 ng-if="de.valueType=='NUMBER' || de.valueType=='INTEGER_POSITIVE'">
                             <label>{{de.displayName}}</label>
                             <input ng-model="dv.value" ng-blur="ctrl.updateDataValue(dv)"
-                                   ng-class="ctrl.getHeightWeightBackgroundColorClass(dv.dataElement)">
+                                   ng-class="ctrl.getHeightWeightBackgroundColorClass(dv)">
                         </md-input-container>
                         <md-input-container
                                 ng-if="de.valueType=='TEXT' && de.optionSet">

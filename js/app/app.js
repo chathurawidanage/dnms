@@ -3,7 +3,7 @@
 //var serverRoot = 'http://148.251.224.242/nss1/api/';
 var serverRoot = '../../';
 var app = angular.module('long-charts', ['ngMaterial', 'ngRoute', 'longitudinalChartControllers', 'dropzone', 'chart.js'
-    , 'mdColorPicker', 'lfNgMdFileInput', 'angular-timeline', 'forerunnerdb', 'angularTreeview', 'ngMap','dndLists']);
+    , 'mdColorPicker', 'lfNgMdFileInput', 'angular-timeline', 'forerunnerdb', 'angularTreeview', 'ngMap', 'dndLists']);
 app.config(['$routeProvider', function ($routeProvider) {
     $routeProvider.when('/', {
         templateUrl: 'templates/dashboard.html'
@@ -65,6 +65,7 @@ app.factory('enrollmentService', EnrollmentService);
 
 app.factory('eventService', EventService);
 app.factory('settingsService', SettingsService);
+app.factory('sdCategoryService', SDCategoryService);
 
 app.factory('orgUnitsService', function ($http, $q) {
     return {
@@ -464,14 +465,27 @@ app.factory('userService', UserService);
  * Toast Service
  **/
 app.factory('toastService', function ($mdToast, $mdDialog) {
-    return {
+    var toastQueue = [];
+    var toastShowing = false;
+    var toastService = {
         showToast: function (msg) {
+            if (toastShowing) {
+                toastQueue.push(msg);
+                return;
+            }
+            toastShowing = true;
             $mdToast.show(
                 $mdToast.simple()
                     .textContent(msg)
                     .position('bottom left')
                     .hideDelay(3000)
-            );
+            ).then(function () {
+                toastShowing = false;
+                var toast = toastQueue.splice(0, 1);
+                if (toast.length > 0) {
+                    toastService.showToast(toast[0]);
+                }
+            });
         },
         showConfirm: function (title, description, ok, cancel, callbackSuccess, callbackCancel) {
             var confirm = $mdDialog.confirm()
@@ -486,6 +500,7 @@ app.factory('toastService', function ($mdToast, $mdDialog) {
             });
         }
     }
+    return toastService;
 });
 
 /**
