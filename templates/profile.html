@@ -37,7 +37,7 @@
                         </table>-->
 
                     <md-list class="tei-attributes">
-                        <md-list-item class="md-2-line" ng-repeat="att in ctrl.teiObj.attributes">
+                        <md-list-item class="md-2-line" ng-repeat="att in ctrl.teiObj.attributes" ng-show="att.attribute!=ctrl.childProfile.dob.key">
                             <!--<img ng-src="{{todos[0].face}}?20" class="md-avatar" alt="{{todos[0].who}}" />-->
                             <md-input-container
                                     ng-if="att.valueType=='BOOLEAN' || att.valueType=='TRUE_ONLY'">
