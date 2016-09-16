@@ -40,9 +40,19 @@ function ProfileController($location, appService, teiService, $routeParams, toas
         ageOfChildInMonths: "GDhOcklahIq"
     }
 
-    this.hidenDataElements=["GDhOcklahIq","RGmYXRckjv0","bYTh3TBpAFF","qh8ptEnFWmp"];
+    this.hidenDataElements = ["GDhOcklahIq", "RGmYXRckjv0", "bYTh3TBpAFF", "qh8ptEnFWmp"];
 
     this.user;
+
+    ctrl.getAge = function () {
+        if (ctrl.childProfile.dob.value) {
+            var ageInmonths = (new Date().getTime() - new Date(ctrl.childProfile.dob.value).getTime()) / (1000 * 60 * 60 * 24 * 30);
+            var years = Math.round(ageInmonths / 12);
+            var months = Math.round(ageInmonths % 12);
+            return (years > 0 ? (years + " years and ") : "") + months + " months";
+        }
+        return "Undefined Age";
+    }
 
     userService.getCurrentUser().then(function (user) {
         ctrl.user = user;

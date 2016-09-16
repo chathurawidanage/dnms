@@ -96,10 +96,14 @@ function EventService($http, $q, $fdb, userService) {
             return defer.promise;
         },
 
-        getHeightWeightAnalytics: function (sqlViewId, date1, date2, ouId, dataElementId) {
+        getHeightWeightAnalytics: function (sqlViewId, date1, date2, ouId, dataElementId, index) {
             var defer = $q.defer();
             $http.get(serverRoot + 'sqlViews/' + sqlViewId + '/data?var=date1:' + date1 + '&var=date2:' + date2 + '&var=ou:' + ouId + '&var=dataElement:' + dataElementId).then(function (response) {
-                defer.resolve(response.data);
+                if (!index) {
+                    defer.resolve(response.data);
+                } else {
+                    defer.resolve({index: index, data: response.data});
+                }
             }, function (response) {
                 console.log(response);
                 defer.reject(response);

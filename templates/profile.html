@@ -5,11 +5,11 @@
             <md-card class="profile-card">
                 <md-card-header>
                     <md-card-avatar>
-                        <md-icon class="md-avatar-icon" md-png-icon="img/profile_default.png"></md-icon>
+                        <img ng-src="img/{{(ctrl.childProfile.gender.value && ctrl.childProfile.gender.value!='female')?'boy':'girl'}}_ico.png">
                     </md-card-avatar>
                     <md-card-header-text>
                         <span class="md-title">{{ctrl.childProfile.firstName.value}} {{ctrl.childProfile.lastName.value}}</span>
-                        <span class="md-subhead">{{ctrl.childProfile.chdrNumber.value}}</span>
+                        <span class="md-subhead">{{ctrl.getAge()}}</span>
                     </md-card-header-text>
                 </md-card-header>
                 <!--<md-card-title>
@@ -37,7 +37,8 @@
                         </table>-->
 
                     <md-list class="tei-attributes">
-                        <md-list-item class="md-2-line" ng-repeat="att in ctrl.teiObj.attributes" ng-show="att.attribute!=ctrl.childProfile.dob.key">
+                        <md-list-item class="md-2-line" ng-repeat="att in ctrl.teiObj.attributes"
+                                      ng-show="att.attribute!=ctrl.childProfile.dob.key">
                             <!--<img ng-src="{{todos[0].face}}?20" class="md-avatar" alt="{{todos[0].who}}" />-->
                             <md-input-container
                                     ng-if="att.valueType=='BOOLEAN' || att.valueType=='TRUE_ONLY'">
@@ -85,13 +86,13 @@
                 <md-divider>
                     <md-content style="text-align: right">
                         <span flex></span>
-                        <md-button class="md-secondary md-warn" ng-click="ctrl.deleteTei()">
+                        <md-button class="md-secondary md-warn" ng-click="ctrl.deleteTei()" ng-disabled="true">
                             <md-icon>
                                 <i class="material-icons">delete</i>
                             </md-icon>
                             Delete Profile
                         </md-button>
-                        <md-button class="md-secondary" ng-click="ctrl.unenrollTei()">
+                        <md-button class="md-secondary" ng-click="ctrl.unenrollTei()" ng-disabled="true">
                             <md-icon>
                                 <i class="material-icons">touch_app</i>
                             </md-icon>

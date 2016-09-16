@@ -93,8 +93,10 @@ function DashboardController($location, $scope, toastService, programService, us
     //end of side nav
 
     //load orgUnits
+    //todo remove not using
     ctrl.fetchOrgUnits = function (callback) {
         var ouDb = $fdb.db('dnms').collection("ous");
+        ouDb.drop();
         ouDb.load(function (err, tableStats, metaStats) {
             if (!err && tableStats.foundData && tableStats.rowCount > 0) {
                 console.log("loaded cached org tree successfully");
@@ -305,6 +307,7 @@ function DashboardController($location, $scope, toastService, programService, us
     };
 
     ctrl.showGlobalTeiSearch = function () {
+        console.log("Selected OU",ctrl.currentOuSelection);
         teiService.changeTeiList("Global Search", function (regexp, page, limit) {
             return ctrl.teiDb.find({
                 $or: [

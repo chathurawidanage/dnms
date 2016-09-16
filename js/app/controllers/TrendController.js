@@ -5,7 +5,7 @@ function TrendController($location, appService, teiService, $routeParams, toastS
                          programService, dataElementService, programIndicatorsService, $q, $scope, $mdSidenav, eventService) {
     var tctrl = this;
 
-    tctrl.trendDataElementId = undefined;
+    tctrl.trendDataElement = undefined;
     tctrl.date = new Date();
     tctrl.dataElementName = "";
 
@@ -42,7 +42,7 @@ function TrendController($location, appService, teiService, $routeParams, toastS
     }
 
     $scope.$watch('ctrl.trendDataElement', function (trendDataElement) {
-        tctrl.trendDataElementId = trendDataElement;
+        tctrl.trendDataElement = trendDataElement;
         if (trendDataElement) {
             tctrl.readyness.dataElement = trendDataElement;
             tctrl.loadData();
@@ -89,20 +89,41 @@ function TrendController($location, appService, teiService, $routeParams, toastS
         for (var i = 0; i < dates.length; i++) {
             var d = dates[i];
             tctrl.mainChart.labels.push(d.toDateString());
-            eventService.getAnalyticsForDeCustom(new Date(0).toDateString(), d.toDateString(), $scope.ctrl.currentOuSelection.id, tctrl.trendDataElementId, i).then(function (data) {
-                if (data.data && data.data.rows.length > 0) {
-                    var tableRow = data.data.rows[0];
-                    if (tableRow.length > 0) {
-                        tctrl.mainChart.data[data.index] = (tableRow[0]);
-                        dataElementService.getDataElementNameById(tctrl.trendDataElementId).then(function (name) {
-                            tctrl.mainChart.options.title.text = "Trend analysis of " + name;
-                        })
-                        console.log("Chart", tctrl.mainChart);
-                        tctrl.mainChart.visible = true;
-                        tctrl.mainChart.loading = false;
+            //todo use a better approach
+            if (tctrl.trendDataElement.de) {//height weight analysis
+                var deId = tctrl.trendDataElement.de;
+                var sqlView = tctrl.trendDataElement.sqlView;
+                eventService.getHeightWeightAnalytics(sqlView.id, new Date(0).toDateString(), d.toDateString(), $scope.ctrl.currentOuSelection.id, deId, i).then(function (data) {
+                    //console.log(data);
+                    if (data.data && data.data.rows.length > 0) {
+                        var tableRow = data.data.rows[0];
+                        if (tableRow.length > 0) {
+                            tctrl.mainChart.data[data.index] = (tableRow[0]);
+                            dataElementService.getDataElementNameById(deId).then(function (name) {
+                                tctrl.mainChart.options.title.text = "Trend analysis of " + name + " - " + sqlView.name;
+                            })
+                            console.log("Chart", tctrl.mainChart);
+                            tctrl.mainChart.visible = true;
+                            tctrl.mainChart.loading = false;
+                        }
                     }
-                }
-            });
+                })
+            } else {
+                eventService.getAnalyticsForDeCustom(new Date(0).toDateString(), d.toDateString(), $scope.ctrl.currentOuSelection.id, tctrl.trendDataElement, i).then(function (data) {
+                    if (data.data && data.data.rows.length > 0) {
+                        var tableRow = data.data.rows[0];
+                        if (tableRow.length > 0) {
+                            tctrl.mainChart.data[data.index] = (tableRow[0]);
+                            dataElementService.getDataElementNameById(tctrl.trendDataElement).then(function (name) {
+                                tctrl.mainChart.options.title.text = "Trend analysis of " + name;
+                            })
+                            console.log("Chart", tctrl.mainChart);
+                            tctrl.mainChart.visible = true;
+                            tctrl.mainChart.loading = false;
+                        }
+                    }
+                });
+            }
         }
 
 

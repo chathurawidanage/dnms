@@ -140,6 +140,8 @@
                                         <div ng-repeat="nchart in nctrl.charts">
                                             <md-list-item>
                                                 <canvas class="chart chart-bar"
+                                                        data-chartIndex="{{$index}}"
+                                                        chart-click="nctrl.chartClick"
                                                         chart-options="nchart.options"
                                                         chart-data="nchart.data" chart-labels="nchart.labels"
                                                 ></canvas>
