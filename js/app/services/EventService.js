@@ -84,7 +84,7 @@ function EventService($http, $q, $fdb, userService) {
             //lankanets ewmYHyiO0sO
             //main ejUWIpcmgTz
             $http.get(serverRoot + 'sqlViews/ejUWIpcmgTz/data?var=date1:' + date1 + '&var=date2:' + date2 + '&var=ou:' + ouId + '&var=dataElement:' + dataElementId).then(function (response) {
-                if (!index) {//todo remove temp fix
+                if (index==undefined) {//todo remove temp fix
                     defer.resolve(response.data);
                 } else {
                     defer.resolve({index: index, data: response.data});
@@ -99,7 +99,7 @@ function EventService($http, $q, $fdb, userService) {
         getHeightWeightAnalytics: function (sqlViewId, date1, date2, ouId, dataElementId, index) {
             var defer = $q.defer();
             $http.get(serverRoot + 'sqlViews/' + sqlViewId + '/data?var=date1:' + date1 + '&var=date2:' + date2 + '&var=ou:' + ouId + '&var=dataElement:' + dataElementId).then(function (response) {
-                if (!index) {
+                if (index == undefined) {
                     defer.resolve(response.data);
                 } else {
                     defer.resolve({index: index, data: response.data});

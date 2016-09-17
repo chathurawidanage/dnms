@@ -124,15 +124,20 @@ function NutritionController($location, appService, teiService, $routeParams, to
 
         nctrl.charts.forEach(function (chart) {
             chart.reset();
+            var i = 0;
             chart.sqlViews.forEach(function (sqlView) {
-                eventService.getHeightWeightAnalytics(sqlView.id, new Date(0).toDateString(), nctrl.date.toDateString(), $scope.ctrl.currentOuSelection.id, chart.dataElementId).then(function (data) {
-                    var rows = data.rows;
-                    if (rows.length > 0) {
-                        var row = rows[0];
-                        if (row.length > 0) {
-                            var dataValue = row[0];
-                            chart.data.push(dataValue);
-                            chart.labels.push(sqlView.name + " [" + dataValue + "]");
+                eventService.getHeightWeightAnalytics(sqlView.id, new Date(0).toDateString(), nctrl.date.toDateString(), $scope.ctrl.currentOuSelection.id, chart.dataElementId, i++).then(function (data) {
+
+                        console.log("DATA",data);
+                    if (data.data) {
+                        var rows = data.data.rows;
+                        if (rows.length > 0) {
+                            var row = rows[0];
+                            if (row.length > 0) {
+                                var dataValue = row[0];
+                                chart.data[data.index] = (dataValue);
+                                chart.labels[data.index] = (sqlView.name + " [" + dataValue + "]");
+                            }
                         }
                     }
                 });
