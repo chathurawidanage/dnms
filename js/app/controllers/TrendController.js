@@ -9,6 +9,8 @@ function TrendController($location, appService, teiService, $routeParams, toastS
     tctrl.date = new Date();
     tctrl.dataElementName = "";
 
+    tctrl.widgetVisible = false;
+
     tctrl.mainChart = {
         loading: false,
         visible: false,
@@ -26,10 +28,10 @@ function TrendController($location, appService, teiService, $routeParams, toastS
             }
         },
         reset: function () {
-            this.visible = false;
             this.data = [];
             this.labels = [];
-            this.loading = false;
+            this.loading = true;
+            this.options.title.text = "Loading..";
         }
     }
 
@@ -42,6 +44,7 @@ function TrendController($location, appService, teiService, $routeParams, toastS
     }
 
     $scope.$watch('ctrl.trendDataElement', function (trendDataElement) {
+        console.log("Trend de triggered", trendDataElement);
         tctrl.trendDataElement = trendDataElement;
         if (trendDataElement) {
             tctrl.readyness.dataElement = trendDataElement;
@@ -64,17 +67,18 @@ function TrendController($location, appService, teiService, $routeParams, toastS
     });
 
     tctrl.hideChart = function () {
-        tctrl.mainChart.visible = false;
+        tctrl.widgetVisible = false;
     }
 
 
     tctrl.loadData = function () {
 
+        tctrl.mainChart.reset();
         if (!tctrl.readyness.isReady()) {
             return;
         }
+        tctrl.widgetVisible = true;
 
-        tctrl.mainChart.reset();
         console.log("loading trends");
         tctrl.mainChart.loading = true;
 
@@ -85,8 +89,10 @@ function TrendController($location, appService, teiService, $routeParams, toastS
         }
         dates.push(tctrl.date);
 
-
+        var requestCount = 0;
+        var responseCount = 0;
         for (var i = 0; i < dates.length; i++) {
+            requestCount++;
             var d = dates[i];
             tctrl.mainChart.labels.push(d.toDateString());
             //todo use a better approach
@@ -99,12 +105,15 @@ function TrendController($location, appService, teiService, $routeParams, toastS
                         var tableRow = data.data.rows[0];
                         if (tableRow.length > 0) {
                             tctrl.mainChart.data[data.index] = (tableRow[0]);
-                            dataElementService.getDataElementNameById(deId).then(function (name) {
-                                tctrl.mainChart.options.title.text = "Trend analysis of " + name + " - " + sqlView.name;
-                            })
+
                             console.log("Chart", tctrl.mainChart);
-                            tctrl.mainChart.visible = true;
-                            tctrl.mainChart.loading = false;
+                            responseCount++;
+                            if (requestCount == responseCount) {
+                                dataElementService.getDataElementNameById(deId).then(function (name) {
+                                    tctrl.mainChart.options.title.text = "Trend analysis of " + name + " - " + sqlView.name;
+                                    tctrl.mainChart.loading = false;
+                                })
+                            }
                         }
                     }
                 })
@@ -114,12 +123,14 @@ function TrendController($location, appService, teiService, $routeParams, toastS
                         var tableRow = data.data.rows[0];
                         if (tableRow.length > 0) {
                             tctrl.mainChart.data[data.index] = (tableRow[0]);
-                            dataElementService.getDataElementNameById(tctrl.trendDataElement).then(function (name) {
-                                tctrl.mainChart.options.title.text = "Trend analysis of " + name;
-                            })
-                            console.log("Chart", tctrl.mainChart);
-                            tctrl.mainChart.visible = true;
-                            tctrl.mainChart.loading = false;
+
+                            responseCount++;
+                            if (requestCount == responseCount) {
+                                dataElementService.getDataElementNameById(tctrl.trendDataElement).then(function (name) {
+                                    tctrl.mainChart.options.title.text = "Trend analysis of " + name;
+                                    tctrl.mainChart.loading = false;
+                                })
+                            }
                         }
                     }
                 });

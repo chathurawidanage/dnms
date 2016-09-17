@@ -128,7 +128,7 @@ function NutritionController($location, appService, teiService, $routeParams, to
             chart.sqlViews.forEach(function (sqlView) {
                 eventService.getHeightWeightAnalytics(sqlView.id, new Date(0).toDateString(), nctrl.date.toDateString(), $scope.ctrl.currentOuSelection.id, chart.dataElementId, i++).then(function (data) {
 
-                        console.log("DATA",data);
+                    console.log("DATA", data);
                     if (data.data) {
                         var rows = data.data.rows;
                         if (rows.length > 0) {
@@ -149,11 +149,12 @@ function NutritionController($location, appService, teiService, $routeParams, to
     nctrl.chartClick = function (points, evt) {
         var index = points[0]._index;
         var chartIndex = parseInt(evt.srcElement.attributes["data-chartIndex"].nodeValue);
-        $scope.ctrl.trendDataElement = {
-            de: nctrl.charts[chartIndex].dataElementId,
-            sqlView: sqlViews[index]
-        };
-        console.log($scope.ctrl.trendDataElement);
+        $scope.$evalAsync(function () {
+            $scope.ctrl.trendDataElement = {
+                de: nctrl.charts[chartIndex].dataElementId,
+                sqlView: sqlViews[index]
+            };
+        });
     }
 
 

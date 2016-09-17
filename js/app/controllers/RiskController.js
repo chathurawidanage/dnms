@@ -322,7 +322,6 @@ function RiskController($location, appService, teiService, $routeParams, toastSe
     rctrl.currentMainRisk = undefined;
     rctrl.chartClick = function (points, evt) {
         var index = points[0]._index;
-        console.log(index);
         $scope.ctrl.trendDataElement = rctrl.risks[index].id;
         rctrl.currentMainRisk = rctrl.risks[index];
         rctrl.generateSubChart(index, true);
@@ -330,10 +329,10 @@ function RiskController($location, appService, teiService, $routeParams, toastSe
 
     rctrl.subChartClick = function (points, evt) {
         var index = points[0]._index;
-        console.log("Sub chart click", index);
         if (rctrl.currentMainRisk) {
-            console.log(rctrl.currentMainRisk);
-            $scope.ctrl.trendDataElement = rctrl.currentMainRisk.children[index].id;
+            $scope.$evalAsync(function () {
+                $scope.ctrl.trendDataElement = rctrl.currentMainRisk.children[index].id;
+            });
         }
     }
 
