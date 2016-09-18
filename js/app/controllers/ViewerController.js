@@ -310,7 +310,16 @@ function ViewerController($location, appService, teiService, $routeParams, toast
                 }
 
                 chart.dso[0].data = data;
-                console.log(data);
+
+                //flood fill sd3
+                var sd3 = chart.data.splice(chart.data.length - 1, 1);
+                var first = sd3[0][0];
+                var last = sd3[0][sd3[0].length - 1];
+                first.y = Math.ceil((last.y+1)/10)*10;
+                last.y = first.y;
+                chart.data.push([first, last]);
+
+                console.log(chart);
                 chart.processing = false;
             }, function (error) {
                 toastService.showToast(error);
