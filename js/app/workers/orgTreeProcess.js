@@ -30,5 +30,10 @@ recursiveCollapse = function (node) {
         //remove children temporary to avoid ng-repeat lag
         node.childrenTemp = node.children;
         node.children = undefined;
+
+        //sorting children in alpahebtica order
+        node.childrenTemp.sort(function (a, b) {
+            return a.displayName.localeCompare(b.displayName);
+        })
     }
 }
