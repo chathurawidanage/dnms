@@ -9,7 +9,7 @@
                     </md-card-avatar>
                     <md-card-header-text>
                         <span class="md-title">{{ctrl.childProfile.firstName.value}} {{ctrl.childProfile.lastName.value}}</span>
-                        <span class="md-subhead">{{ctrl.getAge()}}</span>
+                        <span class="md-subhead">{{ctrl.teiObj.orgUnitName}} | {{ctrl.getAge()}}</span>
                     </md-card-header-text>
                 </md-card-header>
                 <!--<md-card-title>
@@ -136,12 +136,20 @@
                                 </md-icon>
                                 {{chart.options.legend.display?'Hide':'Show'}} Legend
                             </md-button>
+                            <md-button class="md-secondary"
+                                       ng-click="vctrl.downloadChart($index)">
+                                <md-icon>
+                                    <i class="material-icons">file_download</i>
+                                </md-icon>
+                                Download Chart
+                            </md-button>
+                            <md-progress-linear md-mode="indeterminate" ng-show="chart.processing"></md-progress-linear>
                             <div style="padding: 25px; text-align: center;" ng-show="!chart.processing">
                                 <canvas class="chart chart-line" chart-data="chart.data" chart-labels="chart.labels"
                                         chart-series="chart.series" chart-colors="chart.dataColors"
                                         chart-options="chart.options"
                                         chart-dataset-override="chart.dso"
-                                        id="chart-preview"></canvas>
+                                        id="lon-chart-{{$index}}"></canvas>
                             </div>
                         </md-tab>
                     </md-tabs>

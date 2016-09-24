@@ -77,6 +77,15 @@ app.factory('orgUnitsService', function ($http, $q) {
                 defer.reject(response);
             });
             return defer.promise;
+        },
+        getOrgNameById: function (orgId) {
+            var defer = $q.defer();
+            $http.get(serverRoot + 'organisationUnits/' + orgId + '.json?fields=displayName').then(function (response) {
+                defer.resolve(response.data.displayName);
+            }, function (response) {
+                defer.reject(response);
+            });
+            return defer.promise;
         }
     }
 });

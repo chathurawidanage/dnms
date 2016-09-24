@@ -2,7 +2,7 @@
  * Created by chathura on 6/1/16.
  */
 function ViewerController($location, appService, teiService, $routeParams, toastService, chartService,
-                          programService, dataElementService, programIndicatorsService, $q, $mdDialog) {
+                          programService, dataElementService, programIndicatorsService, $q, $mdDialog, $timeout,$window) {
     var ctrl = this;
     this.tei = $routeParams.tei;
     this.program = $routeParams.program;
@@ -17,12 +17,24 @@ function ViewerController($location, appService, teiService, $routeParams, toast
 
     this.charts = [];
 
+    this.downloadChart = function (index) {
+        $timeout(function () {
+            var canvas = document.getElementById("lon-chart-" + index);
+            var image = canvas.toDataURL("image/png");//.replace("image/png", "image/octet-stream");
+            console.log(image);
+            $window.open(image, '_blank');
+        })
+    }
+
     this.loadData = function () {
         //load charts
         chartService.getAllCharts().then(function (charts) {
             ctrl.charts = [];
             charts.forEach(function (chart) {
                 if (chart.program == ctrl.program) {
+                    //make chart loading
+                    chart.processing = true;
+
                     ctrl.charts.push(chart);
                 }
             });//todo load dob
@@ -53,7 +65,6 @@ function ViewerController($location, appService, teiService, $routeParams, toast
 
     this.refineCharts = function () {
         this.charts.forEach(function (chart) {
-            chart.processing = true;
             chart.options.legend = {
                 display: true
             }
@@ -315,7 +326,7 @@ function ViewerController($location, appService, teiService, $routeParams, toast
                 var sd3 = chart.data.splice(chart.data.length - 1, 1);
                 var first = sd3[0][0];
                 var last = sd3[0][sd3[0].length - 1];
-                first.y = Math.ceil((last.y+1)/10)*10;
+                first.y = Math.ceil((last.y + 1) / 10) * 10;
                 last.y = first.y;
                 chart.data.push([first, last]);
 

@@ -3,7 +3,7 @@
  */
 function ProfileController($location, appService, teiService, $routeParams, toastService,
                            programService, dataElementService, programIndicatorsService, $q, $mdDialog, $mdSidenav,
-                           eventService, enrollmentService, $fdb, userService, settingsService, sdCategoryService) {
+                           eventService, enrollmentService, $fdb, userService, settingsService, sdCategoryService, orgUnitsService) {
     var ctrl = this;
     this.tei = $routeParams.tei;
     this.teiObj = null;
@@ -221,6 +221,11 @@ function ProfileController($location, appService, teiService, $routeParams, toas
         console.log("Loading attributes of ", ctrl.tei);
         teiService.getTeiById(ctrl.tei).then(function (tei) {
             ctrl.teiObj = tei;
+
+            //setting orgUnitName
+            orgUnitsService.getOrgNameById(ctrl.teiObj.orgUnit).then(function (orgUnitName) {
+                ctrl.teiObj.orgUnitName = orgUnitName;
+            });
 
             //filling known attributes
             var knownAtts = Object.keys(ctrl.childProfile);

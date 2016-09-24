@@ -148,7 +148,9 @@ function NutritionController($location, appService, teiService, $routeParams, to
 
     nctrl.chartClick = function (points, evt) {
         var index = points[0]._index;
-        var chartIndex = parseInt(evt.srcElement.attributes["data-chartIndex"].nodeValue);
+        console.log("Event", evt);
+        var target = evt.srcElement || evt.target;
+        var chartIndex = parseInt(target.attributes["data-chartIndex"].nodeValue);
         $scope.$evalAsync(function () {
             $scope.ctrl.trendDataElement = {
                 de: nctrl.charts[chartIndex].dataElementId,
