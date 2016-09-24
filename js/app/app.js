@@ -206,14 +206,19 @@ app.factory('teiService', function ($http, $q, appService) {
             return defer.promise;
         },
 
-        queryForAllTeis: function (attributes, program) {
+        queryForAllTeis: function (attributes, program, unenrolled) {
+            var programStatus = "ACTIVE";
+            if (unenrolled) {
+                programStatus = "COMPLETED";
+            }
             var defer = $q.defer();
-            var url = serverRoot + 'trackedEntityInstances/query.json?ouMode=ACCESSIBLE&programStatus=ACTIVE&program=' + program;
+            var url = serverRoot + 'trackedEntityInstances/query.json?ouMode=ACCESSIBLE&programStatus=' + programStatus + '&program=' + program;
             if (attributes) {
                 attributes.forEach(function (attr) {
                     url += "&attribute=" + attr;
                 })
             }
+            console.log(url);
             $http.get(url).then(function (response) {
                 defer.resolve(response.data);
             }, function (response) {
