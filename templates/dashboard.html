@@ -334,14 +334,33 @@
                         </md-card-header-text>
                     </md-card-header>
                     <md-card-content>
-                        <md-input-container md-no-float class="md-block" style="margin-bottom: -15px"
-                                            ng-if="tctrl.global">
-                            <md-icon>
-                                <i class="material-icons">search</i>
-                            </md-icon>
-                            <input ng-model="tctrl.keyword" type="text" placeholder="Search for a child"
-                                   ng-keyup="tctrl.refreshList($event)">
-                        </md-input-container>
+                        <div  style="margin-bottom: -15px"
+                              ng-if="tctrl.global" md-no-float class="md-block" layout="row">
+                            <md-input-container flex>
+                                <label>Search by name or CHDR</label>
+                                <md-icon>
+                                    <i class="material-icons">search</i>
+                                </md-icon>
+                                <input ng-model="tctrl.keyword" type="text"
+                                       ng-keyup="tctrl.refreshList($event)">
+                            </md-input-container>
+                            <md-input-container flex>
+                                <label>State</label>
+                                <md-select ng-model="ctrl.globalSearchEnrolledOnly"
+                                           ng-change="tctrl.refreshList($event)">
+                                    <md-option ng-value="true">
+                                        Active Children
+                                    </md-option>
+                                    <md-option ng-value="false">
+                                        Unenrolled Children
+                                    </md-option>
+                                </md-select>
+                            </md-input-container>
+                        </div>
+                        <!--<md-radio-group ng-model="ctrl.globalSearchEnrolledOnly" ng-change="tctrl.refreshList()">
+                            <md-radio-button value="true" class="md-primary">Active Children</md-radio-button>
+                            <md-radio-button value="false">Unenrolled Children</md-radio-button>
+                        </md-radio-group>-->
                         <md-button ng-click="ctrl.showGlobalTeiSearch()" ng-if="!tctrl.global" class="md-secondary">
                             <md-icon>
                                 <i class="material-icons">arrow_back</i>

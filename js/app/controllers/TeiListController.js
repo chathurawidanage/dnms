@@ -16,7 +16,8 @@ function TeiListController(teiService, $controller, $scope, $fdb) {
     tctrl.keyword = "";
 
     tctrl.refreshList = function (event) {
-        if (event.keyCode == 13) {
+        if (!event || event.keyCode == 13) {//not a key event or enter
+            console.log("refreshing");
             tctrl.infiniteItems.reset();
         }
     }

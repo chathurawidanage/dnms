@@ -10,7 +10,6 @@ function EventService($http, $q, $fdb, userService) {
         getEventAnalytics: function (programId, orgUnit, dataElementId, expectedValue) {//todo dates are hard coded
             var defer = $q.defer();
             var url = serverRoot + 'analytics/events/query/' + programId + '?dimension=' + dataElementId + ':EQ:' + expectedValue + '&startDate=1992-08-16&endDate=2016-12-12&dimension=ou:' + orgUnit;
-            console.log(url);
             $http.get(url).then(function (response) {
                 defer.resolve(response.data);
             }, function (response) {

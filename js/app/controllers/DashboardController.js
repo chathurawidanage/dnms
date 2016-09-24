@@ -284,10 +284,8 @@ function DashboardController($location, $scope, toastService, programService, us
 
     ctrl.cacheTeis = function () {
         ctrl.caches.tei = CAHCE_STATUS.loading;
-        //todo firstname and last name attributes are hard coded
-        teiService.queryForAllTeis(["izuwkaOUgFg", "C8DBAo2wEYN", "BZEpuufLyDE", "WqdldQpOIxm"], ctrl.selectedProgram.id).then(function (data) {
-            var rows = data.rows;
-            ctrl.loadingText = "Saving children data...";
+
+        var saveToDb = function (rows, enrolled) {
             rows.forEach(function (row) {
                 ctrl.teiDb.insert({
                     _id: row[0],
@@ -296,18 +294,32 @@ function DashboardController($location, $scope, toastService, programService, us
                     fName: row[7],
                     lName: row[8],
                     gender: row[9],
-                    chdrNumber: row[10]
+                    chdrNumber: row[10],
+                    enrolled: enrolled
                 })
             });
             ctrl.caches.tei = CAHCE_STATUS.loaded;
             ctrl.showGlobalTeiSearch();
-
             ctrl.checkProgress();
+        }
+        debugDb = ctrl.teiDb;
+        //todo firstname and last name attributes are hard coded
+        //enrolled children
+        teiService.queryForAllTeis(["izuwkaOUgFg", "C8DBAo2wEYN", "BZEpuufLyDE", "WqdldQpOIxm"], ctrl.selectedProgram.id).then(function (data) {
+            var rows = data.rows;
+            saveToDb(rows, true);
+        });
+
+        //not enrolled children
+        teiService.queryForAllTeis(["izuwkaOUgFg", "C8DBAo2wEYN", "BZEpuufLyDE", "WqdldQpOIxm"], ctrl.selectedProgram.id, true).then(function (data) {
+            var rows = data.rows;
+            saveToDb(rows, false);
         });
     };
 
+    ctrl.globalSearchEnrolledOnly='true';
     ctrl.showGlobalTeiSearch = function () {
-        console.log("Selected OU",ctrl.currentOuSelection);
+        console.log("Selected OU", ctrl.currentOuSelection);
         teiService.changeTeiList("Global Search", function (regexp, page, limit) {
             return ctrl.teiDb.find({
                 $or: [
@@ -320,7 +332,8 @@ function DashboardController($location, $scope, toastService, programService, us
                     {
                         chdrNumber: regexp
                     }
-                ]
+                ],
+                enrolled:ctrl.globalSearchEnrolledOnly
             }, {
                 $page: page,
                 $limit: limit
@@ -403,8 +416,8 @@ function DashboardController($location, $scope, toastService, programService, us
     ctrl.isElevatedUser = function () {
         return userService.hasRole(userService.MOH_USER);
     }
-    
-    ctrl.isSuperUser=function () {
+
+    ctrl.isSuperUser = function () {
         return userService.hasRole(userService.SUPER_USER);
     }
 
