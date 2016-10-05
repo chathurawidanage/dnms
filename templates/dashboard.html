@@ -336,7 +336,7 @@
                     <md-card-content>
                         <div  style="margin-bottom: -15px"
                               ng-if="tctrl.global" md-no-float class="md-block" layout="row">
-                            <md-input-container flex>
+                            <md-input-container flex="60">
                                 <label>Search by name or CHDR</label>
                                 <md-icon>
                                     <i class="material-icons">search</i>
@@ -344,7 +344,7 @@
                                 <input ng-model="tctrl.keyword" type="text"
                                        ng-keyup="tctrl.refreshList($event)">
                             </md-input-container>
-                            <md-input-container flex>
+                            <md-input-container flex="40">
                                 <label>State</label>
                                 <md-select ng-model="ctrl.globalSearchEnrolledOnly"
                                            ng-change="tctrl.refreshList($event)">
