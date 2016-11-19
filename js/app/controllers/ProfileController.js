@@ -171,6 +171,11 @@ function ProfileController($location, appService, teiService, $routeParams, toas
     ctrl.isElevatedUser = function () {
         return userService.hasRole(userService.MOH_USER);
     }
+    
+    ctrl.isSuperUser = function () {
+        return userService.hasRole(userService.SUPER_USER);
+    }
+
 
     /**
      * mark event as compete or active

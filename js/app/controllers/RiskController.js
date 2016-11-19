@@ -257,8 +257,11 @@ function RiskController($location, appService, teiService, $routeParams, toastSe
         rctrl.mainChart.loading = true;
         var grandTotal = 0;
         var count = 0;
+        var index = 0;
         rctrl.risks.forEach(function (mainRisk) {
-            eventService.getAnalyticsForDeCustom(new Date(0).toDateString(), rctrl.date2.toDateString(), $scope.ctrl.currentOuSelection.id, mainRisk.id).then(function (data) {
+            eventService.getAnalyticsForDeCustom(STAGE_RISK_MONITOR,new Date(0).toDateString(), rctrl.date2.toDateString(), $scope.ctrl.currentOuSelection.id, mainRisk.id, 'true',index++).then(function (response) {
+                var data = response.data;
+                var idx = response.index;
                 var total = 0;
                 if (data.rows.length > 0) {
                     var tableRow = data.rows[0];
@@ -268,7 +271,7 @@ function RiskController($location, appService, teiService, $routeParams, toastSe
                 }
                 //
                 mainRisk.total = parseInt(total);
-                rctrl.mainChart.data.push(mainRisk.total);
+                rctrl.mainChart.data[idx] = (mainRisk.total);
                 grandTotal += mainRisk.total;
                 count++;
                 if (count == rctrl.risks.length) {
@@ -344,8 +347,11 @@ function RiskController($location, appService, teiService, $routeParams, toastSe
         rctrl.subChart.loading = true;
         rctrl.subChart.visible = true;
         rctrl.subChart.options.title.text = majorRisk.name;
+        var index = 0;
         majorRisk.children.forEach(function (subRisk) {
-            eventService.getAnalyticsForDeCustom(new Date(0).toDateString(), rctrl.date2.toDateString(), $scope.ctrl.currentOuSelection.id, subRisk.id).then(function (data) {
+            eventService.getAnalyticsForDeCustom(STAGE_RISK_MONITOR,new Date(0).toDateString(), rctrl.date2.toDateString(), $scope.ctrl.currentOuSelection.id, subRisk.id, 'true',index++).then(function (resp) {
+                var data = resp.data;
+                var idx = resp.index;
                 var total = 0;
                 if (data.rows.length > 0) {
                     var tableRow = data.rows[0];
@@ -355,7 +361,7 @@ function RiskController($location, appService, teiService, $routeParams, toastSe
                 }
                 //
                 subRisk.total = parseInt(total);
-                rctrl.subChart.data.push(subRisk.total);
+                rctrl.subChart.data[idx] = (subRisk.total);
                 grandTotal += subRisk.total;
                 count++;
                 if (count == majorRisk.children.length) {

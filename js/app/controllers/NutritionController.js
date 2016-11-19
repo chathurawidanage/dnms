@@ -4,9 +4,9 @@
 function NutritionController($location, appService, teiService, $routeParams, toastService,
                              programService, dataElementService, programIndicatorsService, $q, $scope, $mdSidenav, eventService) {
     var nctrl = this;
-    var sqlViews = [{id: "vMzcq7lEtWv", name: "Less than -3SD"},
-        {id: "UWkVK5iP7c6", name: "Between -2SD and -3SD"},
-        {id: "sXrfZU9sHix", name: "Greater than +2SD"}];
+    var sqlViews = [{id: "vMzcq7lEtWv", name: "Less than -3SD",value:"Less than -3SD"},
+        {id: "UWkVK5iP7c6", name: "Between -2SD and -3SD",value:"Between -2SD to -3SD"},
+        {id: "sXrfZU9sHix", name: "Greater than +2SD",value:"More than +2 SD"}];
     /*    var sqlViews=[{id: "Eq5TZZjmiVQ", name: "Less than -3SD"},
      {id: "iHDzKAWHtK1", name: "Between -2SD and -3SD"},
      {id: "nTGbJDnaqiU", name: "Greater than +2SD"}];*/
@@ -126,7 +126,8 @@ function NutritionController($location, appService, teiService, $routeParams, to
             chart.reset();
             var i = 0;
             chart.sqlViews.forEach(function (sqlView) {
-                eventService.getHeightWeightAnalytics(sqlView.id, new Date(0).toDateString(), nctrl.date.toDateString(), $scope.ctrl.currentOuSelection.id, chart.dataElementId, i++).then(function (data) {
+                //eventService.getHeightWeightAnalytics(sqlView.id, new Date(0).toDateString(), nctrl.date.toDateString(), $scope.ctrl.currentOuSelection.id, chart.dataElementId, i++).then(function (data) {
+                eventService.getAnalyticsForDeCustom(STAGE_NUT_MONITOR,new Date(0).toDateString(), nctrl.date.toDateString(), $scope.ctrl.currentOuSelection.id, chart.dataElementId,sqlView.value, i++).then(function (data) {
 
                     console.log("DATA", data);
                     if (data.data) {

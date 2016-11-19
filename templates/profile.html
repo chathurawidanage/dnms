@@ -86,13 +86,13 @@
                 <md-divider>
                     <md-content style="text-align: right">
                         <span flex></span>
-                        <md-button class="md-secondary md-warn" ng-click="ctrl.deleteTei()" ng-disabled="true">
+                        <md-button class="md-secondary md-warn" ng-click="ctrl.deleteTei()" ng-disabled="!ctrl.isSuperUser()">
                             <md-icon>
                                 <i class="material-icons">delete</i>
                             </md-icon>
                             Delete Profile
                         </md-button>
-                        <md-button class="md-secondary" ng-click="ctrl.unenrollTei()" ng-disabled="true">
+                        <md-button class="md-secondary" ng-click="ctrl.unenrollTei()" ng-disabled="!ctrl.isSuperUser()">
                             <md-icon>
                                 <i class="material-icons">touch_app</i>
                             </md-icon>

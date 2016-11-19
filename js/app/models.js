@@ -9,6 +9,9 @@ var intervals = ["Daily", "Weekly", "Monthly", "Yearly"];
 var intervalNoun = ["Days", "Weeks", "Months", "Years"];
 var intervalInDays = [1, 7, 30, 365];
 var gender = ["Any", "Male", "Female"];
+
+const STAGE_RISK_MONITOR=14872;
+const STAGE_NUT_MONITOR=14855;
 /**
  * Local modals
  * */

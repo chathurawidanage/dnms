@@ -99,7 +99,8 @@ function TrendController($location, appService, teiService, $routeParams, toastS
             if (tctrl.trendDataElement.de) {//height weight analysis
                 var deId = tctrl.trendDataElement.de;
                 var sqlView = tctrl.trendDataElement.sqlView;
-                eventService.getHeightWeightAnalytics(sqlView.id, new Date(0).toDateString(), d.toDateString(), $scope.ctrl.currentOuSelection.id, deId, i).then(function (data) {
+                //eventService.getHeightWeightAnalytics(sqlView.id, new Date(0).toDateString(), d.toDateString(), $scope.ctrl.currentOuSelection.id, deId, i).then(function (data) {
+                eventService.getAnalyticsForDeCustom(STAGE_NUT_MONITOR, new Date(0).toDateString(), d.toDateString(), $scope.ctrl.currentOuSelection.id, deId, sqlView.value,i).then(function (data) {
                     //console.log(data);
                     if (data.data && data.data.rows.length > 0) {
                         var tableRow = data.data.rows[0];
@@ -118,7 +119,7 @@ function TrendController($location, appService, teiService, $routeParams, toastS
                     }
                 })
             } else {
-                eventService.getAnalyticsForDeCustom(new Date(0).toDateString(), d.toDateString(), $scope.ctrl.currentOuSelection.id, tctrl.trendDataElement, i).then(function (data) {
+                eventService.getAnalyticsForDeCustom(STAGE_RISK_MONITOR,new Date(0).toDateString(), d.toDateString(), $scope.ctrl.currentOuSelection.id, tctrl.trendDataElement, 'true',i).then(function (data) {
                     if (data.data && data.data.rows.length > 0) {
                         var tableRow = data.data.rows[0];
                         if (tableRow.length > 0) {

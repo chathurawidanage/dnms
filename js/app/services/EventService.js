@@ -78,11 +78,11 @@ function EventService($http, $q, $fdb, userService) {
             return defer.promise;
         },
 
-        getAnalyticsForDeCustom: function (date1, date2, ouId, dataElementId, index) {
+        getAnalyticsForDeCustom: function (psid,date1, date2, ouId, dataElementId, value,index) {
             var defer = $q.defer();
             //lankanets ewmYHyiO0sO
             //main ejUWIpcmgTz
-            $http.get(serverRoot + 'sqlViews/ejUWIpcmgTz/data?var=date1:' + date1 + '&var=date2:' + date2 + '&var=ou:' + ouId + '&var=dataElement:' + dataElementId).then(function (response) {
+            $http.get(serverRoot + 'sqlViews/XDKErUBFJLQ/data?var=date1:' + date1 + '&var=date2:' + date2 + '&var=ou:' + ouId + '&var=dataElement:' + dataElementId+'&var=psid:'+psid+'&var=val:'+value).then(function (response) {
                 if (index==undefined) {//todo remove temp fix
                     defer.resolve(response.data);
                 } else {
