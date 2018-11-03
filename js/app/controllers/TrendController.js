@@ -4,6 +4,7 @@
 function TrendController($location, appService, teiService, $routeParams, toastService,
                          programService, dataElementService, programIndicatorsService, $q, $scope, $mdSidenav, eventService) {
     var tctrl = this;
+    var dateService = new DateService();
 
     tctrl.trendDataElement = undefined;
     tctrl.date = new Date();
@@ -100,7 +101,7 @@ function TrendController($location, appService, teiService, $routeParams, toastS
                 var deId = tctrl.trendDataElement.de;
                 var sqlView = tctrl.trendDataElement.sqlView;
                 //eventService.getHeightWeightAnalytics(sqlView.id, new Date(0).toDateString(), d.toDateString(), $scope.ctrl.currentOuSelection.id, deId, i).then(function (data) {
-                eventService.getAnalyticsForDeCustom(STAGE_NUT_MONITOR, new Date(0).toDateString(), d.toDateString(), $scope.ctrl.currentOuSelection.id, deId, sqlView.value,i).then(function (data) {
+                eventService.getAnalyticsForDeCustom(STAGE_NUT_MONITOR, dateService.toDateString(new Date(0)), dateService.toDateString(d), $scope.ctrl.currentOuSelection.id, deId, sqlView.value, i).then(function (data) {
                     //console.log(data);
                     if (data.data && data.data.rows.length > 0) {
                         var tableRow = data.data.rows[0];
@@ -119,7 +120,7 @@ function TrendController($location, appService, teiService, $routeParams, toastS
                     }
                 })
             } else {
-                eventService.getAnalyticsForDeCustom(STAGE_RISK_MONITOR,new Date(0).toDateString(), d.toDateString(), $scope.ctrl.currentOuSelection.id, tctrl.trendDataElement, 'true',i).then(function (data) {
+                eventService.getAnalyticsForDeCustom(STAGE_RISK_MONITOR, dateService.toDateString(new Date(0)), dateService.toDateString(d), $scope.ctrl.currentOuSelection.id, tctrl.trendDataElement, 'true', i).then(function (data) {
                     if (data.data && data.data.rows.length > 0) {
                         var tableRow = data.data.rows[0];
                         if (tableRow.length > 0) {

@@ -334,8 +334,8 @@
                         </md-card-header-text>
                     </md-card-header>
                     <md-card-content>
-                        <div  style="margin-bottom: -15px"
-                              ng-if="tctrl.global" md-no-float class="md-block" layout="row">
+                        <div style="margin-bottom: -15px"
+                             ng-if="tctrl.global" md-no-float class="md-block" layout="row">
                             <md-input-container flex="60">
                                 <label>Search by name or CHDR</label>
                                 <md-icon>
@@ -349,10 +349,10 @@
                                 <md-select ng-model="ctrl.globalSearchEnrolledOnly"
                                            ng-change="tctrl.refreshList($event)">
                                     <md-option ng-value="true">
-                                        Active Children
+                                        Active Children [{{ctrl.numberOfEnrolledChildren}}]
                                     </md-option>
                                     <md-option ng-value="false">
-                                        Unenrolled Children
+                                        Unenrolled Children [{{ctrl.numberOfUnEnrolledChildren}}]
                                     </md-option>
                                 </md-select>
                             </md-input-container>

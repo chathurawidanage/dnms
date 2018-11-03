@@ -3,13 +3,14 @@
  */
 function EventService($http, $q, $fdb, userService) {
     var eventDb = $fdb.db('dnms').collection("events");
+    var dateService = new DateService();
     var eventService = {
         getEventsDb: function (drop) {
             return eventDb;
         },
         getEventAnalytics: function (programId, orgUnit, dataElementId, expectedValue) {//todo dates are hard coded
             var defer = $q.defer();
-            var url = serverRoot + 'analytics/events/query/' + programId + '?dimension=' + dataElementId + ':EQ:' + expectedValue + '&startDate=1992-08-16&endDate=2016-12-12&dimension=ou:' + orgUnit;
+            var url = serverRoot + 'analytics/events/query/' + programId + '?dimension=' + dataElementId + ':EQ:' + expectedValue + '&startDate=1992-08-16&endDate=' + dateService.toDateString(new Date()) + '&dimension=ou:' + orgUnit;
             $http.get(url).then(function (response) {
                 defer.resolve(response.data);
             }, function (response) {
@@ -78,12 +79,12 @@ function EventService($http, $q, $fdb, userService) {
             return defer.promise;
         },
 
-        getAnalyticsForDeCustom: function (psid,date1, date2, ouId, dataElementId, value,index) {
+        getAnalyticsForDeCustom: function (psid, date1, date2, ouId, dataElementId, value, index) {
             var defer = $q.defer();
             //lankanets ewmYHyiO0sO
             //main ejUWIpcmgTz
-            $http.get(serverRoot + 'sqlViews/XDKErUBFJLQ/data?var=date1:' + date1 + '&var=date2:' + date2 + '&var=ou:' + ouId + '&var=dataElement:' + dataElementId+'&var=psid:'+psid+'&var=val:'+value).then(function (response) {
-                if (index==undefined) {//todo remove temp fix
+            $http.get(serverRoot + 'sqlViews/nRgOxJtX2zp/data?var=date1:' + date1 + '&var=date2:' + date2 + '&var=ou:' + ouId + '&var=dataElement:' + dataElementId + '&var=psid:' + psid + '&var=val:' + value).then(function (response) {
+                if (index == undefined) {//todo remove temp fix
                     defer.resolve(response.data);
                 } else {
                     defer.resolve({index: index, data: response.data});

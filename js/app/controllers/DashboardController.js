@@ -25,6 +25,9 @@ function DashboardController($location, $scope, toastService, programService, us
     ctrl.teiDb = null;
     ctrl.eventsDb = null;
 
+    ctrl.numberOfEnrolledChildren = 0;
+    ctrl.numberOfUnEnrolledChildren = 0;
+
     ctrl.malNutReasons = [
         {
             title: "Low birth weight",
@@ -255,7 +258,7 @@ function DashboardController($location, $scope, toastService, programService, us
                     });
                     malNut.selectedRecords = malNut.records;
                     malNutLoadCount++;
-                    if (malNutLoadCount == ctrl.malNutReasons.length) {
+                    if (malNutLoadCount === ctrl.malNutReasons.length) {
                         ctrl.caches.malNut = CAHCE_STATUS.loaded;
                         ctrl.checkProgress();
                     }
@@ -307,17 +310,19 @@ function DashboardController($location, $scope, toastService, programService, us
         //enrolled children
         teiService.queryForAllTeis(["izuwkaOUgFg", "C8DBAo2wEYN", "BZEpuufLyDE", "WqdldQpOIxm"], ctrl.selectedProgram.id).then(function (data) {
             var rows = data.rows;
+            ctrl.numberOfEnrolledChildren = rows.length;
             saveToDb(rows, true);
         });
 
         //not enrolled children
         teiService.queryForAllTeis(["izuwkaOUgFg", "C8DBAo2wEYN", "BZEpuufLyDE", "WqdldQpOIxm"], ctrl.selectedProgram.id, true).then(function (data) {
             var rows = data.rows;
+            ctrl.numberOfUnEnrolledChildren = rows.length;
             saveToDb(rows, false);
         });
     };
 
-    ctrl.globalSearchEnrolledOnly='true';
+    ctrl.globalSearchEnrolledOnly = 'true';
     ctrl.showGlobalTeiSearch = function () {
         console.log("Selected OU", ctrl.currentOuSelection);
         teiService.changeTeiList("Global Search", function (regexp, page, limit) {
@@ -333,7 +338,7 @@ function DashboardController($location, $scope, toastService, programService, us
                         chdrNumber: regexp
                     }
                 ],
-                enrolled:ctrl.globalSearchEnrolledOnly
+                enrolled: ctrl.globalSearchEnrolledOnly
             }, {
                 $page: page,
                 $limit: limit

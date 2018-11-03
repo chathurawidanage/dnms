@@ -4,6 +4,7 @@
 function RiskController($location, appService, teiService, $routeParams, toastService,
                         programService, dataElementService, programIndicatorsService, $q, $scope, $mdSidenav, eventService) {
     var rctrl = this;
+    var dateService = new DateService();
     rctrl.risks = [
         {
             "id": "BTwe8lvhr4b",
@@ -259,7 +260,7 @@ function RiskController($location, appService, teiService, $routeParams, toastSe
         var count = 0;
         var index = 0;
         rctrl.risks.forEach(function (mainRisk) {
-            eventService.getAnalyticsForDeCustom(STAGE_RISK_MONITOR,new Date(0).toDateString(), rctrl.date2.toDateString(), $scope.ctrl.currentOuSelection.id, mainRisk.id, 'true',index++).then(function (response) {
+            eventService.getAnalyticsForDeCustom(STAGE_RISK_MONITOR, dateService.toDateString(new Date(0)), dateService.toDateString(rctrl.date2), $scope.ctrl.currentOuSelection.id, mainRisk.id, 'true', index++).then(function (response) {
                 var data = response.data;
                 var idx = response.index;
                 var total = 0;
@@ -349,7 +350,7 @@ function RiskController($location, appService, teiService, $routeParams, toastSe
         rctrl.subChart.options.title.text = majorRisk.name;
         var index = 0;
         majorRisk.children.forEach(function (subRisk) {
-            eventService.getAnalyticsForDeCustom(STAGE_RISK_MONITOR,new Date(0).toDateString(), rctrl.date2.toDateString(), $scope.ctrl.currentOuSelection.id, subRisk.id, 'true',index++).then(function (resp) {
+            eventService.getAnalyticsForDeCustom(STAGE_RISK_MONITOR, dateService.toDateString(new Date(0)), dateService.toDateString(rctrl.date2), $scope.ctrl.currentOuSelection.id, subRisk.id, 'true', index++).then(function (resp) {
                 var data = resp.data;
                 var idx = resp.index;
                 var total = 0;
