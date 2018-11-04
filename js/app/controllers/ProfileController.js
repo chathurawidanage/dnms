@@ -171,7 +171,7 @@ function ProfileController($location, appService, teiService, $routeParams, toas
     ctrl.isElevatedUser = function () {
         return userService.hasRole(userService.MOH_USER);
     }
-    
+
     ctrl.isSuperUser = function () {
         return userService.hasRole(userService.SUPER_USER);
     }
@@ -289,77 +289,10 @@ function ProfileController($location, appService, teiService, $routeParams, toas
             });
         }).then(function () {
             console.log("loading events for tei");
-            var romanToHindu = function (roman) {
-                switch (roman.trim()) {
-                    case "i":
-                        return 1;
-                    case "ii":
-                        return 2;
-                    case "iii":
-                        return 3;
-                    case "iv":
-                        return 4;
-                    case "v":
-                        return 5;
-                    case "vi":
-                        return 6;
-                    case "vii":
-                        return 7;
-                    case "viii":
-                        return 8;
-                    case "ix":
-                        return 9;
-                    case "x":
-                        return 10;
-                    default:
-                        return -1;
-                }
-            }
             teiService.getEventData(ctrl.tei, ctrl.programId).then(function (events) {
                 events.forEach(function (event) {
-                    event.badgeIcon = "insert_chart";//nut monitoring
-                    if (event.programStage == ctrl.knownProgramStages.registration) {
-                        event.badgeIcon = "person_pin";
-                    } else if (event.programStage == ctrl.knownProgramStages.riskMonitoring) {
-                        event.badgeIcon = "child_care";
-                    }
-
-                    event.title = ctrl.getProgramStageById(event.programStage).displayName;
-                    event.content = new Date(event.eventDate).toDateString();
-
-                    //add missing datavalues to event
-                    var eventAllDataValues = ctrl.dataElemets.find({programStage: event.programStage});
-                    var availableDataValues = [];
-                    event.dataValues.forEach(function (dv) {
-                        availableDataValues.push(dv.dataElement);
-                    });
-
-                    eventAllDataValues.forEach(function (de) {
-                        if (availableDataValues.indexOf(de.id) < 0) {
-                            event.dataValues.push({
-                                dataElement: de.id
-                            });
-                        }
-                    });
-
-
-                    //soring riskMonitoring Program Stage
-                    if (event.programStage == ctrl.knownProgramStages.riskMonitoring) {
-                        event.dataValues.sort(function (risk1, risk2) {
-                            var risk1DE = ctrl.dataElemets.find({id: risk1.dataElement})[0].displayName;
-                            var risk2DE = ctrl.dataElemets.find({id: risk2.dataElement})[0].displayName;
-                            var risk1DESplit = risk1DE.split(".");
-                            var risk2DESplit = risk2DE.split(".");
-
-                            if (risk1DESplit[0].trim().localeCompare(risk2DESplit[0].trim()) == 0) {
-                                return romanToHindu(risk1DESplit[1]) - romanToHindu(risk2DESplit[1]);
-                            } else {
-                                return risk1DESplit[0].trim().localeCompare(risk2DESplit[0].trim());
-                            }
-
-                        });
-                    }
-                })
+                    ctrl.formatEventForUI(event);
+                });
                 events.sort(function (a, b) {
                     var dateA = new Date(a.eventDate);
                     var dateB = new Date(b.eventDate);
@@ -378,6 +311,81 @@ function ProfileController($location, appService, teiService, $routeParams, toas
             });
         })
     });
+
+    ctrl.formatEventForUI = function (event) {
+        var romanToHindu = function (roman) {
+            switch (roman.trim()) {
+                case "i":
+                    return 1;
+                case "ii":
+                    return 2;
+                case "iii":
+                    return 3;
+                case "iv":
+                    return 4;
+                case "v":
+                    return 5;
+                case "vi":
+                    return 6;
+                case "vii":
+                    return 7;
+                case "viii":
+                    return 8;
+                case "ix":
+                    return 9;
+                case "x":
+                    return 10;
+                default:
+                    return -1;
+            }
+        };
+
+        event.badgeIcon = "insert_chart";//nut monitoring
+        if (event.programStage === ctrl.knownProgramStages.registration) {
+            event.badgeIcon = "person_pin";
+        } else if (event.programStage === ctrl.knownProgramStages.riskMonitoring) {
+            event.badgeIcon = "child_care";
+        }
+
+        event.title = ctrl.getProgramStageById(event.programStage).displayName;
+        event.content = new Date(event.eventDate).toDateString();
+
+        //add missing datavalues to event
+        var eventAllDataValues = ctrl.dataElemets.find({programStage: event.programStage});
+        var availableDataValues = [];
+        if (!event.dataValues) {
+            event.dataValues = [];
+        }
+        event.dataValues.forEach(function (dv) {
+            availableDataValues.push(dv.dataElement);
+        });
+
+        eventAllDataValues.forEach(function (de) {
+            if (availableDataValues.indexOf(de.id) < 0) {
+                event.dataValues.push({
+                    dataElement: de.id
+                });
+            }
+        });
+
+
+        //soring riskMonitoring Program Stage
+        if (event.programStage === ctrl.knownProgramStages.riskMonitoring) {
+            event.dataValues.sort(function (risk1, risk2) {
+                var risk1DE = ctrl.dataElemets.find({id: risk1.dataElement})[0].displayName;
+                var risk2DE = ctrl.dataElemets.find({id: risk2.dataElement})[0].displayName;
+                var risk1DESplit = risk1DE.split(".");
+                var risk2DESplit = risk2DE.split(".");
+
+                if (risk1DESplit[0].trim().localeCompare(risk2DESplit[0].trim()) === 0) {
+                    return romanToHindu(risk1DESplit[1]) - romanToHindu(risk2DESplit[1]);
+                } else {
+                    return risk1DESplit[0].trim().localeCompare(risk2DESplit[0].trim());
+                }
+
+            });
+        }
+    };
 
     ctrl.updateDataValue = function (dataValue) {
         eventService.updateEventData(ctrl.selectedEvent, dataValue).then(function (data) {
@@ -510,6 +518,22 @@ function ProfileController($location, appService, teiService, $routeParams, toas
          -1 SD to -2 SD : light green
          +2 SD to -1 SD : green
          >+2 SD : Purple*/
+    }
+
+    ctrl.createNewEvent = function (programStageId) {
+        console.log("NEW event called")
+        eventService.createEvent(
+            ctrl.programId,
+            programStageId,
+            ctrl.tei,
+            ctrl.teiObj.orgUnit
+        ).then(function (eventId) {
+            eventService.getEventById(eventId).then(function (event) {
+                ctrl.formatEventForUI(event);
+                ctrl.events.push(event);
+                ctrl.showEvent(event);
+            });
+        });
     }
 
 

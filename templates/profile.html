@@ -86,7 +86,8 @@
                 <md-divider>
                     <md-content style="text-align: right">
                         <span flex></span>
-                        <md-button class="md-secondary md-warn" ng-click="ctrl.deleteTei()" ng-disabled="!ctrl.isSuperUser()">
+                        <md-button class="md-secondary md-warn" ng-click="ctrl.deleteTei()"
+                                   ng-disabled="!ctrl.isSuperUser()">
                             <md-icon>
                                 <i class="material-icons">delete</i>
                             </md-icon>
@@ -157,6 +158,25 @@
                 </md-content>
             </div>
             <!--End of Charts Widget-->
+
+            <div layout="column">
+                <md-content layout-padding>
+                    <md-button class="md-primary"
+                               ng-click="ctrl.createNewEvent(ctrl.knownProgramStages.nutritionMonitoring)">
+                        <md-icon>
+                            <i class="material-icons">insert_chart</i>
+                        </md-icon>
+                        New Nutrition Monitoring Event
+                    </md-button>
+                    <md-button class="md-primary"
+                               ng-click="ctrl.createNewEvent(ctrl.knownProgramStages.riskMonitoring)">
+                        <md-icon>
+                            <i class="material-icons">child_care</i>
+                        </md-icon>
+                        New Risk Identification Event
+                    </md-button>
+                </md-content>
+            </div>
 
             <!--Events time line-->
             <timeline side="right">

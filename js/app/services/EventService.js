@@ -132,6 +132,42 @@ function EventService($http, $q, $fdb, userService) {
                 defer.reject(response);
             });
             return defer.promise;
+        },
+
+        getEventById: function (eventId) {
+            var defer = $q.defer();
+            $http.get(serverRoot + 'events/' + eventId + ".json").then(function (response) {
+                defer.resolve(response.data);
+            }, function (response) {
+                console.log(response);
+                defer.reject(response);
+            });
+            return defer.promise;
+        },
+
+        createEvent: function (programId, programStageId, teiId, orgUnit) {
+            var defer = $q.defer();
+            var event = {
+                program: programId,
+                orgUnit: orgUnit,
+                programStage: programStageId,
+                trackedEntityInstance: teiId,
+                dataValues: [],
+                eventDate: dateService.toDateString(new Date())
+            };
+            $http.post(serverRoot + 'events.json', event).then(function (response) {
+                console.log("Create event response", response);
+                if (response.data.httpStatusCode === 200) {
+                    var newEventId = response.data.response.importSummaries[0].reference;
+                    defer.resolve(newEventId);
+                } else {
+                    defer.reject(response);
+                }
+            }, function (response) {
+                console.log(response);
+                defer.reject(response);
+            });
+            return defer.promise;
         }
     }
     return eventService;
