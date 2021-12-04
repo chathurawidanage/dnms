@@ -1,7 +1,24 @@
 //var serverRoot = 'http://lankanets.info:8080/nss/api/';
 //var serverRoot = 'http://dhis.pgim.cmb.ac.lk/nss/api/';
 //var serverRoot = 'http://148.251.224.242/nss1/api/';
-var serverRoot = '../../';
+var serverRoot = 'https://www.erhmis.fhb.health.gov.lk/erhmis2356/api/';
+
+
+const PROGRAM_NON_HEALTH = "iUgzznPsePB";
+const PROGRAM_ANTHROPOMETRY = "iUgzznPsePB";
+
+const PROGRAM_NON_HEALTH_STAGE_POV_INCOME_MGT = "bXWTWS8lkbv";
+const PROGRAM_NON_HEALTH_STAGE_FOOD_INSEC = "m7IDhrn3y22";
+const PROGRAM_NON_HEALTH_STAGE_INAD_WATER = "EHn8MUIERRM";
+
+
+const TEI_ATT_NAME = "zh4hiarsSD5";
+const TEI_ATT_SEX = "lmtzQrlHMYF";
+const TEI_ATT_REG_NO = "h2ATdtJguMq";
+const TEI_ATT_DOB = "qNH202ChkV3";
+
+
+// var serverRoot = '../../';
 var app = angular.module('long-charts', ['ngMaterial', 'ngRoute', 'longitudinalChartControllers', 'dropzone', 'chart.js'
     , 'mdColorPicker', 'lfNgMdFileInput', 'angular-timeline', 'forerunnerdb', 'angularTreeview', 'ngMap', 'dndLists']);
 app.config(['$routeProvider', function ($routeProvider) {
@@ -68,6 +85,7 @@ app.factory('settingsService', SettingsService);
 app.factory('sdCategoryService', SDCategoryService);
 
 app.factory('orgUnitsService', function ($http, $q) {
+    $http.defaults.headers.common['Authorization'] = 'Basic ' + btoa('dev' + ':' + 'Test1234#');
     return {
         getOrgTree: function () {
             var defer = $q.defer();
@@ -152,7 +170,7 @@ app.factory('teiService', function ($http, $q, appService) {
          */
         getAllTeiAttributes: function () {
             var defer = $q.defer();
-            $http.get(serverRoot + 'trackedEntityAttributes?fields=id,displayName,valueType,optionSet[options[:all]]').then(function (response) {
+            $http.get(serverRoot + 'trackedEntityAttributes?fields=id,displayName,valueType,optionSet[options[:all]]&paging=false').then(function (response) {
                 defer.resolve(response.data.trackedEntityAttributes);
             }, function (response) {
                 defer.reject(response);
@@ -277,13 +295,13 @@ app.factory('teiService', function ($http, $q, appService) {
             var defer = $q.defer();
             $http.get(serverRoot + 'events.json?ouMode=ACCESSIBLE&skipPaging=true&trackedEntityInstance='
                 + trackedEntityInstance + "&program=" + program).then(function (response) {
-                var events = response.data.events;
-                defer.resolve(events);
-            });
+                    var events = response.data.events;
+                    defer.resolve(events);
+                });
             return defer.promise;
         },
         getDateDiffInDays: function (date1, date2) {
-            return Math.floor((date1 - date2) / (1000 * 60 * 60 * 24 ));
+            return Math.floor((date1 - date2) / (1000 * 60 * 60 * 24));
         },
         /**
          * @param chart chart object
@@ -302,57 +320,57 @@ app.factory('teiService', function ($http, $q, appService) {
                 console.log("Pre req", dateOfBirth, intervalDays);
                 $http.get(serverRoot + 'events.json?ouMode=ACCESSIBLE&skipPaging=true&trackedEntityInstance='
                     + trackedEntityInstance + "&program=" + chart.program).then(function (response) {
-                    var events = response.data.events;
-                    var dataToPlot = [];
-                    var maxTimeSpanInDays = 0;//the largest distance between the DOB and the data points available. The graph will be chosen depending on this
-                    var dataValues1 = [];
-                    var dataValues2 = [];
-                    events.forEach(function (event) {
-                        event.dataValues.forEach(function (dataValue) {
-                            var updatedDate = new Date(dataValue.lastUpdated);
-                            var timeFromBirth = teiService.getDateDiffInDays(updatedDate, dob);
-                            if (maxTimeSpanInDays < timeFromBirth) {
-                                maxTimeSpanInDays = timeFromBirth;
-                            }
-                            if (dataValue.dataElement == yAxisVariable1) {
-                                dataValues1.push(dataValue);
-                                /* console.log(dataValue);
-                                 var timePlot = Math.floor((updatedDate - dateOfBirth) / (1000 * 60 * 60 * 24 * intervalDays));
-                                 var plotObject = {
-                                 x: timePlot,
-                                 y: dataValue.value
-                                 }
-                                 dataToPlot.push(plotObject);
-                                 console.log(plotObject, updatedDate);*/
-                            } else if (chartType == 1 && dataValue.dataElement == yAxisVariable2) {
-                                dataValues2.push(dataValue);
-                            }
-                        })
-                    });
-                    //iterate over refData of chart to select most suitable chart
-                    var refDataCoverage = [];//store temp refData objects with coverage values
-                    chart.refData.forEach(function (refData, index) {
-                        var xAxisPeriod = parseInt(refData.xAxisPeriod);
-                        var daysPerThisPeriod = intervalInDays[xAxisPeriod];//how many days in this period, ie: 7 days for a week
-                        var totalDaysCoveredByChart = daysPerThisPeriod * (refData.centiles.length);
-                        if (totalDaysCoveredByChart >= maxTimeSpanInDays) {//we don't care about charts that can't cover the data
-                            refDataCoverage.push({
-                                index: index,
-                                coverage: totalDaysCoveredByChart
+                        var events = response.data.events;
+                        var dataToPlot = [];
+                        var maxTimeSpanInDays = 0;//the largest distance between the DOB and the data points available. The graph will be chosen depending on this
+                        var dataValues1 = [];
+                        var dataValues2 = [];
+                        events.forEach(function (event) {
+                            event.dataValues.forEach(function (dataValue) {
+                                var updatedDate = new Date(dataValue.lastUpdated);
+                                var timeFromBirth = teiService.getDateDiffInDays(updatedDate, dob);
+                                if (maxTimeSpanInDays < timeFromBirth) {
+                                    maxTimeSpanInDays = timeFromBirth;
+                                }
+                                if (dataValue.dataElement == yAxisVariable1) {
+                                    dataValues1.push(dataValue);
+                                    /* console.log(dataValue);
+                                     var timePlot = Math.floor((updatedDate - dateOfBirth) / (1000 * 60 * 60 * 24 * intervalDays));
+                                     var plotObject = {
+                                     x: timePlot,
+                                     y: dataValue.value
+                                     }
+                                     dataToPlot.push(plotObject);
+                                     console.log(plotObject, updatedDate);*/
+                                } else if (chartType == 1 && dataValue.dataElement == yAxisVariable2) {
+                                    dataValues2.push(dataValue);
+                                }
                             })
-                        }
-                    });
-                    //sort by coverage, we have to select the graph with lowest coverage that can cover all the TEI data
-                    refDataCoverage.sort(function (a, b) {
-                        a.coverage - b.coverage;
-                    });
-                    var selectedRefData = chart.refData[refDataCoverage[0].index];
+                        });
+                        //iterate over refData of chart to select most suitable chart
+                        var refDataCoverage = [];//store temp refData objects with coverage values
+                        chart.refData.forEach(function (refData, index) {
+                            var xAxisPeriod = parseInt(refData.xAxisPeriod);
+                            var daysPerThisPeriod = intervalInDays[xAxisPeriod];//how many days in this period, ie: 7 days for a week
+                            var totalDaysCoveredByChart = daysPerThisPeriod * (refData.centiles.length);
+                            if (totalDaysCoveredByChart >= maxTimeSpanInDays) {//we don't care about charts that can't cover the data
+                                refDataCoverage.push({
+                                    index: index,
+                                    coverage: totalDaysCoveredByChart
+                                })
+                            }
+                        });
+                        //sort by coverage, we have to select the graph with lowest coverage that can cover all the TEI data
+                        refDataCoverage.sort(function (a, b) {
+                            a.coverage - b.coverage;
+                        });
+                        var selectedRefData = chart.refData[refDataCoverage[0].index];
 
 
-                    defer.resolve(dataToPlot);
-                }, function (response) {
-                    defer.reject(response);
-                });
+                        defer.resolve(dataToPlot);
+                    }, function (response) {
+                        defer.reject(response);
+                    });
             }, function (msg) {//no dob set
                 defer.reject(msg);
             })

@@ -2,14 +2,14 @@
  * @author Chathura Widanage
  */
 function DashboardController($location, $scope, toastService, programService, userService,
-                             chartService, appService, $mdDialog, $timeout, teiService, eventService,
-                             $fdb, $window, orgUnitsService, $mdSidenav, $interval) {
+    chartService, appService, $mdDialog, $timeout, teiService, eventService,
+    $fdb, $window, orgUnitsService, $mdSidenav, $interval) {
     var ctrl = this;
-    ctrl.programs = [];
+    // ctrl.programs = [];
     ctrl.mohUserRole = "Ej7USJV1ccn";
     ctrl.phmUserRole = "jpsN0Kh6KTr";//todo make as a setting
 
-    ctrl.selectedProgram = null;
+    ctrl.selectedProgram = { id: PROGRAM_NON_HEALTH };
     ctrl.user;
 
     ctrl.queryOrgUnits = [];
@@ -30,38 +30,37 @@ function DashboardController($location, $scope, toastService, programService, us
 
     ctrl.malNutReasons = [
         {
-            title: "Low birth weight",
-            dataElementId: "Sf3lPKs8oLs",
-            records: null,
-            visibleRecords: null
-        },
-        {
-            title: "Under five with underweight",
-            dataElementId: "gaZGnRTcR7T",
-            records: null,
-            visibleRecords: null
-        },
-        {
-            title: "Under five with wasting",
-            dataElementId: "oTLBvqfHCxz",
+            title: "Overweight_Obesity",
+            dataElementId: "dnLak5wmEzT",
             records: null,
             visibleRecords: null
         }, {
-            title: "Under five with stunting",
-            dataElementId: "hUxgdSCMiNy",
+            title: "Underweight",
+            dataElementId: "xkhQxmJ8X24",
             records: null,
             visibleRecords: null
         }, {
-            title: "Anemia",
-            dataElementId: "kerTmzDMqUB",
+            title: "MAM",
+            dataElementId: "QNV3Qb2kjx8",
             records: null,
             visibleRecords: null
         }, {
-            title: "Overweight",
-            dataElementId: "l0WWFNEMoQZ",
+            title: "Stunting",
+            dataElementId: "paM0QZaZMTO",
+            records: null,
+            visibleRecords: null
+        }, {
+            title: "SAM",
+            dataElementId: "AOKp3oQPyYP",
             records: null,
             visibleRecords: null
         }
+        // , {
+        //     title: "Overweight",
+        //     dataElementId: "l0WWFNEMoQZ",
+        //     records: null,
+        //     visibleRecords: null
+        // }
     ];
 
     const CAHCE_STATUS = {
@@ -235,40 +234,34 @@ function DashboardController($location, $scope, toastService, programService, us
         ctrl.caches.profile = CAHCE_STATUS.loaded;
         ctrl.checkProgress();
         //ctrl.doneInitLoading = true;
-    }).then(function () {//stage 2
-        programService.getPrograms().then(function (programs) {
-            ctrl.programs = programs;
-            ctrl.selectedProgram = ctrl.programs[0];//todo change
-            console.log("Selected program", ctrl.selectedProgram);
-        }).then(function () {//symul
-            console.log(ctrl.queryOrgUnits[0]);
+    }).then(function () {//symul
+        console.log(ctrl.queryOrgUnits[0]);
 
-            //loading mal nut data
-            ctrl.caches.malNut = CAHCE_STATUS.loading;
-            var malNutLoadCount = 0;
-            ctrl.malNutReasons.forEach(function (malNut) {
-                malNut.records = [];
-                eventService.getEventAnalytics(ctrl.selectedProgram.id, ctrl.queryOrgUnits[0], malNut.dataElementId, 1).then(function (data) {
-                    //event id is the only thing that matter
-                    data.rows.forEach(function (row) {
-                        malNut.records.push({
-                            eventId: row[0],
-                            ou: row[7]
-                        });
+        //loading mal nut data
+        ctrl.caches.malNut = CAHCE_STATUS.loading;
+        var malNutLoadCount = 0;
+        ctrl.malNutReasons.forEach(function (malNut) {
+            malNut.records = [];
+            eventService.getEventAnalytics(ctrl.selectedProgram.id, ctrl.queryOrgUnits[0], malNut.dataElementId, 1).then(function (data) {
+                //event id is the only thing that matter
+                data.rows.forEach(function (row) {
+                    malNut.records.push({
+                        eventId: row[0],
+                        ou: row[7]
                     });
-                    malNut.selectedRecords = malNut.records;
-                    malNutLoadCount++;
-                    if (malNutLoadCount === ctrl.malNutReasons.length) {
-                        ctrl.caches.malNut = CAHCE_STATUS.loaded;
-                        ctrl.checkProgress();
-                    }
-                })
-            });
-        }).then(function () {//symul
-            //loading tracked entity instances and events
-            ctrl.cacheTeis();
-            ctrl.buildEventTeiMap();
+                });
+                malNut.selectedRecords = malNut.records;
+                malNutLoadCount++;
+                if (malNutLoadCount === ctrl.malNutReasons.length) {
+                    ctrl.caches.malNut = CAHCE_STATUS.loaded;
+                    ctrl.checkProgress();
+                }
+            })
         });
+    }).then(function () {//symul
+        //loading tracked entity instances and events
+        ctrl.cacheTeis();
+        ctrl.buildEventTeiMap();
     });
 
     ctrl.buildEventTeiMap = function () {
@@ -306,16 +299,18 @@ function DashboardController($location, $scope, toastService, programService, us
             ctrl.checkProgress();
         }
         debugDb = ctrl.teiDb;
+
+        let attributes = [TEI_ATT_NAME, TEI_ATT_SEX, TEI_ATT_REG_NO]
         //todo firstname and last name attributes are hard coded
         //enrolled children
-        teiService.queryForAllTeis(["izuwkaOUgFg", "C8DBAo2wEYN", "BZEpuufLyDE", "WqdldQpOIxm"], ctrl.selectedProgram.id).then(function (data) {
+        teiService.queryForAllTeis(attributes, ctrl.selectedProgram.id).then(function (data) {
             var rows = data.rows;
             ctrl.numberOfEnrolledChildren = rows.length;
             saveToDb(rows, true);
         });
 
         //not enrolled children
-        teiService.queryForAllTeis(["izuwkaOUgFg", "C8DBAo2wEYN", "BZEpuufLyDE", "WqdldQpOIxm"], ctrl.selectedProgram.id, true).then(function (data) {
+        teiService.queryForAllTeis(attributes, ctrl.selectedProgram.id, true).then(function (data) {
             var rows = data.rows;
             ctrl.numberOfUnEnrolledChildren = rows.length;
             saveToDb(rows, false);
@@ -385,10 +380,10 @@ function DashboardController($location, $scope, toastService, programService, us
                 var teis = [];
                 while (index < upperBound) {
                     var eventId = ctrl.selectedMalNul.selectedRecords[index++].eventId;
-                    var event = ctrl.eventsDb.find({event: eventId});
+                    var event = ctrl.eventsDb.find({ event: eventId });
                     if (event.length > 0) {
                         var teiId = event[0].trackedEntityInstance;
-                        var teiArr = ctrl.teiDb.find({_id: teiId});
+                        var teiArr = ctrl.teiDb.find({ _id: teiId });
                         if (teiArr.length > 0) {
                             teis.push(teiArr[0]);
                         }
@@ -430,8 +425,8 @@ function DashboardController($location, $scope, toastService, programService, us
     ctrl.pickRandomEvent = function (active) {
         if (ctrl.eventsDb) {
             var filteredEvents = ctrl.eventsDb.find({
-                    status: active ? "ACTIVE" : "SCHEDULE"
-                }
+                status: active ? "ACTIVE" : "SCHEDULE"
+            }
             );
             var event = filteredEvents[Math.floor(Math.random() * filteredEvents.length)];
             ctrl.openChildProfile(event.trackedEntityInstance);
@@ -455,11 +450,11 @@ function DashboardController($location, $scope, toastService, programService, us
     ctrl.viewAllIncompleteEvents = function (active) {
         teiService.changeTeiList("Children having incomplete events", function (regexp, page, limit) {
             var events = ctrl.eventsDb.find({
-                    status: active ? "ACTIVE" : "SCHEDULE"
-                }, {
-                    $page: page,
-                    $limit: limit
-                }
+                status: active ? "ACTIVE" : "SCHEDULE"
+            }, {
+                $page: page,
+                $limit: limit
+            }
             );
 
             var teis = [];
@@ -468,7 +463,7 @@ function DashboardController($location, $scope, toastService, programService, us
                 var teiId = event.trackedEntityInstance;
                 if (selectedTeis.indexOf(teiId) < 0) {
                     selectedTeis.push(teiId);
-                    var teiArr = ctrl.teiDb.find({_id: teiId});
+                    var teiArr = ctrl.teiDb.find({ _id: teiId });
                     if (teiArr.length > 0) {
                         teis.push(teiArr[0]);
                     }
@@ -486,8 +481,8 @@ function DashboardController($location, $scope, toastService, programService, us
         }
         $interval(function () {
             ctrl.viewedEventsCount = ctrl.eventsDb.find({
-                    status: "SCHEDULE"
-                }
+                status: "SCHEDULE"
+            }
             ).length;
         }, 5000);
         ctrl.updateActiveEventsCount();
@@ -501,8 +496,8 @@ function DashboardController($location, $scope, toastService, programService, us
         }
         $interval(function () {
             ctrl.activeEventsCount = ctrl.eventsDb.find({
-                    status: "ACTIVE"
-                }
+                status: "ACTIVE"
+            }
             ).length;
         }, 5000);
     };

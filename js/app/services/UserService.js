@@ -2,6 +2,8 @@
  * Created by chath on 9/9/2016.
  */
 function UserService($http, $q) {
+    $http.defaults.headers.common['Authorization'] = 'Basic ' + btoa('dev' + ':' + 'Test1234#');
+    
     const SUPER_USER = 0;
     const MOH_USER = 3;
     const SISTER_USER = 4;
@@ -17,13 +19,14 @@ function UserService($http, $q) {
         getCurrentUser: function () {
             var defer = $q.defer();
             var userRoleMap = {//todo remove this temp fix
-                wC9asSQrYO0: 0,//super user
-                Ej7USJV1ccn: 3,//moh
+                yrB6vc5Ip3r: 0,//super user
+                w4qpnx1NFyr: 3,//moh
                 uCBJBr2plYV: 4,//sister
-                jpsN0Kh6KTr: 5//mid wife
+                to1ek38ykKC: 5//mid wife
             }
             if (!cachedUser) {
                 $http.get(serverRoot + 'me.json?fields=:all,organisationUnits[level,id,displayName,,parent[id,displayName,level],children[level,id,displayName,children[level,id,displayName,children[level,id,displayName,children[level,id,displayName]]]]&paging=false').then(function (response) {
+                    console.log("User response",response)
                     response.data.level = 5;
                     try {
                         var userRole = response.data.userCredentials.userRoles[0].id;

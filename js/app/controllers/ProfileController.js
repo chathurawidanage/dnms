@@ -20,15 +20,18 @@ function ProfileController($location, appService, teiService, $routeParams, toas
     this.knownProgramStages = {
         riskMonitoring: "vTWcDsFE1rf",
         registration: "FyR0ymIDsoA",
-        nutritionMonitoring: "wS2i9c9hXXz"
+        nutritionMonitoring: "wS2i9c9hXXz",
+        povertyAndIncomeMgt: PROGRAM_NON_HEALTH_STAGE_POV_INCOME_MGT,
+        foodInsecurity: PROGRAM_NON_HEALTH_STAGE_FOOD_INSEC,
+        inadequateWater: PROGRAM_NON_HEALTH_STAGE_INAD_WATER
     }
 
     this.childProfile = {
-        firstName: {key: "izuwkaOUgFg", value: null},
-        lastName: {key: "C8DBAo2wEYN", value: null},
-        chdrNumber: {key: "WqdldQpOIxm", value: null},
-        dob: {key: "AtK3fDqU8uu", value: null},
-        gender: {key: "BZEpuufLyDE", value: null}
+        firstName: {key: TEI_ATT_NAME, value: null},
+        lastName: {key: TEI_ATT_NAME, value: null},
+        chdrNumber: {key: TEI_ATT_REG_NO, value: null},
+        dob: {key: TEI_ATT_DOB, value: null},
+        gender: {key: TEI_ATT_SEX, value: null}
     }
 
     this.knownDataElements = {
@@ -369,7 +372,7 @@ function ProfileController($location, appService, teiService, $routeParams, toas
         });
 
 
-        //soring riskMonitoring Program Stage
+        //sorting riskMonitoring Program Stage
         if (event.programStage === ctrl.knownProgramStages.riskMonitoring) {
             event.dataValues.sort(function (risk1, risk2) {
                 var risk1DE = ctrl.dataElemets.find({id: risk1.dataElement})[0].displayName;

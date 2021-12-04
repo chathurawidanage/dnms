@@ -5,7 +5,7 @@ function ViewerController($location, appService, teiService, $routeParams, toast
                           programService, dataElementService, programIndicatorsService, $q, $mdDialog, $timeout,$window) {
     var ctrl = this;
     this.tei = $routeParams.tei;
-    this.program = $routeParams.program;
+    this.program = "hM6Yt9FQL0n"//$routeParams.program;
     this.programName;
     this.teiEventData;
     this.teiDob = new Date("2016-01-01");

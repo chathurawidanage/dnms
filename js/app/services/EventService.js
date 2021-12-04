@@ -83,7 +83,9 @@ function EventService($http, $q, $fdb, userService) {
             var defer = $q.defer();
             //lankanets ewmYHyiO0sO
             //main ejUWIpcmgTz
-            $http.get(serverRoot + 'sqlViews/nRgOxJtX2zp/data?var=date1:' + date1 + '&var=date2:' + date2 + '&var=ou:' + ouId + '&var=dataElement:' + dataElementId + '&var=psid:' + psid + '&var=val:' + value).then(function (response) {
+            // nutrition.lk nRgOxJtX2zp
+            // erhmis RzpksdwliTH
+            $http.get(serverRoot + 'sqlViews/RzpksdwliTH/data?var=date1:' + date1 + '&var=date2:' + date2 + '&var=ou:' + ouId + '&var=dataElement:' + dataElementId + '&var=psid:' + psid + '&var=val:' + value).then(function (response) {
                 if (index == undefined) {//todo remove temp fix
                     defer.resolve(response.data);
                 } else {

@@ -162,18 +162,25 @@
             <div layout="column">
                 <md-content layout-padding>
                     <md-button class="md-primary"
-                               ng-click="ctrl.createNewEvent(ctrl.knownProgramStages.nutritionMonitoring)">
+                               ng-click="ctrl.createNewEvent(ctrl.knownProgramStages.povertyAndIncomeMgt)">
                         <md-icon>
                             <i class="material-icons">insert_chart</i>
                         </md-icon>
-                        New Nutrition Monitoring Event
+                        New Intervention - Poverty & Poor Income Management
                     </md-button>
                     <md-button class="md-primary"
-                               ng-click="ctrl.createNewEvent(ctrl.knownProgramStages.riskMonitoring)">
+                               ng-click="ctrl.createNewEvent(ctrl.knownProgramStages.foodInsecurity)">
                         <md-icon>
                             <i class="material-icons">child_care</i>
                         </md-icon>
-                        New Risk Identification Event
+                        New Intervention - Food Insecurity
+                    </md-button>
+                    <md-button class="md-primary"
+                               ng-click="ctrl.createNewEvent(ctrl.knownProgramStages.inadequateWater)">
+                        <md-icon>
+                            <i class="material-icons">child_care</i>
+                        </md-icon>
+                        New Intervention - Inadequate water , sanitation and Hygiene
                     </md-button>
                 </md-content>
             </div>
@@ -226,7 +233,7 @@
             <md-list class="">
                 <div ng-repeat="dv in ctrl.selectedEvent.dataValues" ng-init="de=ctrl.getDataElement(dv.dataElement)">
                     <md-list-item class="md-2-line"
-                                  ng-if="de.valueType!='COORDINATE'" ng-show="ctrl.hidenDataElements.indexOf(de.id)<0">
+                                  ng-if="de.valueType!='COORDINATE' && de.valueType!='DATE'" ng-show="ctrl.hidenDataElements.indexOf(de.id)<0">
                         <md-tooltip md-direction="right">
                             Stored by {{dv.storedBy}}
                         </md-tooltip>
