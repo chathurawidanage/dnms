@@ -89,7 +89,7 @@ function EventService($http, $q, $fdb, userService) {
                 if (index == undefined) {//todo remove temp fix
                     defer.resolve(response.data);
                 } else {
-                    defer.resolve({index: index, data: response.data});
+                    defer.resolve({ index: index, data: response.data });
                 }
             }, function (response) {
                 console.log(response);
@@ -104,7 +104,7 @@ function EventService($http, $q, $fdb, userService) {
                 if (index == undefined) {
                     defer.resolve(response.data);
                 } else {
-                    defer.resolve({index: index, data: response.data});
+                    defer.resolve({ index: index, data: response.data });
                 }
             }, function (response) {
                 console.log(response);
@@ -147,14 +147,14 @@ function EventService($http, $q, $fdb, userService) {
             return defer.promise;
         },
 
-        createEvent: function (programId, programStageId, teiId, orgUnit) {
+        createEvent: function (programId, programStageId, teiId, orgUnit, dataValues = []) {
             var defer = $q.defer();
             var event = {
                 program: programId,
                 orgUnit: orgUnit,
                 programStage: programStageId,
                 trackedEntityInstance: teiId,
-                dataValues: [],
+                dataValues: dataValues,
                 eventDate: dateService.toDateString(new Date())
             };
             $http.post(serverRoot + 'events.json', event).then(function (response) {

@@ -2,8 +2,8 @@
  * @author Chathura Widanage
  */
 function ProfileController($location, appService, teiService, $routeParams, toastService,
-                           programService, dataElementService, programIndicatorsService, $q, $mdDialog, $mdSidenav,
-                           eventService, enrollmentService, $fdb, userService, settingsService, sdCategoryService, orgUnitsService) {
+    programService, dataElementService, programIndicatorsService, $q, $mdDialog, $mdSidenav,
+    eventService, enrollmentService, $fdb, userService, settingsService, sdCategoryService, orgUnitsService) {
     var ctrl = this;
     this.tei = $routeParams.tei;
     this.teiObj = null;
@@ -27,11 +27,11 @@ function ProfileController($location, appService, teiService, $routeParams, toas
     }
 
     this.childProfile = {
-        firstName: {key: TEI_ATT_NAME, value: null},
-        lastName: {key: TEI_ATT_NAME, value: null},
-        chdrNumber: {key: TEI_ATT_REG_NO, value: null},
-        dob: {key: TEI_ATT_DOB, value: null},
-        gender: {key: TEI_ATT_SEX, value: null}
+        firstName: { key: TEI_ATT_NAME, value: null },
+        lastName: { key: TEI_ATT_NAME, value: null },
+        chdrNumber: { key: TEI_ATT_REG_NO, value: null },
+        dob: { key: TEI_ATT_DOB, value: null },
+        gender: { key: TEI_ATT_SEX, value: null }
     }
 
     this.knownDataElements = {
@@ -188,6 +188,22 @@ function ProfileController($location, appService, teiService, $routeParams, toas
         //todo make changes to local cache as well
         if (ctrl.selectedEvent) {
             eventService.completeEvent(ctrl.selectedEvent, reverse).then(function (response) {
+                if (!reverse && ctrl.selectedEvent.programStage === PROGRAM_NON_HEALTH_STAGE_RISK_FACTOR_EVAL) {
+                    // create refered for intervention event
+                    eventService.createEvent(
+                        ctrl.programId,
+                        PROGRAM_NON_HEALTH_STAGE_REF_FOR_INTERVENTION,
+                        ctrl.tei,
+                        ctrl.teiObj.orgUnit,
+                        ctrl.selectedEvent.dataValues
+                    ).then(function (eventId) {
+                        eventService.getEventById(eventId).then(function (event) {
+                            ctrl.formatEventForUI(event);
+                            ctrl.events.push(event);
+                        });
+                    });
+                    toastService.showToast("Child referred for intervention.");
+                }
                 toastService.showToast(response);
             }, function (msg) {
                 toastService.showToast(msg);
@@ -210,8 +226,8 @@ function ProfileController($location, appService, teiService, $routeParams, toas
 
     ctrl.getDataElement = function (dataElementId) {
         if (dataElementId) {
-//            console.log(ctrl.dataElemets.find({id: dataElementId})[0], dataElementId);
-            var de = ctrl.dataElemets.find({id: dataElementId})[0];
+            //            console.log(ctrl.dataElemets.find({id: dataElementId})[0], dataElementId);
+            var de = ctrl.dataElemets.find({ id: dataElementId })[0];
             return de;
         } else {
             return null;
@@ -354,7 +370,7 @@ function ProfileController($location, appService, teiService, $routeParams, toas
         event.content = new Date(event.eventDate).toDateString();
 
         //add missing datavalues to event
-        var eventAllDataValues = ctrl.dataElemets.find({programStage: event.programStage});
+        var eventAllDataValues = ctrl.dataElemets.find({ programStage: event.programStage });
         var availableDataValues = [];
         if (!event.dataValues) {
             event.dataValues = [];
@@ -375,8 +391,8 @@ function ProfileController($location, appService, teiService, $routeParams, toas
         //sorting riskMonitoring Program Stage
         if (event.programStage === ctrl.knownProgramStages.riskMonitoring) {
             event.dataValues.sort(function (risk1, risk2) {
-                var risk1DE = ctrl.dataElemets.find({id: risk1.dataElement})[0].displayName;
-                var risk2DE = ctrl.dataElemets.find({id: risk2.dataElement})[0].displayName;
+                var risk1DE = ctrl.dataElemets.find({ id: risk1.dataElement })[0].displayName;
+                var risk2DE = ctrl.dataElemets.find({ id: risk2.dataElement })[0].displayName;
                 var risk1DESplit = risk1DE.split(".");
                 var risk2DESplit = risk2DE.split(".");
 
@@ -499,7 +515,7 @@ function ProfileController($location, appService, teiService, $routeParams, toas
             switch (value) {
                 case "More than 2 SD":
                     return "purple";
-                case "Between -1SD to +2SD" :
+                case "Between -1SD to +2SD":
                     return "green";
                 case "Between -1SD to -2SD":
                     return "light-green";

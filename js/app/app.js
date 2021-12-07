@@ -2,21 +2,27 @@
 //var serverRoot = 'http://dhis.pgim.cmb.ac.lk/nss/api/';
 //var serverRoot = 'http://148.251.224.242/nss1/api/';
 var serverRoot = 'https://www.erhmis.fhb.health.gov.lk/erhmis2356/api/';
+//var serverRoot = '../../';
 
+var manualAuth = true;
+// var authUsername = "moh-test";
+// var authPassword = "Test234#";
+var authUsername = "dev";
+var authPassword = "Test1234#";
 
 const PROGRAM_NON_HEALTH = "iUgzznPsePB";
-const PROGRAM_ANTHROPOMETRY = "iUgzznPsePB";
+const PROGRAM_ANTHROPOMETRY = "hM6Yt9FQL0n";
 
+const PROGRAM_NON_HEALTH_STAGE_RISK_FACTOR_EVAL = "O9FEeIYqGRH";
+const PROGRAM_NON_HEALTH_STAGE_REF_FOR_INTERVENTION = "y2imfIjE4zt";
 const PROGRAM_NON_HEALTH_STAGE_POV_INCOME_MGT = "bXWTWS8lkbv";
 const PROGRAM_NON_HEALTH_STAGE_FOOD_INSEC = "m7IDhrn3y22";
 const PROGRAM_NON_HEALTH_STAGE_INAD_WATER = "EHn8MUIERRM";
-
 
 const TEI_ATT_NAME = "zh4hiarsSD5";
 const TEI_ATT_SEX = "lmtzQrlHMYF";
 const TEI_ATT_REG_NO = "h2ATdtJguMq";
 const TEI_ATT_DOB = "qNH202ChkV3";
-
 
 // var serverRoot = '../../';
 var app = angular.module('long-charts', ['ngMaterial', 'ngRoute', 'longitudinalChartControllers', 'dropzone', 'chart.js'
@@ -85,7 +91,9 @@ app.factory('settingsService', SettingsService);
 app.factory('sdCategoryService', SDCategoryService);
 
 app.factory('orgUnitsService', function ($http, $q) {
-    $http.defaults.headers.common['Authorization'] = 'Basic ' + btoa('dev' + ':' + 'Test1234#');
+    if (manualAuth) {
+        $http.defaults.headers.common['Authorization'] = 'Basic ' + btoa(authUsername + ':' + authPassword);
+    }
     return {
         getOrgTree: function () {
             var defer = $q.defer();

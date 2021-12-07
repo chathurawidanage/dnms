@@ -233,7 +233,8 @@
             <md-list class="">
                 <div ng-repeat="dv in ctrl.selectedEvent.dataValues" ng-init="de=ctrl.getDataElement(dv.dataElement)">
                     <md-list-item class="md-2-line"
-                                  ng-if="de.valueType!='COORDINATE' && de.valueType!='DATE'" ng-show="ctrl.hidenDataElements.indexOf(de.id)<0">
+                                  ng-if="de.valueType && de.valueType!='COORDINATE' && de.valueType!='DATE'" 
+                                  ng-show="ctrl.hidenDataElements.indexOf(de.id)<0">
                         <md-tooltip md-direction="right">
                             Stored by {{dv.storedBy}}
                         </md-tooltip>
