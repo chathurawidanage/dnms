@@ -2,7 +2,7 @@
  * Created by chathura on 6/1/16.
  */
 function ViewerController($location, appService, teiService, $routeParams, toastService, chartService,
-                          programService, dataElementService, programIndicatorsService, $q, $mdDialog, $timeout,$window) {
+    programService, dataElementService, programIndicatorsService, $q, $mdDialog, $timeout, $window) {
     var ctrl = this;
     this.tei = $routeParams.tei;
     this.program = PROGRAM_ANTHROPOMETRY;
@@ -60,7 +60,7 @@ function ViewerController($location, appService, teiService, $routeParams, toast
     };
 
     ctrl.getDateDiffInDays = function (date1, date2) {
-        return Math.floor(Math.abs(date1 - date2) / (1000 * 60 * 60 * 24 ));
+        return Math.floor(Math.abs(date1 - date2) / (1000 * 60 * 60 * 24));
     }
 
     this.refineCharts = function () {
@@ -326,8 +326,16 @@ function ViewerController($location, appService, teiService, $routeParams, toast
                 var sd3 = chart.data.splice(chart.data.length - 1, 1);
                 var first = sd3[0][0];
                 var last = sd3[0][sd3[0].length - 1];
-                first.y = Math.ceil((last.y + 1) / 10) * 10;
+                if (typeof last.y === "string") {
+                    last.y = parseFloat(last.y);
+                }
+                var mul = 10;
+                if (last.y > 10000) {
+                    mul = 10000;
+                }
+                first.y = Math.ceil((last.y + 1) / mul) * mul;
                 last.y = first.y;
+
                 chart.data.push([first, last]);
 
                 console.log(chart);

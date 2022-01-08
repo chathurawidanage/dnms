@@ -9,7 +9,7 @@
             <div layout="column">
                 <div>
                     <i class="material-icons" ng-if="ctrl.caches.profile!=2"
-                       ng-class="{'progressing' : ctrl.caches.profile==1,'todo':ctrl.caches.profile==0}">panorama_fish_eye</i>
+                        ng-class="{'progressing' : ctrl.caches.profile==1,'todo':ctrl.caches.profile==0}">panorama_fish_eye</i>
                     <i class="material-icons done" ng-if="ctrl.caches.profile==2">offline_pin</i>
                 </div>
                 <div>
@@ -21,7 +21,7 @@
             <div layout="column">
                 <div>
                     <i class="material-icons" ng-if="ctrl.caches.events!=2"
-                       ng-class="{'progressing' : ctrl.caches.events==1,'todo':ctrl.caches.events==0}">panorama_fish_eye</i>
+                        ng-class="{'progressing' : ctrl.caches.events==1,'todo':ctrl.caches.events==0}">panorama_fish_eye</i>
                     <i class="material-icons done" ng-if="ctrl.caches.events==2">offline_pin</i>
                 </div>
                 <div>
@@ -33,7 +33,7 @@
             <div layout="column">
                 <div>
                     <i class="material-icons" ng-if="ctrl.caches.tei!=2"
-                       ng-class="{'progressing' : ctrl.caches.tei==1,'todo':ctrl.caches.tei==0}">panorama_fish_eye</i>
+                        ng-class="{'progressing' : ctrl.caches.tei==1,'todo':ctrl.caches.tei==0}">panorama_fish_eye</i>
                     <i class="material-icons done" ng-if="ctrl.caches.tei==2">offline_pin</i>
                 </div>
                 <div>
@@ -45,7 +45,7 @@
             <div layout="column">
                 <div>
                     <i class="material-icons" ng-if="ctrl.caches.malNut!=2"
-                       ng-class="{'progressing' : ctrl.caches.malNut==1,'todo':ctrl.caches.malNut==0}">panorama_fish_eye</i>
+                        ng-class="{'progressing' : ctrl.caches.malNut==1,'todo':ctrl.caches.malNut==0}">panorama_fish_eye</i>
                     <i class="material-icons done" ng-if="ctrl.caches.malNut==2">offline_pin</i>
                 </div>
                 <div>
@@ -57,10 +57,10 @@
     </div>
     <div layout="row" ng-show="ctrl.doneInitLoading">
         <div flex="50" layout="column">
-            <div flex="100">
+            <div>
                 <md-tabs md-dynamic-height md-border-bottom>
                     <md-tab label="Malnutrition Analysis">
-                        <md-content class="md-padding">
+                        <md-content>
                             <md-card>
                                 <md-card-header class="colored-card-header">
                                     <md-card-header-text>
@@ -72,15 +72,13 @@
                                     <md-list>
                                         <md-list-item ng-repeat="malNut in ctrl.malNutReasons" class="noright">
                                             <img alt="{{ malNut.title }}" ng-src="img/health_ico.png"
-                                                 class="md-avatar"/>
+                                                class="md-avatar" />
                                             <p>{{ malNut.title }}</p>
                                             <md-progress-circular ng-show="!malNut.selectedRecords"
-                                                                  md-mode="indeterminate"
-                                                                  class="md-secondary"
-                                                                  md-diameter="20"></md-progress-circular>
+                                                md-mode="indeterminate" class="md-secondary" md-diameter="20">
+                                            </md-progress-circular>
                                             <md-button ng-click="ctrl.showMalNutTeis(malNut)"
-                                                       ng-show="malNut.selectedRecords"
-                                                       class="md-secondary">
+                                                ng-show="malNut.selectedRecords" class="md-secondary">
                                                 View <b>{{malNut.selectedRecords.length}}</b>
                                                 children
                                             </md-button>
@@ -90,7 +88,7 @@
                             </md-card>
                         </md-content>
                     </md-tab>
-                    <md-tab ng-if="ctrl.isElevatedUser()" label="Risk Analytics">
+                    <!-- <md-tab ng-if="ctrl.isElevatedUser()" label="Risk Analytics">
                         <md-card ng-controller="RiskController as rctrl">
                             <md-card-header class="colored-card-header">
                                 <md-card-header-text>
@@ -134,7 +132,6 @@
                                         <span class="md-title main-card-title">Height/Weight Analysis</span>
                                     </md-card-header-text>
                                 </md-card-header>
-                                <!--<img src="img/banner.jpg" class="md-card-image" alt="Washed Out" style="height: 150px !important;">-->
                                 <md-card-content>
                                     <md-list>
                                         <div ng-repeat="nchart in nctrl.charts">
@@ -151,9 +148,28 @@
                                 </md-card-content>
                             </md-card>
                         </md-content>
-                    </md-tab>
+                    </md-tab> -->
                 </md-tabs>
             </div>
+            <div>
+                <md-card>
+                    <md-toolbar class="background-theme">
+                        <div class="md-toolbar-tools background-theme">
+                            <h2>Children Needing Intervention</h2>
+                        </div>
+                    </md-toolbar>
+                    <!--<img src="img/banner.jpg" class="md-card-image" alt="Washed Out" style="height: 150px !important;">-->
+                    <md-card-content>
+                        <md-button md-no-ink class="md-primary" ng-click="ctrl.downloadCSV()">
+                            <md-icon>
+                                <i class="material-icons">download</i>
+                            </md-icon>
+                            Download
+                        </md-button>
+                    </md-card-content>
+                </md-card>
+            </div>
+
         </div>
         <div flex="50" layout="column">
             <!--<div flex="100">
@@ -192,13 +208,12 @@
                     <md-card-content ng-show="optionsVisibility" class="animate-show ng-hide-animate">
                         <md-list>
                             <md-list-item class="md-2-line">
-                                <img src="img/location_ico.png" class="md-avatar" alt="admin-area"/>
+                                <img src="img/location_ico.png" class="md-avatar" alt="admin-area" />
                                 <div class="md-list-item-text">
                                     <h3>Set your location</h3>
                                     <p>{{ctrl.currentOuSelection.displayName}}</p>
                                 </div>
-                                <md-button class="md-secondary" ng-click="ctrl.toggleRightNav()"
-                                           aria-label="toggle">
+                                <md-button class="md-secondary" ng-click="ctrl.toggleRightNav()" aria-label="toggle">
                                     <md-icon>
                                         <i class="material-icons">edit_location</i>
                                     </md-icon>
@@ -207,23 +222,23 @@
                             </md-list-item>
                             <md-divider></md-divider>
                             <md-list-item ng-if="ctrl.isElevatedUser()" class="md-2-line">
-                                <img src="img/calendar-icon.png" class="md-avatar" alt="admin-area"/>
+                                <img src="img/calendar-icon.png" class="md-avatar" alt="admin-area" />
                                 <div class="md-list-item-text">
                                     <h3>Set your report date</h3>
-                                    <md-datepicker ng-model="ctrl.date" id="main-datepicker"
-                                                   md-open-on-focus></md-datepicker>
+                                    <md-datepicker ng-model="ctrl.date" id="main-datepicker" md-open-on-focus>
+                                    </md-datepicker>
                                 </div>
                             </md-list-item>
                             <md-divider></md-divider>
-                            <md-list-item class="md-2-line" ng-if="ctrl.isElevatedUser()">
-                                <img src="img/doctor-icon.png" class="md-avatar" alt="admin-area"/>
+                            <!-- <md-list-item class="md-2-line" ng-if="ctrl.isElevatedUser()">
+                                <img src="img/doctor-icon.png" class="md-avatar" alt="admin-area" />
                                 <div class="md-list-item-text">
                                     <h3>{{ctrl.viewedEventsCount}}</h3>
                                     <p>Events need your approval</p>
                                 </div>
                                 <md-button class="md-secondary md-icon-button md-raised"
-                                           ng-click="ctrl.approveAllEvents(false)"
-                                           aria-label="toggle" ng-if="ctrl.isElevatedUser()">
+                                    ng-click="ctrl.approveAllEvents(false)" aria-label="toggle"
+                                    ng-if="ctrl.isElevatedUser()">
                                     <md-icon>
                                         <i class="material-icons">done</i>
                                     </md-icon>
@@ -232,8 +247,7 @@
                                     </md-tooltip>
                                 </md-button>
                                 <md-button class="md-secondary md-icon-button md-raised"
-                                           ng-click="ctrl.pickRandomEvent(false)"
-                                           aria-label="toggle">
+                                    ng-click="ctrl.pickRandomEvent(false)" aria-label="toggle">
                                     <md-icon>
                                         <i class="material-icons">shuffle</i>
                                     </md-icon>
@@ -242,8 +256,7 @@
                                     </md-tooltip>
                                 </md-button>
                                 <md-button class="md-secondary md-icon-button md-raised"
-                                           ng-click="ctrl.viewAllIncompleteEvents(false)"
-                                           aria-label="toggle">
+                                    ng-click="ctrl.viewAllIncompleteEvents(false)" aria-label="toggle">
                                     <md-icon>
                                         <i class="material-icons">visibility</i>
                                     </md-icon>
@@ -251,16 +264,16 @@
                                         View All
                                     </md-tooltip>
                                 </md-button>
-                            </md-list-item>
+                            </md-list-item> -->
                             <md-list-item class="md-2-line">
-                                <img src="img/warning-icon.png" class="md-avatar" alt="admin-area"/>
+                                <img src="img/warning-icon.png" class="md-avatar" alt="admin-area" />
                                 <div class="md-list-item-text">
                                     <h3>{{ctrl.activeEventsCount}}</h3>
-                                    <p>Events need {{ctrl.isElevatedUser()?"sisters":"your"}} attention</p>
+                                    <p>Events need your attention</p>
                                 </div>
                                 <md-button class="md-secondary md-icon-button md-raised"
-                                           ng-click="ctrl.approveAllEvents(true)"
-                                           aria-label="toggle" ng-if="ctrl.isElevatedUser()">
+                                    ng-click="ctrl.approveAllEvents(true)" aria-label="toggle"
+                                    ng-if="ctrl.isElevatedUser()">
                                     <md-icon>
                                         <i class="material-icons">done</i>
                                     </md-icon>
@@ -269,8 +282,7 @@
                                     </md-tooltip>
                                 </md-button>
                                 <md-button class="md-secondary md-icon-button md-raised"
-                                           ng-click="ctrl.pickRandomEvent(true)"
-                                           aria-label="toggle">
+                                    ng-click="ctrl.pickRandomEvent(true)" aria-label="toggle">
                                     <md-icon>
                                         <i class="material-icons">shuffle</i>
                                     </md-icon>
@@ -279,8 +291,7 @@
                                     </md-tooltip>
                                 </md-button>
                                 <md-button class="md-secondary md-icon-button md-raised"
-                                           ng-click="ctrl.viewAllIncompleteEvents(true)"
-                                           aria-label="toggle">
+                                    ng-click="ctrl.viewAllIncompleteEvents(true)" aria-label="toggle">
                                     <md-icon>
                                         <i class="material-icons">visibility</i>
                                     </md-icon>
@@ -313,9 +324,8 @@
                             <md-list-item>
                                 <md-progress-circular ng-show="tctrl.mainChart.loading"></md-progress-circular>
                                 <canvas class="chart chart-line" ng-show="!tctrl.mainChart.loading"
-                                        chart-options="tctrl.mainChart.options"
-                                        chart-data="tctrl.mainChart.data" chart-labels="tctrl.mainChart.labels"
-                                ></canvas>
+                                    chart-options="tctrl.mainChart.options" chart-data="tctrl.mainChart.data"
+                                    chart-labels="tctrl.mainChart.labels"></canvas>
                             </md-list-item>
                         </md-list>
                     </md-card-content>
@@ -334,20 +344,19 @@
                         </md-card-header-text>
                     </md-card-header>
                     <md-card-content>
-                        <div style="margin-bottom: -15px"
-                             ng-if="tctrl.global" md-no-float class="md-block" layout="row">
+                        <div style="margin-bottom: -15px" ng-if="tctrl.global" md-no-float class="md-block"
+                            layout="row">
                             <md-input-container flex="60">
                                 <label>Search by name or CHDR</label>
                                 <md-icon>
                                     <i class="material-icons">search</i>
                                 </md-icon>
-                                <input ng-model="tctrl.keyword" type="text"
-                                       ng-keyup="tctrl.refreshList($event)">
+                                <input ng-model="tctrl.keyword" type="text" ng-keyup="tctrl.refreshList($event)">
                             </md-input-container>
                             <md-input-container flex="40">
                                 <label>State</label>
                                 <md-select ng-model="ctrl.globalSearchEnrolledOnly"
-                                           ng-change="tctrl.refreshList($event)">
+                                    ng-change="tctrl.refreshList($event)">
                                     <md-option ng-value="true">
                                         Active Children [{{ctrl.numberOfEnrolledChildren}}]
                                     </md-option>
@@ -370,14 +379,13 @@
 
                         <md-content class="teiInfiniteScroll" style="background: white">
                             <md-virtual-repeat-container id="vertical-container"
-                                                         md-top-index="tctrl.infiniteItems.topIndex">
+                                md-top-index="tctrl.infiniteItems.topIndex">
                                 <md-list class="md-dense">
-                                    <div md-virtual-repeat="item in tctrl.infiniteItems"
-                                         md-on-demand flex class="repeated-item">
+                                    <div md-virtual-repeat="item in tctrl.infiniteItems" md-on-demand flex
+                                        class="repeated-item">
                                         <md-list-item class="md-3-line " ng-if="item.fName || item.lName">
                                             <img ng-src="img/{{item.gender=='male'?'boy':'girl'}}_ico.png"
-                                                 class="md-avatar"
-                                                 alt="gender icon"/>
+                                                class="md-avatar" alt="gender icon" />
                                             <div class="md-list-item-text" layout="column">
                                                 <h3>{{item.fName}} {{item.lName}}</h3>
                                                 <h4>{{item.ouName}}</h4>
@@ -510,24 +518,20 @@
             </div>
         </md-toolbar>
         <md-content layout-padding>
-            <div
-                    data-angular-treeview="true"
-                    data-tree-id="orgTree"
-                    data-tree-model="ctrl.orgTree"
-                    data-node-id="id"
-                    data-node-label="displayName"
-                    data-node-children="children">
+            <div data-angular-treeview="true" data-tree-id="orgTree" data-tree-model="ctrl.orgTree" data-node-id="id"
+                data-node-label="displayName" data-node-children="children">
             </div>
         </md-content>
     </md-sidenav>
 
 
     <md-button class="md-fab md-fab md-fab-bottom-right md-faded" aria-label="Add Chart" ng-click="ctrl.showSettings()"
-               style="position: fixed" ng-show="ctrl.doneInitLoading && ctrl.isSuperUser()">
+        style="position: fixed" ng-show="ctrl.doneInitLoading && ctrl.isSuperUser()">
         <md-icon>
             <i class="material-icons">settings</i>
         </md-icon>
-    </md-button><!--
+    </md-button>
+    <!--
         <md-button class="md-fab md-fab md-fab-bottom-right md-primary" aria-label="Add Chart" ng-click="ctrl.new()"
                    style="position: fixed">
             <md-icon>

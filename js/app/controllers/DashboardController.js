@@ -250,7 +250,8 @@ function DashboardController($location, $scope, toastService, programService, us
                         ou: row[7]
                     });
                 });
-                malNut.selectedRecords = malNut.records;
+                malNut.selectedRecords = [...malNut.records];
+                console.log("SELECTED RECORDS", malNut.selectedRecords);
                 malNutLoadCount++;
                 if (malNutLoadCount === ctrl.malNutReasons.length) {
                     ctrl.caches.malNut = CAHCE_STATUS.loaded;
@@ -346,6 +347,7 @@ function DashboardController($location, $scope, toastService, programService, us
         ctrl.progressCount++;
         if (ctrl.progressCount == Object.keys(ctrl.caches).length) {
             ctrl.doneInitLoading = true;
+            $scope.$applyAsync();
         }
     }
 
@@ -369,6 +371,12 @@ function DashboardController($location, $scope, toastService, programService, us
 
     ctrl.showMalNutTeis = function (malNutReason) {
         ctrl.selectedMalNul = malNutReason;
+        console.log("Selected ", malNutReason);
+
+        //todo remove temp fix
+        if (ctrl.selectedMalNul.selectedRecords.length === 0 && ctrl.selectedMalNul.records.length !== 0) {
+            ctrl.selectedMalNul.selectedRecords = ctrl.selectedMalNul.records;
+        }
         teiService.changeTeiList(malNutReason.title, function (regexp, page, limit) {
             var lowerBound = page * limit;
             var upperBound = (page + 1) * limit;
@@ -506,5 +514,10 @@ function DashboardController($location, $scope, toastService, programService, us
         $mdSidenav('right').close();
     }
 
+
+    // temp
+    ctrl.downloadCSV = function () {
+        window.open(serverRoot + "sqlViews/FltvGltWPea/data.csv", '_blank').focus();
+    }
 
 }

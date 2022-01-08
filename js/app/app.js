@@ -1,10 +1,8 @@
-//var serverRoot = 'http://lankanets.info:8080/nss/api/';
-//var serverRoot = 'http://dhis.pgim.cmb.ac.lk/nss/api/';
-//var serverRoot = 'http://148.251.224.242/nss1/api/';
-var serverRoot = 'https://www.erhmis.fhb.health.gov.lk/erhmis2356/api/';
-//var serverRoot = '../../';
 
-var manualAuth = true;
+// var serverRoot = 'https://www.erhmis.fhb.health.gov.lk/erhmis2356/api/';
+var serverRoot = '../../';
+
+var manualAuth = false;
 // var authUsername = "moh-test";
 // var authPassword = "Test234#";
 var authUsername = "dev";
