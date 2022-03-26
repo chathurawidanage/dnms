@@ -202,8 +202,12 @@ function DashboardController($location, $scope, toastService, programService, us
     userService.getCurrentUser().then(function (user) {//stage 1
         ctrl.caches.profile = CAHCE_STATUS.loading;
         ctrl.user = user;
+
+        console.log("USER", ctrl.user, "MOH", userService.hasRole(userService.MOH_USER), "NON", userService.hasRole(userService.DEO_USER))
+
         //loading databases
         ctrl.teiDb = $fdb.db('dnms').collection("teis");
+        window.teiDb = ctrl.teiDb;
         //ctrl.eventsDb = $fdb.db('dnms').collection("events");
         ctrl.eventsDb = eventService.getEventsDb();
 
@@ -235,7 +239,12 @@ function DashboardController($location, $scope, toastService, programService, us
         ctrl.checkProgress();
         //ctrl.doneInitLoading = true;
     }).then(function () {//symul
-        console.log(ctrl.queryOrgUnits[0]);
+        if (!ctrl.isElevatedUser()) {
+            // skip reason for malnut
+            ctrl.caches.malNut = CAHCE_STATUS.loaded;
+            ctrl.checkProgress();
+            return;
+        }
 
         //loading mal nut data
         ctrl.caches.malNut = CAHCE_STATUS.loading;
@@ -247,11 +256,10 @@ function DashboardController($location, $scope, toastService, programService, us
                 data.rows.forEach(function (row) {
                     malNut.records.push({
                         eventId: row[0],
-                        ou: row[7]
+                        ou: row[12]
                     });
                 });
                 malNut.selectedRecords = [...malNut.records];
-                console.log("SELECTED RECORDS", malNut.selectedRecords);
                 malNutLoadCount++;
                 if (malNutLoadCount === ctrl.malNutReasons.length) {
                     ctrl.caches.malNut = CAHCE_STATUS.loaded;
@@ -269,7 +277,6 @@ function DashboardController($location, $scope, toastService, programService, us
         ctrl.caches.events = CAHCE_STATUS.loading;
         eventService.getEventTeiMap(ctrl.selectedProgram.id, ctrl.queryOrgUnits[0]).then(function (events) {
             ctrl.eventsDb.insert(events, function (result) {
-                console.log(result);
                 ctrl.updateViewedEventsCount();
                 //save for future use
 
@@ -284,14 +291,15 @@ function DashboardController($location, $scope, toastService, programService, us
 
         var saveToDb = function (rows, enrolled) {
             rows.forEach(function (row) {
+                console.log(row);
                 ctrl.teiDb.insert({
                     _id: row[0],
                     ou: row[3],
                     ouName: row[4],
-                    fName: row[7],
-                    lName: row[8],
-                    gender: row[9],
-                    chdrNumber: row[10],
+                    fName: row[9],
+                    lName: "",
+                    gender: row[10],
+                    chdrNumber: row[8],
                     enrolled: enrolled
                 })
             });
@@ -299,7 +307,6 @@ function DashboardController($location, $scope, toastService, programService, us
             ctrl.showGlobalTeiSearch();
             ctrl.checkProgress();
         }
-        debugDb = ctrl.teiDb;
 
         let attributes = [TEI_ATT_NAME, TEI_ATT_SEX, TEI_ATT_REG_NO]
         //todo firstname and last name attributes are hard coded
@@ -360,9 +367,10 @@ function DashboardController($location, $scope, toastService, programService, us
         var worker = new Worker("js/app/workers/childou.js");
         worker.postMessage([ctrl.malNutReasons, selectedNode]);
         worker.onmessage = function (e) {
-            $timeout(function () {
-                ctrl.malNutReasons = e.data;
-            });
+            console.log("Applying mal", e);
+            ctrl.malNutReasons = e.data;
+            console.log("Applied..", ctrl.malNutReasons);
+            $scope.$apply();
         }
 
         //show global search
@@ -504,7 +512,8 @@ function DashboardController($location, $scope, toastService, programService, us
         }
         $interval(function () {
             ctrl.activeEventsCount = ctrl.eventsDb.find({
-                status: "ACTIVE"
+                status: "ACTIVE",
+                programStage: ctrl.isElevatedUser() ? PROGRAM_STAGE_RISK_FAC_EVAL : PROGRAM_STAGE_REF_FOR_INT
             }
             ).length;
         }, 5000);

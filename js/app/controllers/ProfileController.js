@@ -78,7 +78,6 @@ function ProfileController($location, appService, teiService, $routeParams, toas
 
                 if (lat > latDown && lat < latUp && lon > lonLeft && lon < lonRight) {
                     ctrl.locationCache = ev.coordinate.latitude + "," + ev.coordinate.longitude;
-                    console.log("Location", ctrl.locationCache);
                     return ctrl.locationCache;
                 } else {
                     return false;
@@ -234,102 +233,113 @@ function ProfileController($location, appService, teiService, $routeParams, toas
         }
     }
 
-    teiService.getAllTeiAttributes().then(function (teiAttributes) {
+    teiService.getAllTeiAttributesOfProgram(PROGRAM_NON_HEALTH).then(function (teiAttributes) {
         ctrl.teiAttributes = [];
         teiAttributes.forEach(function (att) {
             ctrl.teiAttributes[att.id] = att;
         });
 
-        console.log("tei all attributes loaded", ctrl.teiAttributes);
-    }).then(function () {
-        console.log("Loading attributes of ", ctrl.tei);
-        teiService.getTeiById(ctrl.tei).then(function (tei) {
-            ctrl.teiObj = tei;
-
-            //setting orgUnitName
-            orgUnitsService.getOrgNameById(ctrl.teiObj.orgUnit).then(function (orgUnitName) {
-                ctrl.teiObj.orgUnitName = orgUnitName;
-            });
-
-            //filling known attributes
-            var knownAtts = Object.keys(ctrl.childProfile);
-            console.log("Attributes", ctrl.teiObj.attributes);
-            var teiObjAttributesIds = [];
-            ctrl.teiObj.attributes.forEach(function (attr) {
-                teiObjAttributesIds.push(attr.attribute);
-                knownAtts.forEach(function (knownAtt) {
-                    if (!ctrl.childProfile[knownAtt].value && ctrl.childProfile[knownAtt].key == attr.attribute) {
-                        ctrl.childProfile[knownAtt].value = attr.value;
-                    }
-                });
-
-                //convert date strings to date objects to make them editable with dn-datepicker
-                if (attr.valueType == "DATE") {
-                    attr.value = new Date(attr.value);
-                }
-            });
-            //fill other attributes
-            Object.keys(ctrl.teiAttributes).forEach(function (attId) {
-                if (teiObjAttributesIds.indexOf(attId) < 0) {
-                    var newAttribute = ctrl.teiAttributes[attId]
-                    ctrl.teiObj.attributes.push({
-                        attribute: newAttribute.id,
-                        displayName: newAttribute.displayName,
-                        valueType: newAttribute.valueType,
-                        newAttribute: true
-                    });
-                }
-            });
-
-            //ordering attributes
-            settingsService.teiAttributes.get().then(function (teiAttOrder) {
-                console.log("TEI ATT ORDER", teiAttOrder);
-                ctrl.teiObj.attributes.sort(function (a, b) {
-                    return teiAttOrder.indexOf(a.attribute) - teiAttOrder.indexOf(b.attribute);
-                });
-            });
-
-            console.log(ctrl.childProfile);
-        });
-    }).then(function () {
-        console.log("loading program data");
-        programService.getProgramById(ctrl.programId).then(function (program) {
-            ctrl.program = program;
-            console.log("loaded program", program);
-            //Mapping data elements & program stages
-            console.log("data elements", ctrl.dataElemets);
-            ctrl.program.programStages.forEach(function (programStage) {
-                programStage.programStageDataElements.forEach(function (pStateDataElement) {
-                    var de = pStateDataElement.dataElement;
-                    de.programStage = programStage.id;
-                    ctrl.dataElemets.insert(de);
-                    //ctrl.dataElemets[pStateDataElement.dataElement.id] = pStateDataElement.dataElement;
-                })
+    }).then(() => teiService.getAllTeiAttributesOfProgram(PROGRAM_ANTHROPOMETRY))
+        .then((teiAttributes) => {
+            teiAttributes.forEach(function (att) {
+                ctrl.teiAttributes[att.id] = att;
             });
         }).then(function () {
-            console.log("loading events for tei");
-            teiService.getEventData(ctrl.tei, ctrl.programId).then(function (events) {
-                events.forEach(function (event) {
-                    ctrl.formatEventForUI(event);
-                });
-                events.sort(function (a, b) {
-                    var dateA = new Date(a.eventDate);
-                    var dateB = new Date(b.eventDate);
-                    //giving priority for registration
-                    if (a.programStage == ctrl.knownProgramStages.registration) {
-                        return -1;
-                    } else if (b.programStage == ctrl.knownProgramStages.registration) {
-                        return 1;
-                    }
-                    //sort normally
-                    return dateA.getTime() - dateB.getTime();
+            console.log("Loading attributes of ", ctrl.tei);
+            teiService.getTeiById(ctrl.tei).then(function (tei) {
+                ctrl.teiObj = tei;
+
+                //setting orgUnitName
+                orgUnitsService.getOrgNameById(ctrl.teiObj.orgUnit).then(function (orgUnitName) {
+                    ctrl.teiObj.orgUnitName = orgUnitName;
                 });
 
-                ctrl.events = events;
-                console.log("events loaded", events);
+                //filling known attributes
+                var knownAtts = Object.keys(ctrl.childProfile);
+                var teiObjAttributesIds = new Set();
+                ctrl.teiObj.attributes.forEach(function (attr) {
+                    teiObjAttributesIds.add(attr.attribute);
+                    knownAtts.forEach(function (knownAtt) {
+                        if (!ctrl.childProfile[knownAtt].value && ctrl.childProfile[knownAtt].key == attr.attribute) {
+                            ctrl.childProfile[knownAtt].value = attr.value;
+                        }
+                    });
+
+                    //convert date strings to date objects to make them editable with dn-datepicker
+                    if (attr.valueType == "DATE") {
+                        attr.value = new Date(attr.value);
+                    }
+
+                    //attatch form name if available
+                    if (ctrl.teiAttributes[attr.attribute]) {
+                        attr.formName = ctrl.teiAttributes[attr.attribute]?.formName;
+                    } else {
+                        attr.formName = attr.displayName;
+                    }
+                });
+                //fill other attributes
+                Object.keys(ctrl.teiAttributes).forEach(function (attId) {
+                    if (!teiObjAttributesIds.has(attId)) {
+                        var newAttribute = ctrl.teiAttributes[attId]
+                        ctrl.teiObj.attributes.push({
+                            attribute: newAttribute.id,
+                            displayName: newAttribute.displayName,
+                            formName: newAttribute.formName,
+                            valueType: newAttribute.valueType,
+                            newAttribute: true
+                        });
+                    }
+                });
+
+                //ordering attributes
+                settingsService.teiAttributes.get().then(function (teiAttOrder) {
+                    console.debug("TEI ATT ORDER", teiAttOrder);
+                    ctrl.teiObj.attributes.sort(function (a, b) {
+                        return teiAttOrder.indexOf(a.attribute) - teiAttOrder.indexOf(b.attribute);
+                    });
+                });
+
+                console.log(ctrl.childProfile);
             });
-        })
-    });
+        }).then(function () {
+            console.debug("loading program data");
+            programService.getProgramById(ctrl.programId).then(function (program) {
+                ctrl.program = program;
+                console.debug("loaded program", program);
+                //Mapping data elements & program stages
+                console.debug("data elements", ctrl.dataElemets);
+                ctrl.program.programStages.forEach(function (programStage) {
+                    programStage.programStageDataElements.forEach(function (pStateDataElement) {
+                        var de = pStateDataElement.dataElement;
+                        de.programStage = programStage.id;
+                        ctrl.dataElemets.insert(de);
+                        //ctrl.dataElemets[pStateDataElement.dataElement.id] = pStateDataElement.dataElement;
+                    })
+                });
+            }).then(function () {
+                console.debug("loading events for tei");
+                teiService.getEventData(ctrl.tei, ctrl.programId).then(function (events) {
+                    events.forEach(function (event) {
+                        ctrl.formatEventForUI(event);
+                    });
+                    events.sort(function (a, b) {
+                        var dateA = new Date(a.eventDate);
+                        var dateB = new Date(b.eventDate);
+                        //giving priority for registration
+                        if (a.programStage == ctrl.knownProgramStages.registration) {
+                            return -1;
+                        } else if (b.programStage == ctrl.knownProgramStages.registration) {
+                            return 1;
+                        }
+                        //sort normally
+                        return dateA.getTime() - dateB.getTime();
+                    });
+
+                    ctrl.events = events;
+                    console.log("events loaded", events);
+                });
+            })
+        });
 
     ctrl.formatEventForUI = function (event) {
         var romanToHindu = function (roman) {
@@ -540,7 +550,6 @@ function ProfileController($location, appService, teiService, $routeParams, toas
     }
 
     ctrl.createNewEvent = function (programStageId) {
-        console.log("NEW event called")
         eventService.createEvent(
             ctrl.programId,
             programStageId,
@@ -552,6 +561,8 @@ function ProfileController($location, appService, teiService, $routeParams, toas
                 ctrl.events.push(event);
                 ctrl.showEvent(event);
             });
+        }).catch(err => {
+            toastService.showToast("Failed to create a new event.")
         });
     }
 

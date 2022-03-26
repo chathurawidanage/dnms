@@ -9,7 +9,7 @@ onmessage = function (e) {
     getAllLevelFiveOrgUnits(selectedOrgUnit);
     malNulRecords.forEach(function (malNul) {
         malNul.selectedRecords=[];
-        malNul.records.forEach(function (record) {
+        malNul.records && malNul.records.forEach(function (record) {
             if(levelFiveOrgs.indexOf(record.ou)>=0){
                 malNul.selectedRecords.push(record);
             }

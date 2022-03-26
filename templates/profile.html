@@ -42,7 +42,7 @@
                             <!--<img ng-src="{{todos[0].face}}?20" class="md-avatar" alt="{{todos[0].who}}" />-->
                             <md-input-container
                                     ng-if="att.valueType=='BOOLEAN' || att.valueType=='TRUE_ONLY'">
-                                <p>{{att.displayName}}</p>
+                                <p>{{att.formName}}</p>
                                 <!--Due to a bug of angular ng-if should be applied to md-switch too-->
                                 <md-switch class="md-secondary md-" ng-model="att.value" aria-label="Switch 2"
                                            ng-true-value="'true'" ng-false-value="'false'" class="md-warn"
@@ -51,13 +51,13 @@
                                 </md-switch>
                             </md-input-container>
                             <md-input-container
-                                    ng-if="att.valueType=='NUMBER' || att.valueType=='INTEGER_POSITIVE'">
-                                <label>{{att.displayName}}</label>
+                                    ng-if="att.valueType=='NUMBER' || att.valueType=='INTEGER_POSITIVE' || att.valueType=='INTEGER_ZERO_OR_POSITIVE'">
+                                <label>{{att.formName}}</label>
                                 <input ng-model="att.value">
                             </md-input-container>
                             <md-input-container class="md-block"
                                                 ng-if="att.valueType=='TEXT' && ctrl.teiAttributes[att.attribute].optionSet">
-                                <label>{{att.displayName}}</label>
+                                <label>{{att.formName}}</label>
                                 <md-select ng-model="att.value">
                                     <md-option ng-repeat="option in ctrl.teiAttributes[att.attribute].optionSet.options"
                                                ng-value="option.code">
@@ -67,12 +67,12 @@
                             </md-input-container>
                             <md-input-container
                                     ng-if="(att.valueType=='TEXT' || att.valueType=='PHONE_NUMBER') && !ctrl.teiAttributes[att.attribute].optionSet">
-                                <label>{{att.displayName}}</label>
+                                <label>{{att.formName}}</label>
                                 <input ng-model="att.value">
                             </md-input-container>
 
                             <md-input-container ng-if="att.valueType=='DATE'">
-                                <label>{{att.displayName}}</label>
+                                <label>{{att.formName}}</label>
                                 <md-datepicker ng-model="att.value" name="date1"></md-datepicker>
                             </md-input-container>
 
@@ -124,7 +124,7 @@
 
         <div flex="50" layout="column">
             <!--Charts Widget-->
-            <div ng-controller="ViewerController as vctrl" class="dashboard">
+            <div ng-controller="ViewerController as vctrl" class="dashboard" ng-if="ctrl.isElevatedUser()">
                 <md-content layout-padding>
                     <md-tabs md-selected="selectedIndex" md-border-bottom md-autoselect md-dynamic-height>
                         <md-tab ng-repeat="chart in vctrl.charts"
@@ -247,7 +247,7 @@
                         <!--<img ng-src="{{todos[0].face}}?20" class="md-avatar" alt="{{todos[0].who}}" />-->
                         <md-input-container
                                 ng-if="de.valueType=='BOOLEAN' || de.valueType=='TRUE_ONLY'">
-                            <p>{{de.displayName}}</p>
+                            <p>{{de.formName}}</p>
                             <!--Due to a bug of angular ng-if should be applied to md-switch too-->
                             <md-switch class="md-secondary md-" ng-model="dv.value" aria-label="Switch 2"
                                        ng-change="ctrl.updateDataValue(dv)"
@@ -258,13 +258,13 @@
                         </md-input-container>
                         <md-input-container
                                 ng-if="de.valueType=='NUMBER' || de.valueType=='INTEGER_POSITIVE'">
-                            <label>{{de.displayName}}</label>
+                            <label>{{de.formName}}</label>
                             <input ng-model="dv.value" ng-blur="ctrl.updateDataValue(dv)"
                                    ng-class="ctrl.getHeightWeightBackgroundColorClass(dv)">
                         </md-input-container>
                         <md-input-container
                                 ng-if="de.valueType=='TEXT' && de.optionSet">
-                            <label>{{de.displayName}}</label>
+                            <label>{{de.formName}}</label>
                             <md-select ng-model="dv.value" ng-change="ctrl.updateDataValue(dv)">
                                 <md-option ng-repeat="option in de.optionSet.options"
                                            ng-value="option.code">
@@ -274,9 +274,10 @@
                         </md-input-container>
                         <md-input-container
                                 ng-if="de.valueType=='TEXT' && !de.optionSet">
-                            <label>{{de.displayName}}</label>
+                            <label>{{de.formName}}</label>
                             <input ng-model="dv.value" ng-blur="ctrl.updateDataValue(dv)">
                         </md-input-container>
+
                         <!--  <div ng-if="de.valueType!='BOOLEAN' && de.valueType!='TRUE_ONLY'">
                               <p>{{de.displayName}}</p>
                               <p>{{dv.value}}</p>
@@ -305,14 +306,14 @@
                 <md-icon>
                     <i class="material-icons">done</i>
                 </md-icon>
-                Mark as reviewed
+                Mark as Reviewed
             </md-button>
             <md-button class="md-primary" aria-label="Use Android" ng-click="ctrl.completeEvent(true)"
                        ng-if="(ctrl.selectedEvent.status!='ACTIVE' && !ctrl.isElevatedUser() && ctrl.selectedEvent.status!='COMPLETED') || (ctrl.selectedEvent.status=='COMPLETED' && ctrl.isElevatedUser())">
                 <md-icon><!--Trying to avoid the intermediate staus as much as possible in the logic-->
                     <i class="material-icons">undo</i>
                 </md-icon>
-                Reopen event
+                Reopen Event
             </md-button>
         </md-content>
     </md-sidenav>

@@ -1,9 +1,10 @@
 
-// var serverRoot = 'https://www.erhmis.fhb.health.gov.lk/erhmis2356/api/';
-var serverRoot = '../../';
+var serverRoot = 'https://www.erhmis.fhb.health.gov.lk/erhmis2356/api/';
+// var serverRoot = 'http://localhost:8080/api/';
+// var serverRoot = '../../';
 
-var manualAuth = false;
-// var authUsername = "moh-test";
+var manualAuth = true;
+// var authUsername = "dsd-test";
 // var authPassword = "Test234#";
 var authUsername = "dev";
 var authPassword = "Test1234#";
@@ -17,10 +18,16 @@ const PROGRAM_NON_HEALTH_STAGE_POV_INCOME_MGT = "bXWTWS8lkbv";
 const PROGRAM_NON_HEALTH_STAGE_FOOD_INSEC = "m7IDhrn3y22";
 const PROGRAM_NON_HEALTH_STAGE_INAD_WATER = "EHn8MUIERRM";
 
+const PROGRAM_STAGE_REF_FOR_INT = "y2imfIjE4zt";
+const PROGRAM_STAGE_RISK_FAC_EVAL = "O9FEeIYqGRH";
+
 const TEI_ATT_NAME = "zh4hiarsSD5";
 const TEI_ATT_SEX = "lmtzQrlHMYF";
 const TEI_ATT_REG_NO = "h2ATdtJguMq";
 const TEI_ATT_DOB = "qNH202ChkV3";
+
+const USER_GROUP_MOH = "sm6yexdMONH";
+const USER_GROUP_NON_HEALTH = "BvsuVoXX6Zb";
 
 // var serverRoot = '../../';
 var app = angular.module('long-charts', ['ngMaterial', 'ngRoute', 'longitudinalChartControllers', 'dropzone', 'chart.js'
@@ -176,14 +183,22 @@ app.factory('teiService', function ($http, $q, appService) {
          */
         getAllTeiAttributes: function () {
             var defer = $q.defer();
-            $http.get(serverRoot + 'trackedEntityAttributes?fields=id,displayName,valueType,optionSet[options[:all]]&paging=false').then(function (response) {
+            $http.get(serverRoot + 'trackedEntityAttributes?fields=id,displayName,formName,valueType,optionSet[options[:all]]&paging=false').then(function (response) {
                 defer.resolve(response.data.trackedEntityAttributes);
             }, function (response) {
                 defer.reject(response);
             });
             return defer.promise;
         },
-
+        getAllTeiAttributesOfProgram: function (programId) {
+            var defer = $q.defer();
+            $http.get(serverRoot + `programs/${programId}.json?fields=programTrackedEntityAttributes[trackedEntityAttribute[id,formName, valueType]]`).then(function (response) {
+                defer.resolve(response.data.programTrackedEntityAttributes.map(obj=>obj.trackedEntityAttribute));
+            }, function (response) {
+                defer.reject(response);
+            });
+            return defer.promise;
+        },
         getTeiById: function (teiId) {
             var defer = $q.defer();
             $http.get(serverRoot + 'trackedEntityInstances/' + teiId + '.json?paging=false').then(function (response) {
@@ -237,11 +252,11 @@ app.factory('teiService', function ($http, $q, appService) {
             }
             var defer = $q.defer();
             var url = serverRoot + 'trackedEntityInstances/query.json?ouMode=ACCESSIBLE&programStatus=' + programStatus + '&program=' + program;
-            if (attributes) {
-                attributes.forEach(function (attr) {
-                    url += "&attribute=" + attr;
-                })
-            }
+            // if (attributes) {
+            //     attributes.forEach(function (attr) {
+            //         url += "&attribute=" + attr;
+            //     })
+            // }
             console.log(url);
             $http.get(url).then(function (response) {
                 defer.resolve(response.data);
@@ -300,7 +315,7 @@ app.factory('teiService', function ($http, $q, appService) {
         getEventData: function (trackedEntityInstance, program) {
             var defer = $q.defer();
             $http.get(serverRoot + 'events.json?ouMode=ACCESSIBLE&skipPaging=true&trackedEntityInstance='
-                + trackedEntityInstance + "&program=" + program).then(function (response) {
+                + trackedEntityInstance + "&program=" + program+"&fields=event,eventDate,status,program,programStage,dataValues[dataElement,value]").then(function (response) {
                     var events = response.data.events;
                     defer.resolve(events);
                 });
@@ -591,7 +606,7 @@ app.factory('programService', function ($http, $q) {
         },
         getProgramById: function (programId) {
             var defer = $q.defer();
-            $http.get(serverRoot + "programs/" + programId + ".json?fields=:all,programStages[id,displayName,programStageDataElements[id,dataElement[id,displayName,valueType,optionSet[options[:all]]]]]").then(function (response) {
+            $http.get(serverRoot + "programs/" + programId + ".json?fields=:all,programStages[id,displayName,programStageDataElements[id,dataElement[id,displayName,formName,valueType,optionSet[options[:all]]]]]").then(function (response) {
                 defer.resolve(response.data);
             }, function (response) {
                 defer.reject(response);

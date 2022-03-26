@@ -278,9 +278,9 @@ function ViewerController($location, appService, teiService, $routeParams, toast
                 //data to plot
                 var dataToPlot = [];
                 dataValues2.forEach(function (dvX) {
-                    var createdDateX = new Date(dvX.created);
+                    var createdDateX = new Date(dvX.event.eventDate);
                     dataValues1.forEach(function (dvY) {
-                        var createdDateY = new Date(dvY.created);
+                        var createdDateY = new Date(dvY.event.eventDate);
                         var diff = ctrl.getDateDiffInDays(createdDateY, createdDateX);
                         if (diff < 7) {
                             var plotObject = {

@@ -30,7 +30,13 @@ function EventService($http, $q, $fdb, userService) {
                 defer.resolve(reverse ? "Successfully reopened event." : "Successfully marked as " + (isMohUser ? "completed." : "reviewed."));
             }, function (response) {
                 event.status = oldStatus;
-                defer.reject("Failed to change the event status.");
+
+                // try to extract the message
+                if (response?.response?.conflicts?.length > 0) {
+                    defer.reject(response?.response?.conflicts[0].value);
+                } else {
+                    defer.reject("Failed to change the event status.");
+                }
             });
             return defer.promise;
         },
@@ -47,7 +53,7 @@ function EventService($http, $q, $fdb, userService) {
 
         getEventTeiMap: function (programId, ou) {
             var defer = $q.defer();
-            $http.get(serverRoot + 'events.json?orgUnit=' + ou + '&ouMode=DESCENDANTS&skipPaging=true&program=' + programId + '&fields=event,trackedEntityInstance,status').then(function (response) {
+            $http.get(serverRoot + 'events.json?orgUnit=' + ou + '&ouMode=DESCENDANTS&skipPaging=true&program=' + programId + '&fields=event,trackedEntityInstance,status,programStage').then(function (response) {
                 defer.resolve(response.data.events);
             }, function (response) {
                 console.log(response);

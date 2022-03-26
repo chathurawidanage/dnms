@@ -5,10 +5,6 @@ function UserService($http, $q) {
     if (manualAuth) {
         $http.defaults.headers.common['Authorization'] = 'Basic ' + btoa(authUsername + ':' + authPassword);
     }
-    const SUPER_USER = 0;
-    const MOH_USER = 3;
-    const SISTER_USER = 4;
-    const PHM_USER = 5;
     var cachedUser = undefined;
     var us = {
         //constants
@@ -16,6 +12,7 @@ function UserService($http, $q) {
         MOH_USER: 3,
         SISTER_USER: 4,
         PHM_USER: 5,
+        DEO_USER:6,
         //functions
         getCurrentUser: function () {
             var defer = $q.defer();
@@ -23,7 +20,8 @@ function UserService($http, $q) {
                 yrB6vc5Ip3r: 0,//super user
                 w4qpnx1NFyr: 3,//moh
                 uCBJBr2plYV: 4,//sister
-                to1ek38ykKC: 5//mid wife
+                to1ek38ykKC: 5,//mid wife
+                gtkJ4RBqfNS: 6 // DEO
             }
             if (!cachedUser) {
                 $http.get(serverRoot + 'me.json?fields=:all,organisationUnits[level,id,displayName,,parent[id,displayName,level],children[level,id,displayName,children[level,id,displayName,children[level,id,displayName,children[level,id,displayName]]]]&paging=false').then(function (response) {
