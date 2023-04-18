@@ -1,6 +1,7 @@
 
 var serverRoot = 'https://www.erhmis.fhb.health.gov.lk/erhmis2356/api/';
-var baseServerRoot = 'https://www.erhmis.fhb.health.gov.lk/erhmis2356/'; //edited URL for Tracker
+// var baseServerRoot = 'https://www.erhmis.fhb.health.gov.lk/erhmis2356/'; //edited URL for Tracker
+var baseServerRoot = 'https://www.erhmis.fhb.health.gov.lk/nutrition/'; //edited URL for Tracker
 // var serverRoot = 'http://localhost:8080/api/';
 // var serverRoot = '../../';
 
