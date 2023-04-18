@@ -47,6 +47,11 @@ function ProfileController($location, appService, teiService, $routeParams, toas
 
     this.user;
 
+    // this.user = {
+    //     firstName: { key: TEI_ATT_NAME, value: null },
+    //     lastName: { key: TEI_ATT_NAME, value: null },
+    // }
+
     ctrl.getAge = function () {
         if (ctrl.childProfile.dob.value) {
             var ageInmonths = (new Date().getTime() - new Date(ctrl.childProfile.dob.value).getTime()) / (1000 * 60 * 60 * 24 * 30);
@@ -567,7 +572,7 @@ function ProfileController($location, appService, teiService, $routeParams, toas
     }
 
     ctrl.openOnTrackerCapture = function () {
-        window.open(`${baseServerRoot}dhis-web-tracker-capture/index.html#/dashboard?tei=${this.tei}&program=${PROGRAM_ANTHROPOMETRY}&ou=${ctrl.teiObj.orgUnit}`, '_blank').focus();
+        window.open(`${baseServerRoot2}dhis-web-tracker-capture/index.html#/dashboard?tei=${this.tei}&program=${PROGRAM_ANTHROPOMETRY}&ou=${ctrl.teiObj.orgUnit}`, '_blank').focus();
     };
 
 

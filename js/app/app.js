@@ -1,11 +1,12 @@
 
 var serverRoot = 'https://www.erhmis.fhb.health.gov.lk/erhmis2356/api/';
-// var baseServerRoot = 'https://www.erhmis.fhb.health.gov.lk/erhmis2356/'; //edited URL for Tracker
-var baseServerRoot = 'https://www.erhmis.fhb.health.gov.lk/nutrition/'; //edited URL for Tracker
+var baseServerRoot = 'https://www.erhmis.fhb.health.gov.lk/erhmis2356/'; //edited URL for Tracker
+// var baseServerRoot2 = 'https://www.erhmis.fhb.health.gov.lk/nutrition/'; //edited URL for Tracker
+var baseServerRoot2 = '/'; //edited URL for Tracker
 // var serverRoot = 'http://localhost:8080/api/';
 // var serverRoot = '../../';
 
-var manualAuth = true;
+var manualAuth = false;
 // var authUsername = "dsd-test";
 // var authPassword = "Test234#";
 var authUsername = "dev";
