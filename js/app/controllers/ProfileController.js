@@ -567,7 +567,7 @@ function ProfileController($location, appService, teiService, $routeParams, toas
     }
 
     ctrl.openOnTrackerCapture = function () {
-        window.open(`${serverRoot}/dhis-web-tracker-capture/index.html#/dashboard?tei=${this.tei}&program=${PROGRAM_ANTHROPOMETRY}&ou=${ctrl.teiObj.orgUnit}`, '_blank').focus();
+        window.open(`${baseServerRoot}dhis-web-tracker-capture/index.html#/dashboard?tei=${this.tei}&program=${PROGRAM_ANTHROPOMETRY}&ou=${ctrl.teiObj.orgUnit}`, '_blank').focus();
     };
 
 

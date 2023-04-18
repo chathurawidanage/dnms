@@ -1,6 +1,6 @@
 {
-  "version": "2.3",
-  "name": "District Nutrition Monitoring",
+  "version": "2.3.1",
+  "name": "Growth and Nutrition Monitoring System",
   "description": "Responsive Web application for easy monitoring of district nutrition problems",
   "icons": {
     "16": "/img/icons/16.png",
